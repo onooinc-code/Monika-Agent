@@ -1,6 +1,5 @@
-
 import { useState } from 'react';
-import { PipelineStep, Message, ContextMenuItem } from '../../types/index.ts';
+import { PipelineStep, Message, ContextMenuItem, Agent, AgentManager } from '../../types/index.ts';
 
 export interface ActionModalButton {
     label: string;
@@ -43,6 +42,8 @@ export const useModalManager = () => {
     const [isApiUsageOpen, setIsApiUsageOpen] = useState(false);
     const [isArchiveOpen, setIsArchiveOpen] = useState(false);
     const [isBookmarksPanelOpen, setIsBookmarksPanelOpen] = useState(false);
+    const [isAgentSettingsModalOpen, setIsAgentSettingsModalOpen] = useState(false);
+    const [selectedAgentForModal, setSelectedAgentForModal] = useState<Agent | AgentManager | null>(null);
     const [contextMenuState, setContextMenuState] = useState<ContextMenuState>({
         isOpen: false,
         x: 0,
@@ -92,6 +93,16 @@ export const useModalManager = () => {
         setIsPromptInspectorOpen(false);
         setPromptInspectorData(null);
     };
+
+    const openAgentSettingsModal = (agent: Agent | AgentManager) => {
+        setSelectedAgentForModal(agent);
+        setIsAgentSettingsModalOpen(true);
+    };
+
+    const closeAgentSettingsModal = () => {
+        setIsAgentSettingsModalOpen(false);
+        setSelectedAgentForModal(null);
+    };
     
     const openContextMenu = (x: number, y: number, menuItems: ContextMenuItem[]) => {
         setContextMenuState({ isOpen: true, x, y, menuItems });
@@ -117,6 +128,10 @@ export const useModalManager = () => {
         isApiUsageOpen, setIsApiUsageOpen,
         isArchiveOpen, setIsArchiveOpen,
         isBookmarksPanelOpen, setIsBookmarksPanelOpen,
+        isAgentSettingsModalOpen,
+        selectedAgentForModal,
+        openAgentSettingsModal,
+        closeAgentSettingsModal,
         contextMenuState, openContextMenu, closeContextMenu,
     };
 };

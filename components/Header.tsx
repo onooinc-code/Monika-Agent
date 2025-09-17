@@ -1,8 +1,7 @@
-
 import React from 'react';
-import { Agent } from '../types/index.ts';
+import { Agent, AgentManager } from '../types/index.ts';
 import { useAppContext } from '../contexts/StateProvider.tsx';
-import { MenuIcon, SettingsIcon, UsersIcon, CloudIcon, PowerIcon } from './Icons.tsx';
+import { MenuIcon, SettingsIcon, UsersIcon, CloudIcon, PowerIcon, InformationCircleIcon, CpuIcon } from './Icons.tsx';
 import { safeRender } from '../services/utils/safeRender.ts';
 
 // --- SHARED COMPONENTS ---
@@ -28,7 +27,7 @@ const getTodayDateString = (): string => {
 };
 
 const AgentCard: React.FC<{ agent: Agent }> = ({ agent }) => {
-    const { usageMetrics, lastTurnAgentIds, handleToggleAgentEnabled } = useAppContext();
+    const { usageMetrics, lastTurnAgentIds, handleToggleAgentEnabled, openAgentSettingsModal } = useAppContext();
     const todayStr = getTodayDateString();
     
     const stats = usageMetrics.agentUsage[agent.id] || { totalMessages: 0, dailyUsage: [] };
@@ -47,6 +46,9 @@ const AgentCard: React.FC<{ agent: Agent }> = ({ agent }) => {
         <div className="flex-1 min-w-[150px] glass-pane rounded-lg flex flex-col transition-all duration-300 transform hover:-translate-y-1 hover:shadow-lg hover:shadow-indigo-500/20">
             <div className={`flex items-center justify-between p-2 border-b-2 ${borderColorClass}`}>
                 <h3 className="font-bold text-sm text-white truncate">{safeRender(agent.name)}</h3>
+                <button onClick={() => openAgentSettingsModal(agent)} className="p-1 rounded-full text-gray-400 hover:bg-white/20 hover:text-white transition-colors" title={`View details for ${safeRender(agent.name)}`}>
+                    <InformationCircleIcon className="w-4 h-4" />
+                </button>
             </div>
             <div className="flex-1 p-2 flex items-center justify-around text-center">
                 <div className="flex-1 flex flex-col items-center justify-center" title={isEnabled ? 'Click to Disable Agent' : 'Click to Enable Agent'}>
@@ -70,9 +72,39 @@ const AgentCard: React.FC<{ agent: Agent }> = ({ agent }) => {
     );
 };
 
+const ManagerCard: React.FC<{ manager: AgentManager }> = ({ manager }) => {
+    const { usageMetrics, openAgentSettingsModal } = useAppContext();
+    const stats = usageMetrics.agentUsage['manager'] || { totalMessages: 0 };
+    
+    const formatStat = (num: number) => {
+        if (num > 1000) return `${(num / 1000).toFixed(1)}k`;
+        return String(num);
+    };
+
+    return (
+        <div className="flex-1 min-w-[150px] glass-pane rounded-lg flex flex-col transition-all duration-300 transform hover:-translate-y-1 hover:shadow-lg hover:shadow-yellow-500/20">
+            <div className="flex items-center justify-between p-2 border-b-2 border-yellow-500">
+                <h3 className="font-bold text-sm text-white truncate">Agent Manager</h3>
+                <button onClick={() => openAgentSettingsModal(manager)} className="p-1 rounded-full text-gray-400 hover:bg-white/20 hover:text-white transition-colors" title="View details for Agent Manager">
+                    <InformationCircleIcon className="w-4 h-4" />
+                </button>
+            </div>
+            <div className="flex-1 p-2 flex items-center justify-around text-center">
+                <div className="flex-1 flex flex-col items-center justify-center text-yellow-400">
+                    <CpuIcon className="w-6 h-6" />
+                </div>
+                <div className="flex-1 flex flex-col items-center justify-center" title="Total decisions made">
+                     <p className="font-mono font-bold text-sm text-white">{formatStat(stats.totalMessages)}</p>
+                     <p className="text-xs text-white">Decisions</p>
+                </div>
+            </div>
+        </div>
+    );
+};
+
 // Main Header component is now the Dashboard Header
 export const Header: React.FC<{ isSidebarOpen: boolean, toggleSidebar: () => void }> = ({ toggleSidebar }) => {
-    const { agents, setIsSettingsOpen, setIsTeamGeneratorOpen, setIsApiUsageOpen } = useAppContext();
+    const { agents, agentManager, setIsSettingsOpen, setIsTeamGeneratorOpen, setIsApiUsageOpen } = useAppContext();
     return (
         <header 
             className="sticky top-0 p-2 flex justify-between items-center md:items-stretch gap-2 flex-shrink-0 z-30 border-b border-white/10 shadow-lg"
@@ -82,13 +114,13 @@ export const Header: React.FC<{ isSidebarOpen: boolean, toggleSidebar: () => voi
                 animation: 'animated-gradient-bg 15s ease infinite'
             }}
         >
-            <div className="flex-shrink-0 md:w-[30%] flex items-center gap-2">
+            <div className="flex-shrink-0 md:w-[25%] flex items-center gap-2">
                 <button onClick={toggleSidebar} className="p-2 rounded-full hover:bg-white/10 transition-colors" aria-label="Toggle Sidebar" title="Toggle conversation list">
                     <MenuIcon className="w-6 h-6" />
                 </button>
             </div>
 
-            <div className="flex-1 md:w-[40%] flex flex-col">
+            <div className="flex-1 md:w-[50%] flex flex-col">
                  <div className="flex items-center justify-center md:h-[40%]">
                     <h1 
                         className="text-2xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-indigo-400 via-cyan-400 to-indigo-400"
@@ -99,10 +131,11 @@ export const Header: React.FC<{ isSidebarOpen: boolean, toggleSidebar: () => voi
                 </div>
                 <div className="hidden md:flex flex-1 items-center justify-center gap-2">
                     {agents.map(agent => <AgentCard key={agent.id} agent={agent} />)}
+                    <ManagerCard manager={agentManager} />
                 </div>
             </div>
 
-            <div className="flex-shrink-0 md:w-[30%] flex items-end justify-end">
+            <div className="flex-shrink-0 md:w-[25%] flex items-end justify-end">
                 <div className="hidden md:flex items-center gap-1 text-xs">
                     <HeaderButton onClick={() => setIsTeamGeneratorOpen(true)} title="Generate Team" aria-label="Open Team Generator"><UsersIcon className="w-5 h-5"/></HeaderButton>
                     <HeaderButton onClick={() => setIsApiUsageOpen(true)} title="API Usage" aria-label="Open API Usage"><CloudIcon className="w-5 h-5"/></HeaderButton>

@@ -23,6 +23,7 @@ import { ContextMenu } from './components/ContextMenu.tsx';
 import { ConversationSubHeader } from './components/ConversationSubHeader.tsx';
 import { ContextMenuItem } from './types/index.ts';
 import { PlusIcon, SettingsIcon, AlignLeftIcon } from './components/Icons.tsx';
+import { AgentSettingsModal } from './components/AgentSettingsModal.tsx';
 
 export default function App() {
   const { 
@@ -176,6 +177,7 @@ export default function App() {
         <ApiUsageModal />
         <MessageArchiveModal />
         <ContextMenu />
+        <AgentSettingsModal />
     </div>
   );
 }

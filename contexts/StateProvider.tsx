@@ -1,4 +1,3 @@
-
 import React, { createContext, useContext, useRef, useCallback, useState } from 'react';
 import { Agent, AgentManager, ConversationMode, Attachment, ManualSuggestion, HistoryView, Conversation, PipelineStep, UsageMetrics, Message, LongTermMemoryData, BubbleSettings, ContextMenuItem } from '../types/index.ts';
 import { useLocalStorage } from '../hooks/useLocalStorage.ts';
@@ -138,6 +137,12 @@ interface AppState {
     contextMenuState: ContextMenuState;
     openContextMenu: (x: number, y: number, items: ContextMenuItem[]) => void;
     closeContextMenu: () => void;
+
+    // Agent Settings Modal
+    isAgentSettingsModalOpen: boolean;
+    selectedAgentForModal: Agent | AgentManager | null;
+    openAgentSettingsModal: (agent: Agent | AgentManager) => void;
+    closeAgentSettingsModal: () => void;
 }
 
 const AppContext = createContext<AppState | undefined>(undefined);
@@ -351,6 +356,12 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
         contextMenuState: modalManager.contextMenuState,
         openContextMenu: modalManager.openContextMenu,
         closeContextMenu: modalManager.closeContextMenu,
+
+        // Agent Settings Modal
+        isAgentSettingsModalOpen: modalManager.isAgentSettingsModalOpen,
+        selectedAgentForModal: modalManager.selectedAgentForModal,
+        openAgentSettingsModal: modalManager.openAgentSettingsModal,
+        closeAgentSettingsModal: modalManager.closeAgentSettingsModal,
     };
 
     return (
