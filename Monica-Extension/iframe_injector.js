@@ -20,15 +20,17 @@
     // 1. Capture console.error
     const originalConsoleError = console.error;
     console.error = function(...args) {
-        // Format the arguments into a single string
+        // Improved argument handling for better error details.
         const errorString = args.map(arg => {
             if (arg instanceof Error) {
                 return arg.stack || arg.message;
             }
             if (typeof arg === 'object' && arg !== null) {
                 try {
-                    return JSON.stringify(arg);
+                    // Use 2-space indentation for readability.
+                    return JSON.stringify(arg, null, 2);
                 } catch (e) {
+                    // Handle circular references or other stringify errors.
                     return '[Unserializable Object]';
                 }
             }

@@ -13,9 +13,15 @@
   "content_scripts": [
     {
       "matches": [
-        "https://aistudio.google.com/app/apps/drive/*"
+        "https://aistudio.google.com/*"
       ],
       "js": [
+        "modules/state.js",
+        "modules/utils.js",
+        "modules/ui.js",
+        "modules/commands.js",
+        "modules/parser.js",
+        "modules/session.js",
         "content_script.js"
       ]
     }
