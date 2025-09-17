@@ -1,0 +1,35 @@
+{
+  "manifest_version": 3,
+  "name": "Monica AI Interactive Bridge",
+  "version": "2.1",
+  "description": "Enables advanced automation, state persistence, and environmental awareness for AI development within Google AI Studio.",
+  "permissions": [
+    "storage",
+    "scripting"
+  ],
+  "background": {
+    "service_worker": "background.js"
+  },
+  "content_scripts": [
+    {
+      "matches": [
+        "https://aistudio.google.com/app/apps/drive/*"
+      ],
+      "js": [
+        "content_script.js"
+      ]
+    }
+  ],
+  "web_accessible_resources": [
+    {
+      "resources": [
+        "iframe_injector.js",
+        "style.css",
+        "bootstrap_prompt.txt"
+      ],
+      "matches": [
+        "https://aistudio.google.com/*"
+      ]
+    }
+  ]
+}

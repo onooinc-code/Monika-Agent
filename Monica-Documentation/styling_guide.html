@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Monica - Styling Guide</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.tailwindcss.com?plugins=typography"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto+Mono:wght@400;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="./shared.css">
+</head>
+<body class="p-4 sm:p-6 lg:p-8">
+
+    <header class="docs-header max-w-screen-xl mx-auto glass-pane rounded-xl p-3 px-4 flex justify-between items-center">
+        <h1 class="header-title text-xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-indigo-400 via-cyan-400 to-indigo-400">
+            <a href="./index.html">Monica Docs</a>
+        </h1>
+        <div class="header-buttons flex items-center gap-1">
+            <button id="zoom-out-btn" title="Zoom Out" class="p-2 rounded-lg hover:bg-white/10 transition-colors"><i data-lucide="zoom-out"></i></button>
+            <button id="zoom-in-btn" title="Zoom In" class="p-2 rounded-lg hover:bg-white/10 transition-colors"><i data-lucide="zoom-in"></i></button>
+            <button id="text-dec-btn" title="Decrease Text Size" class="p-2 rounded-lg hover:bg-white/10 transition-colors"><i data-lucide="minus"></i></button>
+            <button id="text-inc-btn" title="Increase Text Size" class="p-2 rounded-lg hover:bg-white/10 transition-colors"><i data-lucide="plus"></i></button>
+            <button id="scroll-top-btn" title="Scroll to Top" class="p-2 rounded-lg hover:bg-white/10 transition-colors"><i data-lucide="arrow-up"></i></button>
+            <button id="scroll-bottom-btn" title="Scroll to Bottom" class="p-2 rounded-lg hover:bg-white/10 transition-colors"><i data-lucide="arrow-down"></i></button>
+            <button id="nav-toggle-btn" title="Navigation" class="p-2 rounded-lg hover:bg-white/10 transition-colors"><i data-lucide="menu"></i></button>
+        </div>
+    </header>
+
+    <main class="docs-main max-w-screen-xl mx-auto glass-pane rounded-xl p-8 animate-fade-in-up" style="animation-delay: 0.2s;">
+        <div class="prose prose-docs max-w-none">
+            <h1>Styling Guide</h1>
+            <p class="lead">Monica's visual identity is built on a "Future World" aesthetic, combining dark mode, glassmorphism, and neon highlights to create a modern, immersive user experience. This guide outlines the core principles and tools used to achieve this look.</p>
+
+            <h3>Core Technologies</h3>
+            <ul>
+                <li><strong>Tailwind CSS:</strong> A utility-first CSS framework is used for all styling, enabling rapid development and a consistent design system.</li>
+                <li><strong>Custom CSS:</strong> The shared <code>shared.css</code> file defines CSS variables, animations, and other custom styles that are not easily achievable with Tailwind utilities alone.</li>
+            </ul>
+
+            <h3>Aesthetic Principles</h3>
+            <ul>
+                <li><strong>Glassmorphism:</strong> Key UI panels use a blurred, semi-transparent background (<code>glass-pane</code> class) to create a sense of depth and context.</li>
+                <li><strong>Neon Glows:</strong> Interactive elements use a subtle neon box-shadow to draw attention and provide a futuristic feel.</li>
+                <li><strong>Dark Mode First:</strong> The entire interface is designed with a dark background to reduce eye strain and enhance the neon highlights.</li>
+                <li><strong>Micro-interactions & Animations:</strong> All interactive elements have smooth transitions. New content often appears with a subtle fade-and-slide-in effect.</li>
+            </ul>
+
+            <h3>Key CSS Variables</h3>
+            <p>Colors, fonts, and other core design tokens are defined as CSS variables for easy theming and consistency.</p>
+            <pre><code>:root {
+  --font-sans: 'Inter', sans-serif;
+  --color-bg: #0a0a0f;
+  --color-pane: rgba(23, 26, 43, 0.7);
+  --color-border: rgba(129, 140, 248, 0.2);
+  --color-neon-indigo: rgba(129, 140, 248, 1);
+}</code></pre>
+
+            <h3>Animations</h3>
+            <p>Custom keyframe animations are defined globally to be reused across the application.</p>
+            <ul>
+                <li><strong><code>fadeInUp</code>:</strong> Used for modals and new messages to have them slide and fade into view.</li>
+                <li><strong><code>animated-gradient-text / -bg</code>:</strong> Creates a shimmering, moving gradient effect used in headers.</li>
+            </ul>
+        </div>
+    </main>
+    
+    <div id="nav-modal-overlay"></div>
+    <div id="nav-modal" class="w-full max-w-md glass-pane rounded-xl">
+        <div class="p-4 border-b border-white/10 flex justify-between items-center">
+            <h2 class="text-lg font-semibold text-white">Navigation</h2>
+            <button id="nav-modal-close-btn" title="Close" class="p-2 rounded-lg hover:bg-white/10 transition-colors"><i data-lucide="x"></i></button>
+        </div>
+        <nav class="p-4">
+             <ul class="space-y-2">
+                <li><a href="./index.html" class="nav-link block p-3 rounded-lg border-l-4 border-transparent transition-all hover:bg-white/10">Home</a></li>
+                <li><a href="./README.html" class="nav-link block p-3 rounded-lg border-l-4 border-transparent transition-all hover:bg-white/10">Project Overview</a></li>
+                <li><a href="./architecture.html" class="nav-link block p-3 rounded-lg border-l-4 border-transparent transition-all hover:bg-white/10">Architecture Guide</a></li>
+                <li><a href="./development_cycle.html" class="nav-link block p-3 rounded-lg border-l-4 border-transparent transition-all hover:bg-white/10">Development Cycle</a></li>
+                <li><a href="./state_management.html" class="nav-link block p-3 rounded-lg border-l-4 border-transparent transition-all hover:bg-white/10">State Management</a></li>
+                <li><a href="./services.html" class="nav-link block p-3 rounded-lg border-l-4 border-transparent transition-all hover:bg-white/10">Services & API</a></li>
+                <li><a href="./components.html" class="nav-link block p-3 rounded-lg border-l-4 border-transparent transition-all hover:bg-white/10">Component Library</a></li>
+                <li><a href="./styling_guide.html" class="nav-link block p-3 rounded-lg border-l-4 border-transparent transition-all hover:bg-white/10">Styling Guide</a></li>
+                <li><a href="./database_migration_plan.html" class="nav-link block p-3 rounded-lg border-l-4 border-transparent transition-all hover:bg-white/10">Database Migration</a></li>
+                <li><a href="./future_features_with_backend.html" class="nav-link block p-3 rounded-lg border-l-4 border-transparent transition-all hover:bg-white/10">Future Vision</a></li>
+                <li><a href="./document_generator.html" class="nav-link block p-3 rounded-lg border-l-4 border-transparent transition-all hover:bg-white/10">AI Doc Generator</a></li>
+            </ul>
+        </nav>
+    </div>
+
+    <script>lucide.createIcons();</script>
+    <script src="./shared.js"></script>
+</body>
+</html>

@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Monica - Services & API Layer</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.tailwindcss.com?plugins=typography"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto+Mono:wght@400;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="./shared.css">
+</head>
+<body class="p-4 sm:p-6 lg:p-8">
+
+    <header class="docs-header max-w-screen-xl mx-auto glass-pane rounded-xl p-3 px-4 flex justify-between items-center">
+        <h1 class="header-title text-xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-indigo-400 via-cyan-400 to-indigo-400">
+            <a href="./index.html">Monica Docs</a>
+        </h1>
+        <div class="header-buttons flex items-center gap-1">
+            <button id="zoom-out-btn" title="Zoom Out" class="p-2 rounded-lg hover:bg-white/10 transition-colors"><i data-lucide="zoom-out"></i></button>
+            <button id="zoom-in-btn" title="Zoom In" class="p-2 rounded-lg hover:bg-white/10 transition-colors"><i data-lucide="zoom-in"></i></button>
+            <button id="text-dec-btn" title="Decrease Text Size" class="p-2 rounded-lg hover:bg-white/10 transition-colors"><i data-lucide="minus"></i></button>
+            <button id="text-inc-btn" title="Increase Text Size" class="p-2 rounded-lg hover:bg-white/10 transition-colors"><i data-lucide="plus"></i></button>
+            <button id="scroll-top-btn" title="Scroll to Top" class="p-2 rounded-lg hover:bg-white/10 transition-colors"><i data-lucide="arrow-up"></i></button>
+            <button id="scroll-bottom-btn" title="Scroll to Bottom" class="p-2 rounded-lg hover:bg-white/10 transition-colors"><i data-lucide="arrow-down"></i></button>
+            <button id="nav-toggle-btn" title="Navigation" class="p-2 rounded-lg hover:bg-white/10 transition-colors"><i data-lucide="menu"></i></button>
+        </div>
+    </header>
+
+    <main class="docs-main max-w-screen-xl mx-auto glass-pane rounded-xl p-8 animate-fade-in-up" style="animation-delay: 0.2s;">
+        <div class="prose prose-docs max-w-none">
+            <h1>Services & API Layer</h1>
+            <p class="lead">The service layer is responsible for all external communication, primarily with the Google Gemini API. These services are stateless, pure functions that handle prompt construction, API calls, and robust error handling.</p>
+
+            <h3>Core Gemini Client (<code>gemini/client.ts</code>)</h3>
+            <p>A crucial utility that creates and caches Gemini API client instances based on the API key, preventing redundant initializations and improving performance.</p>
+
+            <h3>Chat Services (<code>services/chat/</code>)</h3>
+            <p>Manages the direct flow of conversation.</p>
+            <ul>
+                <li><strong><code>agentService.ts</code>:</strong> Generates a response from a single AI agent, handling streaming, knowledge/memory injection, and prompt assembly.</li>
+                <li><strong><code>managerService.ts</code>:</strong> Contains all logic for the AI Agent Manager, including deciding speakers, generating plans, and moderating discussions.</li>
+                <li><strong><code>messageActionsService.ts</code>:</strong> Handles AI-powered actions on existing messages, like summarizing or rewriting.</li>
+            </ul>
+
+            <h3>Analysis Services (<code>services/analysis/</code>)</h3>
+            <p>Analyzes conversation content to extract metadata or insights.</p>
+             <ul>
+                <li><strong><code>historyService.ts</code>:</strong> Generates content for the History Modal, including summaries and topic lists.</li>
+                <li><strong><code>memoryService.ts</code>:</strong> Extracts key facts from a conversation for the AI's long-term memory.</li>
+                <li><strong><code>titleService.ts</code>:</strong> Generates a concise title for a conversation.</li>
+            </ul>
+
+            <h3>Creation Services (<code>services/creation/</code>)</h3>
+            <p>Uses AI to generate new configuration or content.</p>
+             <ul>
+                <li><strong><code>discussionService.ts</code>:</strong> Generates rules for a moderated discussion based on agent profiles.</li>
+                <li><strong><code>teamGenerationService.ts</code>:</strong> A multi-step service that generates a team of specialized AI agents from a high-level goal.</li>
+            </ul>
+        </div>
+    </main>
+    
+    <div id="nav-modal-overlay"></div>
+    <div id="nav-modal" class="w-full max-w-md glass-pane rounded-xl">
+        <div class="p-4 border-b border-white/10 flex justify-between items-center">
+            <h2 class="text-lg font-semibold text-white">Navigation</h2>
+            <button id="nav-modal-close-btn" title="Close" class="p-2 rounded-lg hover:bg-white/10 transition-colors"><i data-lucide="x"></i></button>
+        </div>
+        <nav class="p-4">
+             <ul class="space-y-2">
+                <li><a href="./index.html" class="nav-link block p-3 rounded-lg border-l-4 border-transparent transition-all hover:bg-white/10">Home</a></li>
+                <li><a href="./README.html" class="nav-link block p-3 rounded-lg border-l-4 border-transparent transition-all hover:bg-white/10">Project Overview</a></li>
+                <li><a href="./architecture.html" class="nav-link block p-3 rounded-lg border-l-4 border-transparent transition-all hover:bg-white/10">Architecture Guide</a></li>
+                <li><a href="./development_cycle.html" class="nav-link block p-3 rounded-lg border-l-4 border-transparent transition-all hover:bg-white/10">Development Cycle</a></li>
+                <li><a href="./state_management.html" class="nav-link block p-3 rounded-lg border-l-4 border-transparent transition-all hover:bg-white/10">State Management</a></li>
+                <li><a href="./services.html" class="nav-link block p-3 rounded-lg border-l-4 border-transparent transition-all hover:bg-white/10">Services & API</a></li>
+                <li><a href="./components.html" class="nav-link block p-3 rounded-lg border-l-4 border-transparent transition-all hover:bg-white/10">Component Library</a></li>
+                <li><a href="./styling_guide.html" class="nav-link block p-3 rounded-lg border-l-4 border-transparent transition-all hover:bg-white/10">Styling Guide</a></li>
+                <li><a href="./database_migration_plan.html" class="nav-link block p-3 rounded-lg border-l-4 border-transparent transition-all hover:bg-white/10">Database Migration</a></li>
+                <li><a href="./future_features_with_backend.html" class="nav-link block p-3 rounded-lg border-l-4 border-transparent transition-all hover:bg-white/10">Future Vision</a></li>
+                <li><a href="./document_generator.html" class="nav-link block p-3 rounded-lg border-l-4 border-transparent transition-all hover:bg-white/10">AI Doc Generator</a></li>
+            </ul>
+        </nav>
+    </div>
+
+    <script>lucide.createIcons();</script>
+    <script src="./shared.js"></script>
+</body>
+</html>

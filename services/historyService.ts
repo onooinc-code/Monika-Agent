@@ -1,0 +1,88 @@
+// FIX: Updated to use the new Gemini client factory.
+import { getGenAIClient } from './gemini/client.ts';
+// FIX: Corrected import path for types.
+import { Message, AgentManager } from '../types/index.ts';
+import { Type } from "@google/genai";
+// FIX: Replaced local buildContext with a shared utility.
+import { buildContext } from './utils/contextBuilder.ts';
+import { handleAndThrowError } from './utils/errorHandler.ts';
+
+export const summarizeMessageChunk = async (messages: Message[], manager: AgentManager, globalApiKey: string): Promise<string> => {
+    const context = buildContext(messages);
+    const prompt = `Summarize the following part of a conversation in a single, concise sentence:\n\n${context}`;
+    try {
+        const apiKey = manager.apiKey || globalApiKey;
+         if (!apiKey) {
+            return "Could not summarize: API Key is not configured.";
+        }
+        const ai = getGenAIClient(apiKey);
+        const response = await ai.models.generateContent({
+            model: manager.model,
+            contents: prompt,
+            config: {
+                systemInstruction: "You are a summarization assistant.",
+            }
+        });
+        return response.text;
+    } catch (error) {
+        console.error("Error summarizing chunk:", error);
+        // For chunks, we prefer to return a soft error message rather than failing the whole history view.
+        return "Could not summarize this section due to an API error.";
+    }
+};
+
+export const generateOverallSummaryAndTopics = async (messages: Message[], manager: AgentManager, globalApiKey: string): Promise<{ overallSummary: string, topics: string[] }> => {
+    const context = buildContext(messages);
+    const prompt = `Analyze the following conversation and provide an overall summary and a list of the main topics discussed.\n\n${context}`;
+    try {
+        const apiKey = manager.apiKey || globalApiKey;
+        if (!apiKey) {
+            throw new Error("API Key not configured for the Agent Manager. Please set it in the settings.");
+        }
+        const ai = getGenAIClient(apiKey);
+
+        const response = await ai.models.generateContent({
+            model: manager.model,
+            contents: prompt,
+            config: {
+                systemInstruction: "You are a summarization assistant. Your response must be a valid JSON object.",
+                responseMimeType: "application/json",
+                responseSchema: {
+                    type: Type.OBJECT,
+                    properties: {
+                        overallSummary: { type: Type.STRING },
+                        topics: {
+                            type: Type.ARRAY,
+                            items: { type: Type.STRING }
+                        }
+                    }
+                }
+            }
+        });
+        
+        let json;
+        try {
+            json = JSON.parse(response.text);
+        } catch (e) {
+            console.error('Failed to parse summary JSON:', response.text, e);
+            // Throw a structured error if parsing fails
+            handleAndThrowError(e, 'generateOverallSummaryAndTopics', prompt, response.text);
+        }
+        
+        // Add robust validation to ensure the AI's response matches the expected schema
+        const overallSummary = typeof json.overallSummary === 'string' ? json.overallSummary : "No summary available.";
+        const topics = Array.isArray(json.topics) && json.topics.every(t => typeof t === 'string') ? json.topics : [];
+
+        if (!Array.isArray(json.topics) || !json.topics.every(t => typeof t === 'string')) {
+            console.warn("AI returned malformed topics array:", json.topics);
+        }
+
+        return { overallSummary, topics };
+    } catch (error) {
+        // Re-throw structured error for the UI to handle
+        if (error instanceof Error && !(error as any).context) {
+             handleAndThrowError(error, 'generateOverallSummaryAndTopics', prompt);
+        }
+        throw error;
+    }
+};

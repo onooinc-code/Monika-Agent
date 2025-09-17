@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Monica - Development Cycle</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.tailwindcss.com?plugins=typography"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto+Mono:wght@400;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="./shared.css">
+</head>
+<body class="p-4 sm:p-6 lg:p-8">
+
+    <header class="docs-header max-w-screen-xl mx-auto glass-pane rounded-xl p-3 px-4 flex justify-between items-center">
+        <h1 class="header-title text-xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-indigo-400 via-cyan-400 to-indigo-400">
+            <a href="./index.html">Monica Docs</a>
+        </h1>
+        <div class="header-buttons flex items-center gap-1">
+            <button id="zoom-out-btn" title="Zoom Out" class="p-2 rounded-lg hover:bg-white/10 transition-colors"><i data-lucide="zoom-out"></i></button>
+            <button id="zoom-in-btn" title="Zoom In" class="p-2 rounded-lg hover:bg-white/10 transition-colors"><i data-lucide="zoom-in"></i></button>
+            <button id="text-dec-btn" title="Decrease Text Size" class="p-2 rounded-lg hover:bg-white/10 transition-colors"><i data-lucide="minus"></i></button>
+            <button id="text-inc-btn" title="Increase Text Size" class="p-2 rounded-lg hover:bg-white/10 transition-colors"><i data-lucide="plus"></i></button>
+            <button id="scroll-top-btn" title="Scroll to Top" class="p-2 rounded-lg hover:bg-white/10 transition-colors"><i data-lucide="arrow-up"></i></button>
+            <button id="scroll-bottom-btn" title="Scroll to Bottom" class="p-2 rounded-lg hover:bg-white/10 transition-colors"><i data-lucide="arrow-down"></i></button>
+            <button id="nav-toggle-btn" title="Navigation" class="p-2 rounded-lg hover:bg-white/10 transition-colors"><i data-lucide="menu"></i></button>
+        </div>
+    </header>
+
+    <main class="docs-main max-w-screen-xl mx-auto glass-pane rounded-xl p-8 animate-fade-in-up" style="animation-delay: 0.2s;">
+        <div class="prose prose-docs max-w-none">
+            <h1>The Development Cycle</h1>
+            <p class="lead">Our feature-driven development process ensures clarity, quality, and traceability. The entire lifecycle, from idea to production, is designed to be systematic and is followed by both human and AI developers.</p>
+            
+            <h3>The Six Phases of Development</h3>
+            <p>Each new feature or significant change goes through a structured, six-phase lifecycle.</p>
+            
+            <div class="space-y-6">
+                <div class="glass-pane -m-4 p-4 rounded-lg border-l-4 border-cyan-500">
+                    <h4>Phase 1: Idea & Feature Definition</h4>
+                    <p>A new feature begins its life as a formal specification document. This document clearly outlines the feature's objectives and core functionalities, serving as the single source of truth for the entire development team.</p>
+                    <ul>
+                        <li><strong>Artifact:</strong> A <code>.txt</code> file (e.g., <code>15-streaming-responses.txt</code>).</li>
+                        <li><strong>Location:</strong> Initially created in <code>Monica-Documentation/features/Remaining/</code>.</li>
+                    </ul>
+                </div>
+                <div class="glass-pane -m-4 p-4 rounded-lg border-l-4 border-cyan-500">
+                    <h4>Phase 2: Planning</h4>
+                    <p>Before any code is written, a detailed implementation plan is formulated. This crucial step involves architectural decisions, such as identifying which files will be created or modified, defining new functions and components, and outlining the state management strategy. This prevents costly rework and ensures the new feature integrates cleanly with the existing architecture.</p>
+                </div>
+                 <div class="glass-pane -m-4 p-4 rounded-lg border-l-4 border-cyan-500">
+                    <h4>Phase 3: Implementation</h4>
+                    <p>The developer (human or AI) executes the plan, writing clean, efficient, and well-documented code that fulfills the requirements laid out in the feature definition. All code must adhere to the project's established coding standards.</p>
+                </div>
+                 <div class="glass-pane -m-4 p-4 rounded-lg border-l-4 border-cyan-500">
+                    <h4>Phase 4: Testing</h4>
+                    <p>Quality is paramount. A comprehensive QA test plan is generated, covering all aspects of the new feature. This plan includes static code analysis, risk assessment, unit/integration test scenarios (written in Gherkin syntax for clarity), and a step-by-step manual E2E test plan.</p>
+                     <ul>
+                        <li><strong>Artifact:</strong> A <code>.md</code> test plan (e.g., <code>15-streaming-responses.md</code>).</li>
+                        <li><strong>Location:</strong> Created in <code>Monica-Documentation/testing/</code>.</li>
+                    </ul>
+                </div>
+                <div class="glass-pane -m-4 p-4 rounded-lg border-l-4 border-cyan-500">
+                    <h4>Phase 5: Completion & Documentation</h4>
+                    <p>Upon successful implementation and testing, the feature is considered complete. The original feature definition file is moved from the <code>Remaining</code> to the <code>Completed</code> directory, creating a clear and auditable record of progress. Any relevant architectural or user-facing documentation is updated at this stage.</p>
+                </div>
+                <div class="glass-pane -m-4 p-4 rounded-lg border-l-4 border-cyan-500">
+                    <h4>Phase 6: Production</h4>
+                    <p>The feature is merged into the main branch and deployed to production, making it available to users. The cycle then repeats for the next feature in the backlog.</p>
+                </div>
+            </div>
+        </div>
+    </main>
+    
+    <div id="nav-modal-overlay"></div>
+    <div id="nav-modal" class="w-full max-w-md glass-pane rounded-xl">
+        <div class="p-4 border-b border-white/10 flex justify-between items-center">
+            <h2 class="text-lg font-semibold text-white">Navigation</h2>
+            <button id="nav-modal-close-btn" title="Close" class="p-2 rounded-lg hover:bg-white/10 transition-colors"><i data-lucide="x"></i></button>
+        </div>
+        <nav class="p-4">
+             <ul class="space-y-2">
+                <li><a href="./index.html" class="nav-link block p-3 rounded-lg border-l-4 border-transparent transition-all hover:bg-white/10">Home</a></li>
+                <li><a href="./README.html" class="nav-link block p-3 rounded-lg border-l-4 border-transparent transition-all hover:bg-white/10">Project Overview</a></li>
+                <li><a href="./architecture.html" class="nav-link block p-3 rounded-lg border-l-4 border-transparent transition-all hover:bg-white/10">Architecture Guide</a></li>
+                <li><a href="./development_cycle.html" class="nav-link block p-3 rounded-lg border-l-4 border-transparent transition-all hover:bg-white/10">Development Cycle</a></li>
+                <li><a href="./state_management.html" class="nav-link block p-3 rounded-lg border-l-4 border-transparent transition-all hover:bg-white/10">State Management</a></li>
+                <li><a href="./services.html" class="nav-link block p-3 rounded-lg border-l-4 border-transparent transition-all hover:bg-white/10">Services & API</a></li>
+                <li><a href="./components.html" class="nav-link block p-3 rounded-lg border-l-4 border-transparent transition-all hover:bg-white/10">Component Library</a></li>
+                <li><a href="./styling_guide.html" class="nav-link block p-3 rounded-lg border-l-4 border-transparent transition-all hover:bg-white/10">Styling Guide</a></li>
+                <li><a href="./database_migration_plan.html" class="nav-link block p-3 rounded-lg border-l-4 border-transparent transition-all hover:bg-white/10">Database Migration</a></li>
+                <li><a href="./future_features_with_backend.html" class="nav-link block p-3 rounded-lg border-l-4 border-transparent transition-all hover:bg-white/10">Future Vision</a></li>
+                <li><a href="./document_generator.html" class="nav-link block p-3 rounded-lg border-l-4 border-transparent transition-all hover:bg-white/10">AI Doc Generator</a></li>
+            </ul>
+        </nav>
+    </div>
+
+    <script>lucide.createIcons();</script>
+    <script src="./shared.js"></script>
+</body>
+</html>
