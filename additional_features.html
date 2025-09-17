@@ -1,0 +1,172 @@
+
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ميزات إضافية للمساعد الذكي المتقدم</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        :root {
+            --font-sans: 'Inter', sans-serif;
+            --color-bg: #0a0a0f;
+            --color-pane: rgba(23, 26, 43, 0.7);
+            --color-border: rgba(129, 140, 248, 0.2);
+            --color-neon-indigo: rgba(129, 140, 248, 1);
+            --color-neon-cyan: rgba(34, 211, 238, 1);
+        }
+        body {
+            font-family: var(--font-sans), system-ui, sans-serif;
+            background-color: var(--color-bg);
+            color: #e5e7eb;
+            font-size: 17px;
+            line-height: 1.8;
+        }
+        .glass-pane {
+            background-color: var(--color-pane);
+            backdrop-filter: blur(16px) saturate(180%);
+            -webkit-backdrop-filter: blur(16px) saturate(180%);
+            border: 1px solid var(--color-border);
+        }
+        details > summary {
+            cursor: pointer;
+            padding: 1rem 1.5rem;
+            border-radius: 0.75rem;
+            background-color: rgba(129, 140, 248, 0.1);
+            transition: background-color 0.2s ease;
+            font-weight: 600;
+            font-size: 1.25rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        details > summary:hover {
+            background-color: rgba(129, 140, 248, 0.2);
+        }
+        details[open] > summary {
+            border-bottom-left-radius: 0;
+            border-bottom-right-radius: 0;
+        }
+        .summary-arrow {
+            transition: transform 0.3s ease;
+        }
+        details[open] .summary-arrow {
+            transform: rotate(180deg);
+        }
+        .tag-container {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+            margin-top: 0.75rem;
+        }
+        .tag {
+            display: inline-block;
+            padding: 0.25rem 0.75rem;
+            border-radius: 9999px;
+            font-weight: 600;
+            font-size: 0.75rem;
+            border: 1px solid transparent;
+        }
+        .tag-postgres { background-color: #1e3a8a; color: #dbeafe; border-color: #3b82f6; }
+        .tag-firestore { background-color: #831843; color: #fce7f3; border-color: #ec4899; }
+        .tag-realtime { background-color: #854d0e; color: #fef3c7; border-color: #f59e0b; }
+        .tag-pinecone { background-color: #164e63; color: #cffafe; border-color: #06b6d4; }
+        .tag-vercelkv { background-color: #171717; color: #d4d4d4; border-color: #737373; }
+    </style>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body class="p-4 sm:p-6 lg:p-8" style="font-family: 'Cairo', var(--font-sans);">
+
+    <main class="max-w-screen-lg mx-auto space-y-8">
+        <header class="glass-pane rounded-xl p-8 text-center">
+            <h1 class="text-4xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-indigo-400 via-cyan-400 to-indigo-400">50+ ميزة إضافية للمساعد الذكي</h1>
+            <p class="mt-2 text-lg text-gray-300">قائمة تركز على الأتمتة المتقدمة، وأدوات المطورين، والذكاء الاصطناعي العميق.</p>
+        </header>
+
+        <div class="space-y-4">
+            <details>
+                <summary>الذكاء الاصطناعي المتقدم والذاكرة <span class="summary-arrow">&#9662;</span></summary>
+                <div class="glass-pane p-6 border-t-0 rounded-b-xl space-y-4">
+                    <div><h4 class="font-semibold text-white">52. حلقة التحسين الذاتي للوكيل</h4><p class="text-gray-400">يقوم الوكيل بتحليل محادثاته الفاشلة وتحديث تعليماته الأساسية (System Prompt) تلقائيًا لتحسين أدائه المستقبلي.</p><div class="tag-container"><span class="tag tag-postgres">Vercel Postgres</span><span class="tag tag-pinecone">Pinecone</span></div></div>
+                    <div><h4 class="font-semibold text-white">53. مستكشف رسومي للذاكرة</h4><p class="text-gray-400">واجهة مرئية تعرض كيف ترتبط المفاهيم المختلفة في ذاكرة الوكيل طويلة الأمد ببعضها البعض.</p><div class="tag-container"><span class="tag tag-pinecone">Pinecone</span></div></div>
+                    <div><h4 class="font-semibold text-white">54. تحليل نبرة المشاعر</h4><p class="text-gray-400">يحلل الذكاء الاصطناعي النبرة العاطفية لنص المستخدم (غاضب، سعيد، محايد) ويكيف استجاباته وفقًا لذلك.</p><div class="tag-container"></div></div>
+                    <div><h4 class="font-semibold text-white">55. تركيب الذاكرة عبر المحادثات</h4><p class="text-gray-400">يجد الذكاء الاصطناعي أنماطًا واتصالات عبر محادثات متعددة للمستخدم لتقديم رؤى أعمق.</p><div class="tag-container"><span class="tag tag-pinecone">Pinecone</span></div></div>
+                    <div><h4 class="font-semibold text-white">56. محاكاة السيناريوهات الافتراضية</h4><p class="text-gray-400">يقوم الذكاء الاصطناعي بمحاكاة النتائج المحتملة بناءً على سيناريو ومتغيرات معينة يقدمها المستخدم.</p><div class="tag-container"></div></div>
+                    <div><h4 class="font-semibold text-white">57. اختبار الوكيل الخصم (Adversarial)</h4><p class="text-gray-400">وكيل ذكاء اصطناعي يحاول العثور على عيوب أو ثغرات في منطق وكيل آخر لتحسين صلابته.</p><div class="tag-container"><span class="tag tag-firestore">Firestore</span></div></div>
+                    <div><h4 class="font-semibold text-white">58. إنشاء أدوات ديناميكية</h4><p class="text-gray-400">يقوم الذكاء الاصطناعي بكتابة دوال بسيطة ومؤقتة لحل مشكلة معينة أثناء المحادثة.</p><div class="tag-container"></div></div>
+                    <div><h4 class="font-semibold text-white">59. تدقيق الحقائق في الوقت الفعلي</h4><p class="text-gray-400">يستخدم الوكيل البحث على الويب للتحقق من صحة المعلومات قبل تقديمها للمستخدم.</p><div class="tag-container"><span class="tag tag-pinecone">Pinecone</span></div></div>
+                </div>
+            </details>
+            
+            <details>
+                <summary>الأتمتة المتقدمة وسير العمل <span class="summary-arrow">&#9662;</span></summary>
+                <div class="glass-pane p-6 border-t-0 rounded-b-xl space-y-4">
+                    <div><h4 class="font-semibold text-white">60. منطق شرطي (If/Else) في سير العمل</h4><p class="text-gray-400">إضافة فروع منطقية في منشئ سير العمل المرئي لاتخاذ مسارات مختلفة بناءً على النتائج.</p><div class="tag-container"><span class="tag tag-firestore">Firestore</span></div></div>
+                    <div><h4 class="font-semibold text-white">61. التكرار والحلقات (Looping)</h4><p class="text-gray-400">تنفيذ إجراء معين على كل عنصر في قائمة ضمن سير العمل.</p><div class="tag-container"><span class="tag tag-firestore">Firestore</span></div></div>
+                    <div><h4 class="font-semibold text-white">62. مشغلات عبر البريد الإلكتروني</h4><p class="text-gray-400">بدء سير عمل تلقائيًا عند استلام بريد إلكتروني يطابق معايير معينة.</p><div class="tag-container"><span class="tag tag-postgres">Vercel Postgres</span></div></div>
+                    <div><h4 class="font-semibold text-white">63. مشغلات مجدولة (Cron Jobs)</h4><p class="text-gray-400">تشغيل مهام سير العمل في أوقات محددة أو على فترات منتظمة.</p><div class="tag-container"><span class="tag tag-postgres">Vercel Postgres</span></div></div>
+                    <div><h4 class="font-semibold text-white">64. منطق معالجة الأخطاء وإعادة المحاولة</h4><p class="text-gray-400">تحديد ما يجب فعله تلقائيًا عند فشل خطوة في سير العمل، بما في ذلك إعادة المحاولة عدة مرات.</p><div class="tag-container"><span class="tag tag-firestore">Firestore</span></div></div>
+                    <div><h4 class="font-semibold text-white">65. إصدارات سير العمل والعودة للإصدارات السابقة</h4><p class="text-gray-400">حفظ إصدارات متعددة من سير العمل والقدرة على استعادة إصدار أقدم.</p><div class="tag-container"><span class="tag tag-postgres">Vercel Postgres</span></div></div>
+                    <div><h4 class="font-semibold text-white">66. مهام سير العمل الفرعية (Sub-workflows)</h4><p class="text-gray-400">استدعاء سير عمل قابل لإعادة الاستخدام من داخل سير عمل آخر لتقليل التكرار.</p><div class="tag-container"><span class="tag tag-postgres">Vercel Postgres</span></div></div>
+                </div>
+            </details>
+
+            <details>
+                <summary>أدوات المطورين والمستخدمين المحترفين <span class="summary-arrow">&#9662;</span></summary>
+                <div class="glass-pane p-6 border-t-0 rounded-b-xl space-y-4">
+                    <div><h4 class="font-semibold text-white">67. ملعب التعليمات (Prompt Playground)</h4><p class="text-gray-400">بيئة معزولة لاختبار التعليمات وتجربتها على وكلاء ونماذج مختلفة قبل تطبيقها.</p><div class="tag-container"></div></div>
+                    <div><h4 class="font-semibold text-white">68. مقدر التوكنز والتكلفة</h4><p class="text-gray-400">أداة تعرض عدد التوكنز التي ستستخدمها التعليمات وتكلفتها التقديرية قبل إرسالها.</p><div class="tag-container"></div></div>
+                    <div><h4 class="font-semibold text-white">69. مصحح أخطاء المحادثة</h4><p class="text-gray-400">عرض تفصيلي لـ "عملية تفكير" الذكاء الاصطناعي خطوة بخطوة، بما في ذلك استدعاءات الأدوات والقرارات.</p><div class="tag-container"><span class="tag tag-firestore">Firestore</span></div></div>
+                    <div><h4 class="font-semibold text-white">70. حزمة تطوير الأدوات المخصصة (SDK)</h4><p class="text-gray-400">توفير SDK للمطورين لإضافة أدواتهم الخاصة ودمجها مع الوكلاء.</p><div class="tag-container"></div></div>
+                    <div><h4 class="font-semibold text-white">71. التحكم في إصدارات الوكلاء عبر Git</h4><p class="text-gray-400">ربط تكوينات الوكلاء بمستودع Git لتتبع التغييرات والتعاون.</p><div class="tag-container"><span class="tag tag-postgres">Vercel Postgres</span></div></div>
+                    <div><h4 class="font-semibold text-white">72. واجهة سطر الأوامر (CLI)</h4><p class="text-gray-400">أداة للمطورين للتفاعل مع وكلائهم وإدارة المحادثات من خلال سطر الأوامر.</p><div class="tag-container"></div></div>
+                    <div><h4 class="font-semibold text-white">73. استيراد/تصدير جماعي لتكوينات الوكلاء</h4><p class="text-gray-400">استيراد وتصدير تكوينات وكلاء متعددين دفعة واحدة باستخدام ملفات JSON أو YAML.</p><div class="tag-container"><span class="tag tag-postgres">Vercel Postgres</span></div></div>
+                    <div><h4 class="font-semibold text-white">74. بيئة تنفيذ كود معزولة (Sandbox)</h4><p class="text-gray-400">تنفيذ الكود الذي يولده الذكاء الاصطناعي في بيئة آمنة ومعزولة لاختباره.</p><div class="tag-container"></div></div>
+                </div>
+            </details>
+            
+            <details>
+                <summary>تجربة المستخدم والتعاون المحسّن <span class="summary-arrow">&#9662;</span></summary>
+                <div class="glass-pane p-6 border-t-0 rounded-b-xl space-y-4">
+                    <div><h4 class="font-semibold text-white">75. الإشارة (@Mentions) للوكلاء والمستخدمين</h4><p class="text-gray-400">توجيه رسالة مباشرة إلى وكيل معين أو مستخدم آخر في محادثة جماعية.</p><div class="tag-container"><span class="tag tag-realtime">Firebase Realtime</span></div></div>
+                    <div><h4 class="font-semibold text-white">76. الردود المتسلسلة (Threads)</h4><p class="text-gray-400">بدء محادثة جانبية كرد على رسالة معينة للحفاظ على تنظيم النقاش الرئيسي.</p><div class="tag-container"><span class="tag tag-postgres">Vercel Postgres</span></div></div>
+                    <div><h4 class="font-semibold text-white">77. لوح أبيض تعاوني في الوقت الفعلي</h4><p class="text-gray-400">مساحة يمكن للمستخدمين والذكاء الاصطناعي الرسم والكتابة عليها معًا أثناء المحادثة.</p><div class="tag-container"><span class="tag tag-realtime">Firebase Realtime</span></div></div>
+                    <div><h4 class="font-semibold text-white">78. تثبيت الرسائل الهامة</h4><p class="text-gray-400">تثبيت رسالة في أعلى المحادثة للرجوع إليها بسهولة.</p><div class="tag-container"><span class="tag tag-postgres">Vercel Postgres</span></div></div>
+                    <div><h4 class="font-semibold text-white">79. إدخال صوتي وإخراج صوتي</h4><p class="text-gray-400">التحدث إلى المساعد بدلًا من الكتابة، والاستماع إلى ردوده صوتيًا.</p><div class="tag-container"></div></div>
+                    <div><h4 class="font-semibold text-white">80. مشاركة مقتطفات من المحادثة</h4><p class="text-gray-400">مشاركة جزء معين فقط من المحادثة بدلاً من المحادثة بأكملها.</p><div class="tag-container"><span class="tag tag-postgres">Vercel Postgres</span></div></div>
+                    <div><h4 class="font-semibold text-white">81. بحث شامل (Global Search)</h4><p class="text-gray-400">البحث عن نص معين عبر جميع محادثاتك وقواعد المعرفة الخاصة بك.</p><div class="tag-container"><span class="tag tag-pinecone">Pinecone</span></div></div>
+                    <div><h4 class="font-semibold text-white">82. تخصيص اختصارات لوحة المفاتيح</h4><p class="text-gray-400">السماح للمستخدمين بتعيين اختصاراتهم الخاصة للإجراءات الشائعة.</p><div class="tag-container"><span class="tag tag-postgres">Vercel Postgres</span></div></div>
+                </div>
+            </details>
+            
+             <details>
+                <summary>ميزات متنوعة أخرى <span class="summary-arrow">&#9662;</span></summary>
+                <div class="glass-pane p-6 border-t-0 rounded-b-xl space-y-4">
+                    <div><h4 class="font-semibold text-white">83. صفحات الملف الشخصي للمستخدم</h4><p>صفحة لكل مستخدم تعرض إحصائياته ونشاطه والوكلاء الذين أنشأهم.</p><div class="tag-container"><span class="tag tag-postgres">Vercel Postgres</span></div></div>
+                    <div><h4 class="font-semibold text-white">84. محرر متقدم للرسائل الطويلة</h4><p>محرر نصوص متكامل عند كتابة رسائل طويلة، يدعم التنسيق الكامل ومعاينة Markdown.</p><div class="tag-container"></div></div>
+                    <div><h4 class="font-semibold text-white">85. تلخيص التغييرات في المستندات</h4><p>عند تحديث قاعدة معرفة، يقوم الذكاء الاصطناعي بتوليد ملخص للتغييرات الجديدة.</p><div class="tag-container"><span class="tag tag-pinecone">Pinecone</span></div></div>
+                    <div><h4 class="font-semibold text-white">86. تصنيف المحتوى تلقائيًا</h4><p>يقوم الذكاء الاصطناعي بإضافة علامات (tags) تلقائيًا إلى المحادثات بناءً على محتواها.</p><div class="tag-container"><span class="tag tag-pinecone">Pinecone</span></div></div>
+                    <div><h4 class="font-semibold text-white">87. وضع عدم الاتصال (Offline Mode)</h4><p>الوصول إلى المحادثات السابقة وقراءتها حتى مع عدم وجود اتصال بالإنترنت.</p><div class="tag-container"><span class="tag tag-vercelkv">Vercel KV</span></div></div>
+                    <div><h4 class="font-semibold text-white">88. إعدادات إشعارات مفصلة</h4><p>التحكم الدقيق في الإشعارات التي يتلقاها المستخدم (مثل الإشارة فقط، كل الرسائل، إلخ).</p><div class="tag-container"><span class="tag tag-postgres">Vercel Postgres</span></div></div>
+                    <div><h4 class="font-semibold text-white">89. سلة المحذوفات</h4><p>نقل المحادثات المحذوفة إلى سلة المحذوفات بدلاً من حذفها نهائيًا، مع إمكانية استعادتها.</p><div class="tag-container"><span class="tag tag-postgres">Vercel Postgres</span></div></div>
+                    <div><h4 class="font-semibold text-white">90. تتبع صحة النموذج (Model Health)</h4><p>لوحة تحكم تعرض حالة نماذج اللغة المستخدمة (مثل أوقات الاستجابة، معدلات الخطأ).</p><div class="tag-container"><span class="tag tag-postgres">Vercel Postgres</span></div></div>
+                    <div><h4 class="font-semibold text-white">91. توليد صور ومرئيات</h4><p>وكيل متخصص في إنشاء صور بناءً على وصف نصي من المستخدم.</p><div class="tag-container"></div></div>
+                    <div><h4 class="font-semibold text-white">92. وكيل التلخيص الدوري</h4><p>وكيل يرسل ملخصًا أسبوعيًا أو يوميًا للنشاط والمحادثات الهامة.</p><div class="tag-container"><span class="tag tag-postgres">Vercel Postgres</span></div></div>
+                    <div><h4 class="font-semibold text-white">93. تحليل البيانات وتوليد الرسوم البيانية</h4><p>تحميل ملف بيانات (CSV, Excel) ليقوم الوكيل بتحليله وإنشاء رسوم بيانية تفاعلية.</p><div class="tag-container"></div></div>
+                    <div><h4 class="font-semibold text-white">94. إدارة الحالة (State Management) للمحادثات</h4><p>تحديد حالات للمحادثات (جديدة، قيد التنفيذ، مكتملة، مؤرشفة) لتنظيم العمل.</p><div class="tag-container"><span class="tag tag-postgres">Vercel Postgres</span></div></div>
+                    <div><h4 class="font-semibold text-white">95. البحث عن الوكلاء الخبراء</h4><p>أداة تقترح أفضل وكيل في فريقك لمهمة معينة بناءً على وصفك.</p><div class="tag-container"><span class="tag tag-pinecone">Pinecone</span></div></div>
+                    <div><h4 class="font-semibold text-white">96. تصدير سجلات التدقيق</h4><p>تصدير سجلات النشاط بتنسيق CSV لأغراض الامتثال والأمان.</p><div class="tag-container"><span class="tag tag-postgres">Vercel Postgres</span></div></div>
+                    <div><h4 class="font-semibold text-white">97. وضع "عدم الإزعاج"</h4><p>إيقاف جميع الإشعارات مؤقتًا لفترة زمنية محددة.</p><div class="tag-container"><span class="tag tag-realtime">Firebase Realtime</span></div></div>
+                    <div><h4 class="font-semibold text-white">98. وكيل المساعدة على متن الطائرة</h4><p>جولة تفاعلية يقودها الذكاء الاصطناعي لتعليم المستخدمين الجدد كيفية استخدام التطبيق.</p><div class="tag-container"></div></div>
+                    <div><h4 class="font-semibold text-white">99. اكتشاف الرسائل المكررة</h4><p>تنبيه المستخدم إذا كان على وشك طرح سؤال مشابه جدًا لسؤال طرحه من قبل.</p><div class="tag-container"><span class="tag tag-pinecone">Pinecone</span></div></div>
+                    <div><h4 class="font-semibold text-white">100. التحقق من صحة الإدخال في سير العمل</h4><p>التحقق من أن مخرجات خطوة ما صالحة كمدخلات للخطوة التالية قبل التنفيذ.</p><div class="tag-container"><span class="tag tag-firestore">Firestore</span></div></div>
+                    <div><h4 class="font-semibold text-white">101. قفل المحادثة</h4><p>منع إجراء المزيد من التعديلات أو الرسائل في محادثة مكتملة.</p><div class="tag-container"><span class="tag tag-postgres">Vercel Postgres</span></div></div>
+                    <div><h4 class="font-semibold text-white">102. قوالب ردود جاهزة</h4><p>حفظ واستخدام ردود جاهزة للإجابات المتكررة.</p><div class="tag-container"><span class="tag tag-postgres">Vercel Postgres</span></div></div>
+                </div>
+            </details>
+        </div>
+    </main>
+</body>
+</html>
