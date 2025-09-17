@@ -9,16 +9,20 @@
     <style>
         :root {
             --font-sans: 'Inter', sans-serif;
-            --color-bg: #0a0a0f;
-            --color-pane: rgba(23, 26, 43, 0.7);
-            --color-border: rgba(129, 140, 248, 0.2);
-            --color-neon-indigo: rgba(129, 140, 248, 1);
-            --color-neon-cyan: rgba(34, 211, 238, 1);
+            --color-bg: #f8fafc; /* slate-50 */
+            --color-pane: rgba(255, 255, 255, 0.8);
+            --color-border: rgba(129, 140, 248, 0.3);
+            --color-text-primary: #1e293b; /* slate-800 */
+            --color-text-secondary: #475569; /* slate-600 */
+            --color-accent: #4f46e5; /* indigo-600 */
         }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+        @keyframes popIn { 0% { opacity: 0; transform: scale(0.8); } 100% { opacity: 1; transform: scale(1); } }
+
         body {
-            font-family: var(--font-sans), system-ui, sans-serif;
+            font-family: 'Cairo', var(--font-sans);
             background-color: var(--color-bg);
-            color: #e5e7eb;
+            color: var(--color-text-primary);
             font-size: 17px;
             line-height: 1.8;
         }
@@ -27,13 +31,14 @@
             backdrop-filter: blur(16px) saturate(180%);
             -webkit-backdrop-filter: blur(16px) saturate(180%);
             border: 1px solid var(--color-border);
+            box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.05), 0 2px 4px -2px rgb(0 0 0 / 0.05);
         }
         details > summary {
             cursor: pointer;
             padding: 1rem 1.5rem;
             border-radius: 0.75rem;
-            background-color: rgba(129, 140, 248, 0.1);
-            transition: background-color 0.2s ease;
+            background-color: rgba(239, 246, 255, 0.8); /* blue-50 */
+            transition: all 0.2s ease;
             font-weight: 600;
             font-size: 1.25rem;
             display: flex;
@@ -41,190 +46,361 @@
             align-items: center;
         }
         details > summary:hover {
-            background-color: rgba(129, 140, 248, 0.2);
+            background-color: rgba(224, 231, 255, 1); /* indigo-100 */
+            box-shadow: 0 0 15px rgba(79, 70, 229, 0.1);
         }
         details[open] > summary {
             border-bottom-left-radius: 0;
             border-bottom-right-radius: 0;
+            background-color: rgba(224, 231, 255, 1);
         }
-        .summary-arrow {
-            transition: transform 0.3s ease;
-        }
-        details[open] .summary-arrow {
-            transform: rotate(180deg);
-        }
-        .tag-container {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 0.5rem;
-            margin-top: 0.75rem;
-        }
-        .tag {
-            display: inline-block;
-            padding: 0.25rem 0.75rem;
-            border-radius: 9999px;
+        .summary-arrow { transition: transform 0.3s ease; }
+        details[open] .summary-arrow { transform: rotate(180deg); }
+        .tag-container { display: flex; flex-wrap: wrap; gap: 0.5rem; margin-top: 0.75rem; }
+        .tag { display: inline-block; padding: 0.25rem 0.75rem; border-radius: 9999px; font-weight: 600; font-size: 0.75rem; }
+        .tag-memory { background-color: #e0e7ff; color: #3730a3; }
+        .tag-proactive { background-color: #fce7f3; color: #9d174d; }
+        .tag-automation { background-color: #fef3c7; color: #92400e; }
+        .tag-ux { background-color: #cffafe; color: #155e75; }
+        .tag-dev { background-color: #d1d5db; color: #1f2937; }
+        .tag-learning { background-color: #dcfce7; color: #166534; }
+        
+        .feature-item { animation: fadeIn 0.5s ease-out forwards; }
+        .feedback-popup {
+            position: fixed;
+            bottom: 2rem;
+            left: 50%;
+            transform: translateX(-50%);
+            padding: 0.75rem 1.5rem;
+            border-radius: 0.5rem;
+            background-color: #22c55e;
+            color: white;
             font-weight: 600;
-            font-size: 0.75rem;
-            border: 1px solid transparent;
+            z-index: 100;
+            opacity: 0;
+            animation: popIn 0.3s ease-out forwards;
         }
-        .tag-memory { background-color: #1e3a8a; color: #dbeafe; border-color: #3b82f6; }
-        .tag-proactive { background-color: #831843; color: #fce7f3; border-color: #ec4899; }
-        .tag-automation { background-color: #854d0e; color: #fef3c7; border-color: #f59e0b; }
-        .tag-ux { background-color: #164e63; color: #cffafe; border-color: #06b6d4; }
-        .tag-dev { background-color: #171717; color: #d4d4d4; border-color: #737373; }
-        .tag-learning { background-color: #166534; color: #bbf7d0; border-color: #22c55e;}
     </style>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 </head>
-<body class="p-4 sm:p-6 lg:p-8" style="font-family: 'Cairo', var(--font-sans);">
+<body class="p-4 sm:p-6 lg:p-8">
 
     <main class="max-w-screen-lg mx-auto space-y-8">
         <header class="glass-pane rounded-xl p-8 text-center">
-            <h1 class="text-4xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-indigo-400 via-cyan-400 to-indigo-400">خارطة طريق الوعي المستمر</h1>
-            <p class="mt-2 text-lg text-gray-300">أكثر من 100 إمكانية لتحويل المساعد الرقمي إلى عقل واعٍ ومتطور.</p>
+            <h1 class="text-4xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-500">خارطة طريق الوعي المستمر</h1>
+            <p class="mt-2 text-lg text-slate-700">أكثر من 100 إمكانية لتحويل المساعد الرقمي إلى عقل واعٍ ومتطور.</p>
         </header>
 
-        <div class="space-y-4">
-            <details open>
-                <summary>الفئة الأولى: الذاكرة والوعي الإدراكي <span class="summary-arrow">&#9662;</span></summary>
-                <div class="glass-pane p-6 border-t-0 rounded-b-xl space-y-4">
-                    <div><h4 class="font-semibold text-white">1. الذاكرة الدلالية عبر المواضيع</h4><p class="text-gray-400">يربط المساعد المفاهيم من موضوعات مختلفة (مثل ربط فكرة من "التسويق" بمشروع في "الهندسة").</p><div class="tag-container"><span class="tag tag-memory">الذاكرة</span></div></div>
-                    <div><h4 class="font-semibold text-white">2. تلخيص حالة المشروع عند العودة</h4><p class="text-gray-400">عند العودة إلى موضوع قديم، يقدم المساعد ملخصًا فوريًا لـ "آخر ما توصلنا إليه".</p><div class="tag-container"><span class="tag tag-memory">الذاكرة</span><span class="tag tag-ux">تجربة المستخدم</span></div></div>
-                    <div><h4 class="font-semibold text-white">3. تتبع العناصر القابلة للتنفيذ</h4><p class="text-gray-400">يتعرف تلقائيًا على المهام أو الأسئلة التي لم تتم الإجابة عليها في المحادثة ويذكرك بها.</p><div class="tag-container"><span class="tag tag-proactive">استباقي</span><span class="tag tag-automation">أتمتة</span></div></div>
-                    <div><h4 class="font-semibold text-white">4. الذاكرة البصرية</h4><p class="text-gray-400">يتذكر المساعد محتوى الصور التي أرسلتها سابقًا ويمكنه الإجابة على أسئلة حولها لاحقًا.</p><div class="tag-container"><span class="tag tag-memory">الذاكرة</span></div></div>
-                    <div><h4 class="font-semibold text-white">5. تتبع تطور الأفكار</h4><p class="text-gray-400">يمكنك أن تسأل "كيف تطورت فكرتنا حول مشروع X؟" وسيعرض لك المساعد التسلسل الزمني للقرارات.</p><div class="tag-container"><span class="tag tag-memory">الذاكرة</span></div></div>
-                    <div><h4 class="font-semibold text-white">6. البحث الدلالي الشامل</h4><p class="text-gray-400">البحث عن "تلك الفكرة عن الألوان" للعثور على الرسائل ذات الصلة حتى لو لم تذكر كلمة "ألوان".</p><div class="tag-container"><span class="tag tag-memory">الذاكرة</span></div></div>
-                    <div><h4 class="font-semibold text-white">7. فهم الأهداف طويلة المدى</h4><p class="text-gray-400">يفهم المساعد أهدافك العامة (مثل "إطلاق منتج جديد") ويقيم الاقتراحات بناءً على مدى توافقها مع هذا الهدف.</p><div class="tag-container"><span class="tag tag-memory">الذاكرة</span><span class="tag tag-proactive">استباقي</span></div></div>
-                    <div><h4 class="font-semibold text-white">8. التعرف على التناقضات</h4><p class="text-gray-400">إذا قلت شيئًا اليوم يتعارض مع ما قلته الأسبوع الماضي، سينبهك المساعد بلطف.</p><div class="tag-container"><span class="tag tag-proactive">استباقي</span></div></div>
-                    <div><h4 class="font-semibold text-white">9. تتبع الأشخاص والكيانات</h4><p class="text-gray-400">يفهم المساعد من هم "أحمد" أو ما هو "مشروع ألفا" ويحتفظ بسياقهم عبر المحادثة.</p><div class="tag-container"><span class="tag tag-memory">الذاكرة</span></div></div>
-                    <div><h4 class="font-semibold text-white">10. تحديد الفجوات المعرفية</h4><p class="text-gray-400">يقول المساعد، "لقد تحدثنا عن الواجهة الأمامية، ولكننا لم نناقش بعد قاعدة البيانات. هل ننتقل إليها؟"</p><div class="tag-container"><span class="tag tag-proactive">استباقي</span></div></div>
-                    <!-- 15 more -->
-                    <div><h4 class="font-semibold text-white">11. الذاكرة القابلة للتعديل</h4><p class="text-gray-400">يمكنك تصحيح ذاكرة المساعد مباشرة بقول "لا، تذكر أن العميل هو شركة Y وليس X".</p><div class="tag-container"><span class="tag tag-memory">الذاكرة</span><span class="tag tag-ux">تجربة المستخدم</span></div></div>
-                    <div><h4 class="font-semibold text-white">12. الذاكرة المؤقتة للمهام</h4><p class="text-gray-400">إنشاء "لوح كتابة" مؤقت لمهمة معينة، يتم مسحه عند الانتهاء للحفاظ على نظافة الذاكرة الرئيسية.</p><div class="tag-container"><span class="tag tag-memory">الذاكرة</span></div></div>
-                    <div><h4 class="font-semibold text-white">13. تصنيف الذكريات تلقائيًا</h4><p class="text-gray-400">يصنف الذكريات تلقائيًا إلى فئات (حقائق، آراء، قرارات، مهام) لسهولة الاسترجاع.</p><div class="tag-container"><span class="tag tag-memory">الذاكرة</span></div></div>
-                    <div><h4 class="font-semibold text-white">14. فهم السياق الضمني</h4><p class="text-gray-400">عندما تقول "لنبدأ"، يفهم المساعد أنك تقصد بدء المهمة التي كنتم تناقشونها آخر مرة.</p><div class="tag-container"><span class="tag tag-memory">الذاكرة</span></div></div>
-                    <div><h4 class="font-semibold text-white">15. تتبع القرارات وأسبابها</h4><p class="text-gray-400">يمكنك أن تسأل "لماذا اخترنا استخدام React؟" وسيعطيك ملخصًا للنقاش الذي أدى إلى هذا القرار.</p><div class="tag-container"><span class="tag tag-memory">الذاكرة</span></div></div>
-                     <div><h4 class="font-semibold text-white">16. ربط المحادثات بالمصادر الخارجية</h4><p class="text-gray-400">يربط المساعد أجزاء من المحادثة بمستندات Google Docs أو روابط Notion ذات الصلة تلقائيًا.</p><div class="tag-container"><span class="tag tag-automation">أتمتة</span></div></div>
-                    <div><h4 class="font-semibold text-white">17. الذاكرة القائمة على الأولوية</h4><p class="text-gray-400">يعطي المساعد أهمية أكبر للحقائق التي تم تأكيدها مؤخرًا أو بشكل متكرر.</p><div class="tag-container"><span class="tag tag-memory">الذاكرة</span></div></div>
-                    <div><h4 class="font-semibold text-white">18. نسيان انتقائي</h4><p class="text-gray-400">يمكنك أن تطلب من المساعد "نسيان كل ما يتعلق بمشروع Z القديم".</p><div class="tag-container"><span class="tag tag-memory">الذاكرة</span></div></div>
-                    <div><h4 class="font-semibold text-white">19. استنتاج العلاقات</h4><p class="text-gray-400">إذا ذكرت "علي من فريق التسويق" و "فاطمة رئيسة التسويق"، يستنتج المساعد أن فاطمة هي مديرة علي.</p><div class="tag-container"><span class="tag tag-memory">الذاكرة</span></div></div>
-                    <div><h4 class="font-semibold text-white">20. فهم التسلسل الهرمي للمعلومات</h4><p class="text-gray-400">يفهم أن "تغيير لون الزر" هو جزء فرعي من مهمة "تحديث الصفحة الرئيسية".</p><div class="tag-container"><span class="tag tag-memory">الذاكرة</span></div></div>
-                    <div><h4 class="font-semibold text-white">21. تتبع الحالة المزاجية للمشروع</h4><p class="text-gray-400">يحلل اللغة المستخدمة لتقديم ملخص مثل "يبدو أن الفريق كان متفائلاً في البداية ولكنه يواجه تحديات الآن".</p><div class="tag-container"><span class="tag tag-proactive">استباقي</span></div></div>
-                    <div><h4 class="font-semibold text-white">22. ذاكرة متعددة الطبقات</h4><p class="text-gray-400">ذاكرة قصيرة المدى (آخر ساعة)، متوسطة (آخر أسبوع)، وطويلة المدى (كل شيء آخر)، مع استراتيجيات استرجاع مختلفة لكل منها.</p><div class="tag-container"><span class="tag tag-memory">الذاكرة</span></div></div>
-                    <div><h4 class="font-semibold text-white">23. توليد جدول زمني تلقائي</h4><p class="text-gray-400">ينشئ المساعد جدولًا زمنيًا مرئيًا للأحداث والقرارات الرئيسية في موضوع معين.</p><div class="tag-container"><span class="tag tag-ux">تجربة المستخدم</span></div></div>
-                    <div><h4 class="font-semibold text-white">24. التعرف على الأنماط السلوكية</h4><p class="text-gray-400">يلاحظ المساعد أنك تميل إلى العمل على المهام الإبداعية في الصباح والمهام التحليلية بعد الظهر.</p><div class="tag-container"><span class="tag tag-proactive">استباقي</span></div></div>
-                    <div><h4 class="font-semibold text-white">25. الوعي بالسياق الزمني</h4><p class="text-gray-400">عندما تقول "هذا الأسبوع"، يفهم المساعد الأسبوع الحالي ويقوم بتصفية المعلومات وفقًا لذلك.</p><div class="tag-container"><span class="tag tag-memory">الذاكرة</span></div></div>
-                </div>
-            </details>
-            
-            <details>
-                <summary>الفئة الثانية: الذكاء الاستباقي والمساعدة الذاتية <span class="summary-arrow">&#9662;</span></summary>
-                <div class="glass-pane p-6 border-t-0 rounded-b-xl space-y-4">
-                    <div><h4 class="font-semibold text-white">26. اقتراح الخطوات التالية</h4><p class="text-gray-400">بعد الانتهاء من مهمة، يقترح المساعد تلقائيًا 3 خيارات منطقية للخطوة التالية.</p><div class="tag-container"><span class="tag tag-proactive">استباقي</span></div></div>
-                    <div><h4 class="font-semibold text-white">27. تحديد المخاطر المحتملة</h4><p class="text-gray-400">"بناءً على خطتنا، قد نواجه تأخيرًا إذا لم تتم الموافقة على التصميم بحلول يوم الأربعاء."</p><div class="tag-container"><span class="tag tag-proactive">استباقي</span></div></div>
-                    <div><h4 class="font-semibold text-white">28. توليد ملخصات يومية/أسبوعية</h4><p class="text-gray-400">في بداية كل يوم، يرسل المساعد ملخصًا للمهام المكتملة بالأمس والمهام ذات الأولوية لليوم.</p><div class="tag-container"><span class="tag tag-automation">أتمتة</span></div></div>
-                    <div><h4 class="font-semibold text-white">29. توصيات مخصصة</h4><p class="text-gray-400">"لقد لاحظت أنك تبحث كثيرًا عن تصميم الواجهات. هل ترغب في الاطلاع على هذا المقال الجديد؟"</p><div class="tag-container"><span class="tag tag-proactive">استباقي</span></div></div>
-                    <div><h4 class="font-semibold text-white">30. أتمتة المهام المتكررة</h4><p class="text-gray-400">"يبدو أنك تقوم بإنشاء تقرير أسبوعي بنفس الطريقة كل مرة. هل تود أن أقوم بأتمتة هذه العملية؟"</p><div class="tag-container"><span class="tag tag-automation">أتمتة</span></div></div>
-                    <div><h4 class="font-semibold text-white">31. التحضير للاجتماعات</h4><p class="text-gray-400">قبل اجتماع قادم في تقويمك، يجمع المساعد المحادثات والمستندات ذات الصلة ويقدم لك ملخصًا.</p><div class="tag-container"><span class="tag tag-automation">أتمتة</span></div></div>
-                    <div><h4 class="font-semibold text-white">32. مراقبة التقدم نحو الأهداف</h4><p class="text-gray-400">يقدم المساعد تقارير دورية حول مدى تقدمك نحو الأهداف طويلة المدى التي حددتها.</p><div class="tag-container"><span class="tag tag-proactive">استباقي</span></div></div>
-                    <div><h4 class="font-semibold text-white">33. وكيل تحسين التعليمات (Prompt)</h4><p class="text-gray-400">عندما تكتب أمرًا، يقترح المساعد، "يمكنني تنفيذ ذلك، ولكن قد تحصل على نتيجة أفضل إذا استخدمت هذه الصيغة..."</p><div class="tag-container"><span class="tag tag-learning">تعلم ذاتي</span></div></div>
-                    <div><h4 class="font-semibold text-white">34. اكتشاف الأنماط غير الفعالة</h4><p class="text-gray-400">"لقد لاحظت أننا نناقش نفس المشكلة كل أسبوع. ربما يجب أن نخصص جلسة لحلها بشكل نهائي."</p><div class="tag-container"><span class="tag tag-proactive">استباقي</span></div></div>
-                    <div><h4 class="font-semibold text-white">35. إنشاء مسودات استباقية</h4><p class="text-gray-400">بناءً على محادثة، يقوم المساعد تلقائيًا بإنشاء مسودة بريد إلكتروني أو مستند يلخص النقاط الرئيسية.</p><div class="tag-container"><span class="tag tag-automation">أتمتة</span></div></div>
-                    <!-- 15 more -->
-                     <div><h4 class="font-semibold text-white">36. المساعدة في تحديد الأولويات</h4><p class="text-gray-400">يمكنك أن تطلب منه "ساعدني في تحديد أولويات مهامي لهذا الأسبوع" وسيقترح ترتيبًا بناءً على الأهداف والمواعيد النهائية.</p><div class="tag-container"><span class="tag tag-proactive">استباقي</span></div></div>
-                    <div><h4 class="font-semibold text-white">37. اكتشاف المعرفة الصامتة</h4><p class="text-gray-400">يطرح المساعد أسئلة لتوضيح الافتراضات غير المعلنة في خطة ما.</p><div class="tag-container"><span class="tag tag-proactive">استباقي</span></div></div>
-                    <div><h4 class="font-semibold text-white">38. تبسيط المفاهيم المعقدة</h4><p class="text-gray-400">إذا كانت المحادثة تقنية جدًا، يمكن للمساعد إنشاء ملخص "بكلمات بسيطة" للمشاركين غير التقنيين.</p><div class="tag-container"><span class="tag tag-ux">تجربة المستخدم</span></div></div>
-                    <div><h4 class="font-semibold text-white">39. التنبؤ بالاحتياجات المستقبلية</h4><p class="text-gray-400">"بما أننا نطلق الميزة الجديدة الشهر القادم، قد نحتاج إلى تحديث وثائق المساعدة. هل أبدأ في صياغة مسودة؟"</p><div class="tag-container"><span class="tag tag-proactive">استباقي</span></div></div>
-                    <div><h4 class="font-semibold text-white">40. وكيل "محامي الشيطان"</h4><p class="text-gray-400">يمكنك أن تطلب من وكيل معين أن يلعب دور المعارض لأفكارك لمساعدتك على رؤية نقاط الضعف.</p><div class="tag-container"><span class="tag tag-dev">أدوات مطور</span></div></div>
-                    <div><h4 class="font-semibold text-white">41. المساعدة في اتخاذ القرار</h4><p class="text-gray-400">يقارن بين خيارين مختلفين تم طرحهما، ويسرد إيجابيات وسلبيات كل منهما بناءً على سياق المحادثة.</p><div class="tag-container"><span class="tag tag-proactive">استباقي</span></div></div>
-                    <div><h4 class="font-semibold text-white">42. جدولة المهام تلقائيًا</h4><p class="text-gray-400">عندما تقول "أحتاج إلى مراجعة هذا بحلول يوم الجمعة"، يقوم المساعد تلقائيًا بإنشاء تذكير في تقويمك.</p><div class="tag-container"><span class="tag tag-automation">أتمتة</span></div></div>
-                    <div><h4 class="font-semibold text-white">43. تحديد التبعيات بين المهام</h4><p class="text-gray-400">يفهم أن "مهمة ب" لا يمكن أن تبدأ قبل اكتمال "مهمة أ" وينبهك لذلك.</p><div class="tag-container"><span class="tag tag-proactive">استباقي</span></div></div>
-                    <div><h4 class="font-semibold text-white">44. التلخيص التكيفي</h4><p class="text-gray-400">يختلف طول ونوع الملخص الذي يقدمه المساعد بناءً على مقدار الوقت الذي مضى منذ آخر زيارة لك للموضوع.</p><div class="tag-container"><span class="tag tag-ux">تجربة المستخدم</span></div></div>
-                    <div><h4 class="font-semibold text-white">45. توليد الأسئلة الشائعة</h4><p class="text-gray-400">بعد مناقشة طويلة، يمكن للمساعد إنشاء قائمة بالأسئلة الشائعة وإجاباتها من المحتوى.</p><div class="tag-container"><span class="tag tag-automation">أتمتة</span></div></div>
-                    <div><h4 class="font-semibold text-white">46. اقتراح المتعاونين</h4><p class="text-gray-400">(في بيئة الفريق) "يبدو أن هذا الموضوع يتعلق بالتحليل المالي. ربما يجب إشراك سارة من قسم المالية."</p><div class="tag-container"><span class="tag tag-proactive">استباقي</span></div></div>
-                    <div><h4 class="font-semibold text-white">47. تقسيم الأهداف الكبيرة</h4><p class="text-gray-400">يساعدك على تقسيم هدف كبير مثل "بناء تطبيق" إلى مهام فرعية أصغر وقابلة للإدارة.</p><div class="tag-container"><span class="tag tag-proactive">استباقي</span></div></div>
-                    <div><h4 class="font-semibold text-white">48. مراقبة الكلمات الرئيسية</h4><p class="text-gray-400">ينبهك المساعد عندما يتم ذكر كلمة رئيسية أو موضوع معين كنت قد طلبت منه مراقبته.</p><div class="tag-container"><span class="tag tag-automation">أتمتة</span></div></div>
-                    <div><h4 class="font-semibold text-white">49. الحفاظ على تركيز المحادثة</h4><p class="text-gray-400">إذا انحرفت المحادثة بعيدًا عن الموضوع المحدد، يقترح المساعد بلطف العودة إلى النقطة الرئيسية.</p><div class="tag-container"><span class="tag tag-proactive">استباقي</span></div></div>
-                    <div><h4 class="font-semibold text-white">50. التكيف مع أسلوب المستخدم</h4><p class="text-gray-400">يتعلم المساعد ما إذا كنت تفضل الإجابات المختصرة أو المفصلة، الرسمية أو غير الرسمية، ويكيف أسلوبه.</p><div class="tag-container"><span class="tag tag-learning">تعلم ذاتي</span></div></div>
-                </div>
-            </details>
-
-            <details>
-                <summary>الفئة الثالثة: التعلم الذاتي والتطور المستمر <span class="summary-arrow">&#9662;</span></summary>
-                <div class="glass-pane p-6 border-t-0 rounded-b-xl space-y-4">
-                     <div><h4 class="font-semibold text-white">51. حلقة التغذية الراجعة</h4><p class="text-gray-400">بعد كل إجابة معقدة، يسأل المساعد "هل كانت هذه الإجابة مفيدة؟" ويستخدم الإجابة لتحسين نفسه.</p><div class="tag-container"><span class="tag tag-learning">تعلم ذاتي</span></div></div>
-                    <div><h4 class="font-semibold text-white">52. التعلم من التصحيحات</h4><p class="text-gray-400">عندما تصحح معلومة قدمها، يتذكر المساعد التصحيح ويطبقه في المستقبل.</p><div class="tag-container"><span class="tag tag-learning">تعلم ذاتي</span></div></div>
-                    <div><h4 class="font-semibold text-white">53. اختبار A/B للاستجابات</h4><p class="text-gray-400">يقوم المساعد أحيانًا بتجربة استراتيجيات استجابة مختلفة ويرى أيها يحصل على ردود فعل إيجابية أكثر.</p><div class="tag-container"><span class="tag tag-learning">تعلم ذاتي</span></div></div>
-                    <div><h4 class="font-semibold text-white">54. تحليل المحادثات الفاشلة</h4><p class="text-gray-400">يحدد المساعد المحادثات التي انتهت بشكل سيء أو لم تحل المشكلة ويحللها لتجنب تكرار الأخطاء.</p><div class="tag-container"><span class="tag tag-learning">تعلم ذاتي</span></div></div>
-                    <div><h4 class="font-semibold text-white">55. اقتراح أدوات جديدة لنفسه</h4><p class="text-gray-400">"لقد لاحظت أنك تسأل كثيرًا عن أسعار الأسهم. هل تود أن أضيف أداة للحصول على بيانات السوق في الوقت الفعلي؟"</p><div class="tag-container"><span class="tag tag-learning">تعلم ذاتي</span><span class="tag tag-dev">أدوات مطور</span></div></div>
-                    <div><h4 class="font-semibold text-white">56. فهم تفضيلات المستخدم الضمنية</h4><p class="text-gray-400">يتعلم المساعد من خلال الرسائل التي تتفاعل معها أكثر من غيرها لتحديد المحتوى الذي يثير اهتمامك.</p><div class="tag-container"><span class="tag tag-learning">تعلم ذاتي</span></div></div>
-                    <div><h4 class="font-semibold text-white">57. بناء نموذج شخصي للمستخدم</h4><p class="text-gray-400">ينشئ المساعد نموذجًا داخليًا لاهتماماتك وخبراتك وأهدافك لتخصيص كل تفاعل.</p><div class="tag-container"><span class="tag tag-learning">تعلم ذاتي</span><span class="tag tag-memory">الذاكرة</span></div></div>
-                    <div><h4 class="font-semibold text-white">58. التكيف مع المصطلحات الخاصة</h4><p class="text-gray-400">يتعلم المساعد المصطلحات والاختصارات الخاصة بشركتك أو مشروعك ويستخدمها بشكل صحيح.</p><div class="tag-container"><span class="tag tag-learning">تعلم ذاتي</span></div></div>
-                    <!-- 7 more -->
-                     <div><h4 class="font-semibold text-white">59. اقتراح تنظيم أفضل للمعلومات</h4><p class="text-gray-400">"لقد تحدثنا عن 5 مشاريع مختلفة ضمن موضوع 'التسويق'. هل ترغب في فصل كل مشروع في موضوع فرعي خاص به؟"</p><div class="tag-container"><span class="tag tag-learning">تعلم ذاتي</span></div></div>
-                    <div><h4 class="font-semibold text-white">60. التعلم من المحادثات الناجحة</h4><p class="text-gray-400">يحلل المساعد المحادثات التي تم تقييمها بشكل إيجابي لتحديد الأنماط والاستراتيجيات الناجحة.</p><div class="tag-container"><span class="tag tag-learning">تعلم ذاتي</span></div></div>
-                    <div><h4 class="font-semibold text-white">61. تحديث قاعدة المعرفة الداخلية</h4><p class="text-gray-400">عندما يتعلم حقيقة جديدة ومؤكدة، يمكنه إضافتها إلى قاعدة معارفه لاستخدامها في المستقبل.</p><div class="tag-container"><span class="tag tag-learning">تعلم ذاتي</span><span class="tag tag-memory">الذاكرة</span></div></div>
-                    <div><h4 class="font-semibold text-white">62. طلب توضيح عند الغموض</h4><p class="text-gray-400">بدلاً من التخمين، يتعلم المساعد متى يكون من الأفضل أن يسأل سؤالاً توضيحيًا لضمان الدقة.</p><div class="tag-container"><span class="tag tag-learning">تعلم ذاتي</span></div></div>
-                    <div><h4 class="font-semibold text-white">63. فهم العلاقات بين الأدوات</h4><p class="text-gray-400">يتعلم أن مخرجات "أداة التحليل" يمكن استخدامها كمدخلات لـ "أداة إنشاء الرسوم البيانية".</p><div class="tag-container"><span class="tag tag-learning">تعلم ذاتي</span></div></div>
-                    <div><h4 class="font-semibold text-white">64. التطور التدريجي للشخصية</h4><p class="text-gray-400">تتطور شخصية المساعد وأسلوبه بمرور الوقت ليعكس بشكل أفضل أسلوب المستخدم وتفضيلاته.</p><div class="tag-container"><span class="tag tag-learning">تعلم ذاتي</span></div></div>
-                    <div><h4 class="font-semibold text-white">65. اقتراح أتمتة جديدة</h4><p class="text-gray-400">بناءً على المهام المتكررة التي يلاحظها، يقترح المساعد إنشاء مهام سير عمل جديدة لم تكن موجودة من قبل.</p><div class="tag-container"><span class="tag tag-learning">تعلم ذاتي</span><span class="tag tag-automation">أتمتة</span></div></div>
-                </div>
-            </details>
-
-            <details>
-                <summary>الفئة الرابعة: أتمتة المهام وتكامل الأدوات <span class="summary-arrow">&#9662;</span></summary>
-                <div class="glass-pane p-6 border-t-0 rounded-b-xl space-y-4">
-                    <div><h4 class="font-semibold text-white">66. منشئ سير عمل باللغة الطبيعية</h4><p class="text-gray-400">تصف مهمة معقدة باللغة العادية، ويقوم المساعد تلقائيًا بتحويلها إلى سير عمل مرئي متعدد الخطوات.</p><div class="tag-container"><span class="tag tag-automation">أتمتة</span></div></div>
-                    <div><h4 class="font-semibold text-white">67. تكامل مع تقويم Google/Outlook</h4><p class="text-gray-400">يمكن للمساعد قراءة جدولك الزمني، والعثور على أوقات فراغ، وإنشاء اجتماعات مباشرة من المحادثة.</p><div class="tag-container"><span class="tag tag-automation">أتمتة</span></div></div>
-                    <div><h4 class="font-semibold text-white">68. تكامل مع البريد الإلكتروني</h4><p class="text-gray-400">تلخيص رسائل البريد الإلكتروني الجديدة، وإنشاء مسودات ردود، وإرسالها بعد موافقتك.</p><div class="tag-container"><span class="tag tag-automation">أتمتة</span></div></div>
-                    <div><h4 class="font-semibold text-white">69. تنفيذ أوامر Shell/Code</h4><p class="text-gray-400">تنفيذ أوامر برمجية بسيطة في بيئة آمنة ومعزولة وإرجاع الناتج.</p><div class="tag-container"><span class="tag tag-dev">أدوات مطور</span></div></div>
-                    <div><h4 class="font-semibold text-white">70. إدارة المشاريع (Trello/Jira)</h4><p class="text-gray-400">إنشاء بطاقات مهام جديدة، وتحديث حالتها، وإضافة تعليقات مباشرة من المحادثة.</p><div class="tag-container"><span class="tag tag-automation">أتمتة</span></div></div>
-                    <div><h4 class="font-semibold text-white">71. التفاعل مع واجهات برمجة التطبيقات (APIs)</h4><p class="text-gray-400">يمكنك تزويد المساعد بوثائق واجهة برمجة تطبيقات (API)، وسيتعلم كيفية التفاعل معها.</p><div class="tag-container"><span class="tag tag-dev">أدوات مطور</span></div></div>
-                    <div><h4 class="font-semibold text-white">72. أتمتة النماذج (Form Automation)</h4><p class="text-gray-400">ملء النماذج المتكررة على الويب أو في المستندات بناءً على المعلومات التي يعرفها عنك.</p><div class="tag-container"><span class="tag tag-automation">أتمتة</span></div></div>
-                    <div><h4 class="font-semibold text-white">73. إنشاء عروض تقديمية</h4><p class="text-gray-400">يقوم المساعد بإنشاء مسودة عرض تقديمي (Google Slides/PowerPoint) بناءً على ملخص المحادثة.</p><div class="tag-container"><span class="tag tag-automation">أتمتة</span></div></div>
-                    <!-- 7 more -->
-                     <div><h4 class="font-semibold text-white">74. تحليل البيانات من جداول البيانات</h4><p class="text-gray-400">تحميل ملف CSV أو Excel، وطرح أسئلة عليه باللغة الطبيعية.</p><div class="tag-container"><span class="tag tag-automation">أتمتة</span></div></div>
-                    <div><h4 class="font-semibold text-white">75. أتمتة البحث على الويب</h4><p class="text-gray-400">يقوم المساعد بإجراء عمليات بحث معقدة على الويب، وتجميع المعلومات من مصادر متعددة، وتقديم ملخص.</p><div class="tag-container"><span class="tag tag-automation">أتمتة</span></div></div>
-                    <div><h4 class="font-semibold text-white">76. التحكم في الأجهزة الذكية (IoT)</h4><p class="text-gray-400">"أخبر المساعد بتشغيل الأضواء في المكتب" (يتطلب تكاملًا مع منصات المنزل الذكي).</p><div class="tag-container"><span class="tag tag-automation">أتمتة</span></div></div>
-                    <div><h4 class="font-semibold text-white">77. مراقبة وسائل التواصل الاجتماعي</h4><p class="text-gray-400">يقوم المساعد بمراقبة Twitter أو منصات أخرى بحثًا عن إشارات إلى علامتك التجارية ويقدم ملخصًا.</p><div class="tag-container"><span class="tag tag-automation">أتمتة</span></div></div>
-                    <div><h4 class="font-semibold text-white">78. صياغة المستندات القانونية البسيطة</h4><p class="text-gray-400">إنشاء مسودات أولية لاتفاقيات عدم الإفشاء أو عقود العمل الحر بناءً على قوالب.</p><div class="tag-container"><span class="tag tag-automation">أتمتة</span></div></div>
-                    <div><h4 class="font-semibold text-white">79. التفاعل مع قواعد البيانات</h4><p class="text-gray-400">كتابة وتنفيذ استعلامات SQL بسيطة (للقراءة فقط) بناءً على طلبات اللغة الطبيعية.</p><div class="tag-container"><span class="tag tag-dev">أدوات مطور</span></div></div>
-                    <div><h4 class="font-semibold text-white">80. وكيل تسوق شخصي</h4><p class="text-gray-400">يقارن المساعد الأسعار والميزات للمنتجات عبر متاجر متعددة ويقدم توصية.</p><div class="tag-container"><span class="tag tag-automation">أتمتة</span></div></div>
-                </div>
-            </details>
-
-            <details>
-                <summary>الفئة الخامسة: تجربة المستخدم المتقدمة والواجهة <span class="summary-arrow">&#9662;</span></summary>
-                <div class="glass-pane p-6 border-t-0 rounded-b-xl space-y-4">
-                     <div><h4 class="font-semibold text-white">81. واجهة قابلة للتخصيص بالكامل</h4><p class="text-gray-400">السماح للمستخدم بسحب وإفلات عناصر الواجهة لإنشاء مساحة العمل المثالية له.</p><div class="tag-container"><span class="tag tag-ux">تجربة المستخدم</span></div></div>
-                    <div><h4 class="font-semibold text-white">82. أوامر صوتية متقدمة</h4><p class="text-gray-400">ليس فقط تحويل الكلام إلى نص، بل فهم أوامر مثل "يا مونيكا، لخص لي آخر 3 رسائل".</p><div class="tag-container"><span class="tag tag-ux">تجربة المستخدم</span></div></div>
-                    <div><h4 class="font-semibold text-white">83. وضع التركيز (Focus Mode)</h4><p class="text-gray-400">إخفاء جميع عناصر الواجهة غير الضرورية للتركيز على محادثة واحدة فقط.</p><div class="tag-container"><span class="tag tag-ux">تجربة المستخدم</span></div></div>
-                    <div><h4 class="font-semibold text-white">84. لوح معلومات ديناميكي</h4><p class="text-gray-400">لوحة جانبية تعرض معلومات سياقية تتغير بناءً على الموضوع الحالي للمحادثة.</p><div class="tag-container"><span class="tag tag-ux">تجربة المستخدم</span></div></div>
-                    <div><h4 class="font-semibold text-white">85. تصدير المحادثة بتنسيقات متعددة</h4><p class="text-gray-400">تصدير المحادثة كملف PDF، أو Markdown، أو حتى صفحة ويب تفاعلية.</p><div class="tag-container"><span class="tag tag-ux">تجربة المستخدم</span></div></div>
-                    <div><h4 class="font-semibold text-white">86. عرض مرئي للبيانات</h4><p class="text-gray-400">عندما تحتوي الاستجابة على بيانات، يقوم المساعد تلقائيًا بإنشاء رسم بياني تفاعلي.</p><div class="tag-container"><span class="tag tag-ux">تجربة المستخدم</span></div></div>
-                    <div><h4 class="font-semibold text-white">87. الإكمال التلقائي الذكي</h4><p class="text-gray-400">يقترح المساعد إكمال جملك بناءً على سياق المحادثة وأسلوبك المعتاد في الكتابة.</p><div class="tag-container"><span class="tag tag-ux">تجربة المستخدم</span><span class="tag tag-learning">تعلم ذاتي</span></div></div>
-                    <div><h4 class="font-semibold text-white">88. محرر متقدم للرسائل</h4><p class="text-gray-400">عند كتابة رسالة طويلة، يظهر محرر نصوص متكامل مع خيارات تنسيق كاملة.</p><div class="tag-container"><span class="tag tag-ux">تجربة المستخدم</span></div></div>
-                    <div><h4 class="font-semibold text-white">89. تكامل مع أدوات المطور (VS Code)</h4><p class="text-gray-400">إضافة تسمح لك بالتفاعل مع المساعد مباشرة من داخل محرر الأكواد الخاص بك.</p><div class="tag-container"><span class="tag tag-dev">أدوات مطور</span></div></div>
-                    <div><h4 class="font-semibold text-white">90. ميزة "لماذا؟"</h4><p class="text-gray-400">زر بجوار كل استجابة من الذكاء الاصطناعي يجعله يشرح المنطق وراء إجابته.</p><div class="tag-container"><span class="tag tag-ux">تجربة المستخدم</span></div></div>
-                    <!-- 15 more -->
-                     <div><h4 class="font-semibold text-white">91. معاينة الروابط والمرفقات</h4><p class="text-gray-400">عرض معاينة غنية للمحتوى عند لصق رابط ويب أو إرفاق ملف.</p><div class="tag-container"><span class="tag tag-ux">تجربة المستخدم</span></div></div>
-                    <div><h4 class="font-semibold text-white">92. تخصيص الإشعارات</h4><p class="text-gray-400">التحكم الدقيق في متى وكيف تتلقى الإشعارات (على سبيل المثال، فقط عند ذكر اسمك).</p><div class="tag-container"><span class="tag tag-ux">تجربة المستخدم</span></div></div>
-                    <div><h4 class="font-semibold text-white">93. شخصيات متعددة للمساعد</h4><p class="text-gray-400">التبديل بين شخصيات مختلفة للمساعد (مثل الرسمي، الإبداعي، الفكاهي) لتغيير أسلوب الردود.</p><div class="tag-container"><span class="tag tag-ux">تجربة المستخدم</span></div></div>
-                    <div><h4 class="font-semibold text-white">94. جولة تعريفية تفاعلية</h4><p class="text-gray-400">جولة يقودها الذكاء الاصطناعي لتعريف المستخدمين الجدد بأهم ميزات التطبيق.</p><div class="tag-container"><span class="tag tag-ux">تجربة المستخدم</span></div></div>
-                    <div><h4 class="font-semibold text-white">95. الوضع الليلي التكيفي</h4><p class="text-gray-400">تغيير سمة الألوان تلقائيًا بناءً على الوقت من اليوم أو إعدادات النظام.</p><div class="tag-container"><span class="tag tag-ux">تجربة المستخدم</span></div></div>
-                    <div><h4 class="font-semibold text-white">96. دمج المحادثات</h4><p class="text-gray-400">القدرة على دمج محادثتين منفصلتين في محادثة واحدة مستمرة.</p><div class="tag-container"><span class="tag tag-ux">تجربة المستخدم</span></div></div>
-                    <div><h4 class="font-semibold text-white">97. تقسيم المحادثات</h4><p class="text-gray-400">القدرة على أخذ جزء من محادثة طويلة وبدء محادثة جديدة به.</p><div class="tag-container"><span class="tag tag-ux">تجربة المستخدم</span></div></div>
-                    <div><h4 class="font-semibold text-white">98. عرض "العقل"</h4><p class="text-gray-400">واجهة مرئية تعرض "أفكار" المساعد في الوقت الفعلي أثناء قيامه بمعالجة طلبك.</p><div class="tag-container"><span class="tag tag-ux">تجربة المستخدم</span></div></div>
-                    <div><h4 class="font-semibold text-white">99. التعليقات على الرسائل</h4><p class="text-gray-400">(في بيئة الفريق) إضافة تعليقات على رسالة معينة دون مقاطعة تدفق المحادثة الرئيسي.</p><div class="tag-container"><span class="tag tag-ux">تجربة المستخدم</span></div></div>
-                    <div><h4 class="font-semibold text-white">100. الردود السريعة المقترحة</h4><p class="text-gray-400">يقترح المساعد ردودًا قصيرة بنقرة واحدة (مثل "نعم"، "شكرًا لك"، "لنفعل ذلك") بناءً على سياق الرسالة الأخيرة.</p><div class="tag-container"><span class="tag tag-ux">تجربة المستخدم</span></div></div>
-                    <div><h4 class="font-semibold text-white">101. المساعدة في الكتابة التعاونية</h4><p class="text-gray-400">محرر نصوص يمكن لعدة مستخدمين والذكاء الاصطناعي الكتابة فيه معًا في الوقت الفعلي.</p><div class="tag-container"><span class="tag tag-ux">تجربة المستخدم</span></div></div>
-                    <div><h4 class="font-semibold text-white">102. إخفاء المعلومات الحساسة</h4><p class="text-gray-400">يقوم المساعد تلقائيًا بإخفاء البيانات الحساسة مثل أرقام الهواتف أو مفاتيح API في عرض المحادثة.</p><div class="tag-container"><span class="tag tag-ux">تجربة المستخدم</span></div></div>
-                    <div><h4 class="font-semibold text-white">103. اختصارات الأوامر (Command Palette)</h4><p class="text-gray-400">شريط أوامر سريع (مثل Cmd+K) للوصول إلى أي إجراء أو محادثة في التطبيق بسرعة.</p><div class="tag-container"><span class="tag tag-ux">تجربة المستخدم</span><span class="tag tag-dev">أدوات مطور</span></div></div>
-                </div>
-            </details>
+        <div class="space-y-4" id="features-container">
+            <!-- Categories will be injected by JS -->
         </div>
     </main>
+
+    <div id="sticky-footer" class="sticky bottom-4 z-50 transition-transform duration-300">
+        <div class="max-w-screen-lg mx-auto glass-pane rounded-xl p-3 flex items-center justify-between gap-4">
+            <div>
+                <span class="font-bold text-slate-800">المحدد:</span>
+                <span id="selection-count" class="font-mono font-bold text-indigo-600">0</span>
+            </div>
+            <div class="flex items-center gap-2">
+                <button id="clear-selection-btn" class="px-4 py-2 rounded-lg font-semibold bg-slate-200 hover:bg-slate-300 text-slate-700 transition-colors">مسح التحديد</button>
+                <button id="copy-selected-btn" class="px-4 py-2 rounded-lg font-semibold bg-indigo-600 hover:bg-indigo-700 text-white transition-colors">نسخ المحدد</button>
+            </div>
+        </div>
+    </div>
+    
+    <div id="feedback-container"></div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const featuresData = [
+                {
+                    category: 'الفئة الأولى: الذاكرة والوعي الإدراكي',
+                    features: [
+                        { id: 1, text: "الذاكرة الدلالية عبر المواضيع: يربط المساعد المفاهيم من موضوعات مختلفة (مثل ربط فكرة من 'التسويق' بمشروع في 'الهندسة').", tags: ['memory'] },
+                        { id: 2, text: "تلخيص حالة المشروع عند العودة: عند العودة إلى موضوع قديم، يقدم المساعد ملخصًا فوريًا لـ 'آخر ما توصلنا إليه'.", tags: ['memory', 'ux'] },
+                        { id: 3, text: "تتبع العناصر القابلة للتنفيذ: يتعرف تلقائيًا على المهام أو الأسئلة التي لم تتم الإجابة عليها في المحادثة ويذكرك بها.", tags: ['proactive', 'automation'] },
+                        { id: 4, text: "الذاكرة البصرية: يتذكر المساعد محتوى الصور التي أرسلتها سابقًا ويمكنه الإجابة على أسئلة حولها لاحقًا.", tags: ['memory'] },
+                        { id: 5, text: "تتبع تطور الأفكار: يمكنك أن تسأل 'كيف تطورت فكرتنا حول مشروع X؟' وسيعرض لك المساعد التسلسل الزمني للقرارات.", tags: ['memory'] },
+                        { id: 6, text: "البحث الدلالي الشامل: البحث عن 'تلك الفكرة عن الألوان' للعثور على الرسائل ذات الصلة حتى لو لم تذكر كلمة 'ألوان'.", tags: ['memory'] },
+                        { id: 7, text: "فهم الأهداف طويلة المدى: يفهم المساعد أهدافك العامة (مثل 'إطلاق منتج جديد') ويقيم الاقتراحات بناءً على مدى توافقها مع هذا الهدف.", tags: ['memory', 'proactive'] },
+                        { id: 8, text: "التعرف على التناقضات: إذا قلت شيئًا اليوم يتعارض مع ما قلته الأسبوع الماضي، سينبهك المساعد بلطف.", tags: ['proactive'] },
+                        { id: 9, text: "تتبع الأشخاص والكيانات: يفهم المساعد من هم 'أحمد' أو ما هو 'مشروع ألفا' ويحتفظ بسياقهم عبر المحادثة.", tags: ['memory'] },
+                        { id: 10, text: "تحديد الفجوات المعرفية: يقول المساعد، 'لقد تحدثنا عن الواجهة الأمامية، ولكننا لم نناقش بعد قاعدة البيانات. هل ننتقل إليها؟'", tags: ['proactive'] },
+                        { id: 11, text: "الذاكرة القابلة للتعديل: يمكنك تصحيح ذاكرة المساعد مباشرة بقول 'لا، تذكر أن العميل هو شركة Y وليس X'.", tags: ['memory', 'ux'] },
+                        { id: 12, text: "الذاكرة المؤقتة للمهام: إنشاء 'لوح كتابة' مؤقت لمهمة معينة، يتم مسحه عند الانتهاء للحفاظ على نظافة الذاكرة الرئيسية.", tags: ['memory'] },
+                        { id: 13, text: "تصنيف الذكريات تلقائيًا: يصنف الذكريات تلقائيًا إلى فئات (حقائق، آراء، قرارات، مهام) لسهولة الاسترجاع.", tags: ['memory'] },
+                        { id: 14, text: "فهم السياق الضمني: عندما تقول 'لنبدأ'، يفهم المساعد أنك تقصد بدء المهمة التي كنتم تناقشونها آخر مرة.", tags: ['memory'] },
+                        { id: 15, text: "تتبع القرارات وأسبابها: يمكنك أن تسأل 'لماذا اخترنا استخدام React؟' وسيعطيك ملخصًا للنقاش الذي أدى إلى هذا القرار.", tags: ['memory'] },
+                        { id: 16, text: "ربط المحادثات بالمصادر الخارجية: يربط المساعد أجزاء من المحادثة بمستندات Google Docs أو روابط Notion ذات الصلة تلقائيًا.", tags: ['automation'] },
+                        { id: 17, text: "الذاكرة القائمة على الأولوية: يعطي المساعد أهمية أكبر للحقائق التي تم تأكيدها مؤخرًا أو بشكل متكرر.", tags: ['memory'] },
+                        { id: 18, text: "نسيان انتقائي: يمكنك أن تطلب من المساعد 'نسيان كل ما يتعلق بمشروع Z القديم'.", tags: ['memory'] },
+                        { id: 19, text: "استنتاج العلاقات: إذا ذكرت 'علي من فريق التسويق' و 'فاطمة رئيسة التسويق'، يستنتج المساعد أن فاطمة هي مديرة علي.", tags: ['memory'] },
+                        { id: 20, text: "فهم التسلسل الهرمي للمعلومات: يفهم أن 'تغيير لون الزر' هو جزء فرعي من مهمة 'تحديث الصفحة الرئيسية'.", tags: ['memory'] },
+                    ]
+                },
+                {
+                    category: 'الفئة الثانية: الذكاء الاستباقي والمساعدة الذاتية',
+                    features: [
+                        { id: 21, text: "اقتراح الخطوات التالية: بعد الانتهاء من مهمة، يقترح المساعد تلقائيًا 3 خيارات منطقية للخطوة التالية.", tags: ['proactive'] },
+                        { id: 22, text: "تحديد المخاطر المحتملة: 'بناءً على خطتنا، قد نواجه تأخيرًا إذا لم تتم الموافقة على التصميم بحلول يوم الأربعاء.'", tags: ['proactive'] },
+                        { id: 23, text: "توليد ملخصات يومية/أسبوعية: في بداية كل يوم، يرسل المساعد ملخصًا للمهام المكتملة بالأمس والمهام ذات الأولوية لليوم.", tags: ['automation'] },
+                        { id: 24, text: "توصيات مخصصة: 'لقد لاحظت أنك تبحث كثيرًا عن تصميم الواجهات. هل ترغب في الاطلاع على هذا المقال الجديد؟'", tags: ['proactive'] },
+                        { id: 25, text: "أتمتة المهام المتكررة: 'يبدو أنك تقوم بإنشاء تقرير أسبوعي بنفس الطريقة كل مرة. هل تود أن أقوم بأتمتة هذه العملية؟'", tags: ['automation'] },
+                        { id: 26, text: "التحضير للاجتماعات: قبل اجتماع قادم في تقويمك، يجمع المساعد المحادثات والمستندات ذات الصلة ويقدم لك ملخصًا.", tags: ['automation'] },
+                        { id: 27, text: "مراقبة التقدم نحو الأهداف: يقدم المساعد تقارير دورية حول مدى تقدمك نحو الأهداف طويلة المدى التي حددتها.", tags: ['proactive'] },
+                        { id: 28, text: "وكيل تحسين التعليمات (Prompt): عندما تكتب أمرًا، يقترح المساعد، 'يمكنني تنفيذ ذلك، ولكن قد تحصل على نتيجة أفضل إذا استخدمت هذه الصيغة...'", tags: ['learning'] },
+                        { id: 29, text: "اكتشاف الأنماط غير الفعالة: 'لقد لاحظت أننا نناقش نفس المشكلة كل أسبوع. ربما يجب أن نخصص جلسة لحلها بشكل نهائي.'", tags: ['proactive'] },
+                        { id: 30, text: "إنشاء مسودات استباقية: بناءً على محادثة، يقوم المساعد تلقائيًا بإنشاء مسودة بريد إلكتروني أو مستند يلخص النقاط الرئيسية.", tags: ['automation'] },
+                    ]
+                },
+                {
+                    category: 'الفئة الثالثة: التعلم الذاتي والتطور المستمر',
+                    features: [
+                        { id: 31, text: "حلقة التغذية الراجعة: بعد كل إجابة معقدة، يسأل المساعد 'هل كانت هذه الإجابة مفيدة؟' ويستخدم الإجابة لتحسين نفسه.", tags: ['learning'] },
+                        { id: 32, text: "التعلم من التصحيحات: عندما تصحح معلومة قدمها، يتذكر المساعد التصحيح ويطبقه في المستقبل.", tags: ['learning'] },
+                        { id: 33, text: "اقتراح أدوات جديدة لنفسه: 'لقد لاحظت أنك تسأل كثيرًا عن أسعار الأسهم. هل تود أن أضيف أداة للحصول على بيانات السوق في الوقت الفعلي؟'", tags: ['learning', 'dev'] },
+                        { id: 34, text: "فهم تفضيلات المستخدم الضمنية: يتعلم المساعد من خلال الرسائل التي تتفاعل معها أكثر من غيرها لتحديد المحتوى الذي يثير اهتمامك.", tags: ['learning'] },
+                        { id: 35, text: "بناء نموذج شخصي للمستخدم: ينشئ المساعد نموذجًا داخليًا لاهتماماتك وخبراتك وأهدافك لتخصيص كل تفاعل.", tags: ['learning', 'memory'] },
+                        { id: 36, text: "التكيف مع المصطلحات الخاصة: يتعلم المساعد المصطلحات والاختصارات الخاصة بشركتك أو مشروعك ويستخدمها بشكل صحيح.", tags: ['learning'] },
+                    ]
+                },
+                {
+                    category: 'الفئة الرابعة: أتمتة المهام وتكامل الأدوات',
+                    features: [
+                         { id: 37, text: "منشئ سير عمل باللغة الطبيعية: تصف مهمة معقدة باللغة العادية، ويقوم المساعد تلقائيًا بتحويلها إلى سير عمل مرئي متعدد الخطوات.", tags: ['automation'] },
+                        { id: 38, text: "تكامل مع تقويم Google/Outlook: يمكن للمساعد قراءة جدولك الزمني، والعثور على أوقات فراغ، وإنشاء اجتماعات مباشرة من المحادثة.", tags: ['automation'] },
+                        { id: 39, text: "تكامل مع البريد الإلكتروني: تلخيص رسائل البريد الإلكتروني الجديدة، وإنشاء مسودات ردود، وإرسالها بعد موافقتك.", tags: ['automation'] },
+                        { id: 40, text: "تنفيذ أوامر Shell/Code: تنفيذ أوامر برمجية بسيطة في بيئة آمنة ومعزولة وإرجاع الناتج.", tags: ['dev'] },
+                        { id: 41, text: "إدارة المشاريع (Trello/Jira): إنشاء بطاقات مهام جديدة، وتحديث حالتها، وإضافة تعليقات مباشرة من المحادثة.", tags: ['automation'] },
+                    ]
+                },
+                 {
+                    category: 'الفئة الخامسة: تجربة المستخدم المتقدمة والواجهة',
+                    features: [
+                        { id: 42, text: "واجهة قابلة للتخصيص بالكامل: السماح للمستخدم بسحب وإفلات عناصر الواجهة لإنشاء مساحة العمل المثالية له.", tags: ['ux'] },
+                        { id: 43, text: "أوامر صوتية متقدمة: ليس فقط تحويل الكلام إلى نص، بل فهم أوامر مثل 'يا مونيكا، لخص لي آخر 3 رسائل'.", tags: ['ux'] },
+                        { id: 44, text: "لوح معلومات ديناميكي: لوحة جانبية تعرض معلومات سياقية تتغير بناءً على الموضوع الحالي للمحادثة.", tags: ['ux'] },
+                        { id: 45, text: "عرض مرئي للبيانات: عندما تحتوي الاستجابة على بيانات، يقوم المساعد تلقائيًا بإنشاء رسم بياني تفاعلي.", tags: ['ux'] },
+                        { id: 46, text: "الإكمال التلقائي الذكي: يقترح المساعد إكمال جملك بناءً على سياق المحادثة وأسلوبك المعتاد في الكتابة.", tags: ['ux', 'learning'] },
+                        { id: 47, text: "تكامل مع أدوات المطور (VS Code): إضافة تسمح لك بالتفاعل مع المساعد مباشرة من داخل محرر الأكواد الخاص بك.", tags: ['dev'] },
+                        { id: 48, text: "ميزة 'لماذا؟': زر بجوار كل استجابة من الذكاء الاصطناعي يجعله يشرح المنطق وراء إجابته.", tags: ['ux'] },
+                        { id: 49, text: "شخصيات متعددة للمساعد: التبديل بين شخصيات مختلفة للمساعد (مثل الرسمي، الإبداعي، الفكاهي) لتغيير أسلوب الردود.", tags: ['ux'] },
+                        { id: 50, text: "الردود السريعة المقترحة: يقترح المساعد ردودًا قصيرة بنقرة واحدة (مثل 'نعم'، 'شكرًا لك'، 'لنفعل ذلك') بناءً على سياق الرسالة الأخيرة.", tags: ['ux'] },
+                        { id: 51, text: "اختصارات الأوامر (Command Palette): شريط أوامر سريع (مثل Cmd+K) للوصول إلى أي إجراء أو محادثة في التطبيق بسرعة.", tags: ['ux', 'dev'] },
+                    ]
+                }
+            ];
+
+            const tagClasses = {
+                memory: 'tag-memory',
+                proactive: 'tag-proactive',
+                automation: 'tag-automation',
+                ux: 'tag-ux',
+                dev: 'tag-dev',
+                learning: 'tag-learning'
+            };
+
+            const container = document.getElementById('features-container');
+            const selectionCountEl = document.getElementById('selection-count');
+            const copySelectedBtn = document.getElementById('copy-selected-btn');
+            const clearSelectionBtn = document.getElementById('clear-selection-btn');
+            const feedbackContainer = document.getElementById('feedback-container');
+            
+            let editingState = null;
+
+            const render = () => {
+                container.innerHTML = '';
+                featuresData.forEach(category => {
+                    const details = document.createElement('details');
+                    details.open = true;
+
+                    const summary = document.createElement('summary');
+                    summary.innerHTML = `${category.category} <span class="summary-arrow">&#9662;</span>`;
+                    
+                    const contentDiv = document.createElement('div');
+                    contentDiv.className = 'glass-pane p-6 border-t-0 rounded-b-xl space-y-4';
+                    
+                    category.features.forEach(feature => {
+                        const itemDiv = document.createElement('div');
+                        itemDiv.className = 'feature-item flex items-start gap-4 p-3 rounded-lg hover:bg-slate-100';
+                        itemDiv.style.opacity = '0';
+                        
+                        const checkbox = document.createElement('input');
+                        checkbox.type = 'checkbox';
+                        checkbox.className = 'mt-1.5 h-5 w-5 rounded border-gray-300 text-indigo-600 focus:ring-indigo-500 shrink-0';
+                        checkbox.dataset.id = feature.id;
+
+                        const textDiv = document.createElement('div');
+                        textDiv.className = 'flex-grow';
+                        
+                        const textSpan = document.createElement('span');
+                        textSpan.className = 'text-slate-700 cursor-pointer';
+                        textSpan.textContent = feature.text;
+                        textSpan.dataset.id = feature.id;
+
+                        const editDiv = document.createElement('div');
+                        editDiv.className = 'hidden mt-2';
+                        const textarea = document.createElement('textarea');
+                        textarea.className = 'w-full p-2 rounded-md border border-slate-300 focus:ring-indigo-500 focus:border-indigo-500';
+                        textarea.rows = 3;
+                        textarea.value = feature.text;
+                        const saveBtn = document.createElement('button');
+                        saveBtn.textContent = 'حفظ';
+                        saveBtn.className = 'mt-1 px-3 py-1 bg-indigo-600 text-white rounded-md text-sm';
+                        const cancelBtn = document.createElement('button');
+                        cancelBtn.textContent = 'إلغاء';
+                        cancelBtn.className = 'mt-1 mr-2 px-3 py-1 bg-slate-200 text-slate-700 rounded-md text-sm';
+                        
+                        editDiv.appendChild(textarea);
+                        editDiv.appendChild(cancelBtn);
+                        editDiv.appendChild(saveBtn);
+                        
+                        const tagContainer = document.createElement('div');
+                        tagContainer.className = 'tag-container';
+                        feature.tags.forEach(tag => {
+                            const tagEl = document.createElement('span');
+                            tagEl.className = `tag ${tagClasses[tag]}`;
+                            tagEl.textContent = tag.charAt(0).toUpperCase() + tag.slice(1);
+                            tagContainer.appendChild(tagEl);
+                        });
+
+                        textDiv.appendChild(textSpan);
+                        textDiv.appendChild(editDiv);
+                        textDiv.appendChild(tagContainer);
+                        
+                        const copyBtn = document.createElement('button');
+                        copyBtn.textContent = 'نسخ';
+                        copyBtn.className = 'px-3 py-1.5 rounded-lg font-semibold bg-slate-200 hover:bg-slate-300 text-slate-700 transition-colors text-sm shrink-0';
+                        copyBtn.dataset.id = feature.id;
+                        
+                        itemDiv.appendChild(checkbox);
+                        itemDiv.appendChild(textDiv);
+                        itemDiv.appendChild(copyBtn);
+
+                        contentDiv.appendChild(itemDiv);
+                    });
+                    
+                    details.appendChild(summary);
+                    details.appendChild(contentDiv);
+                    container.appendChild(details);
+                });
+            };
+
+            const showFeedback = (message) => {
+                const popup = document.createElement('div');
+                popup.textContent = message;
+                popup.className = 'feedback-popup';
+                feedbackContainer.appendChild(popup);
+                setTimeout(() => {
+                    popup.style.opacity = '0';
+                    popup.style.transition = 'opacity 0.5s ease';
+                    setTimeout(() => popup.remove(), 500);
+                }, 1500);
+            };
+
+            const copyToClipboard = (text, btn) => {
+                navigator.clipboard.writeText(text).then(() => {
+                    const originalText = btn.textContent;
+                    btn.textContent = 'تم النسخ!';
+                    btn.classList.add('bg-green-500', 'text-white');
+                    setTimeout(() => {
+                        btn.textContent = originalText;
+                        btn.classList.remove('bg-green-500', 'text-white');
+                    }, 1500);
+                    showFeedback('تم نسخ النص بنجاح!');
+                });
+            };
+
+            const updateSelectionCount = () => {
+                const count = document.querySelectorAll('input[type="checkbox"]:checked').length;
+                selectionCountEl.textContent = count;
+                copySelectedBtn.disabled = count === 0;
+                clearSelectionBtn.disabled = count === 0;
+            };
+
+            const endEditing = () => {
+                if (editingState) {
+                    const { textSpan, editDiv } = editingState;
+                    editDiv.classList.add('hidden');
+                    textSpan.classList.remove('hidden');
+                    editingState = null;
+                }
+            };
+            
+            container.addEventListener('click', (e) => {
+                const target = e.target;
+                
+                // Handle checkbox change
+                if (target.type === 'checkbox') {
+                    updateSelectionCount();
+                }
+
+                // Handle single copy
+                if (target.matches('button') && target.textContent === 'نسخ') {
+                    const id = target.dataset.id;
+                    const feature = featuresData.flatMap(c => c.features).find(f => f.id == id);
+                    copyToClipboard(feature.text, target);
+                }
+
+                // Handle edit click
+                if (target.matches('span.cursor-pointer')) {
+                    endEditing(); // End any other editing session
+                    const id = target.dataset.id;
+                    const textDiv = target.parentElement;
+                    const editDiv = textDiv.querySelector('div');
+                    target.classList.add('hidden');
+                    editDiv.classList.remove('hidden');
+                    editDiv.querySelector('textarea').focus();
+                    editingState = { textSpan: target, editDiv };
+                }
+
+                // Handle edit save
+                if (target.matches('button') && target.textContent === 'حفظ') {
+                    const textDiv = target.closest('.flex-grow');
+                    const textSpan = textDiv.querySelector('span');
+                    const textarea = textDiv.querySelector('textarea');
+                    const id = textSpan.dataset.id;
+                    
+                    const feature = featuresData.flatMap(c => c.features).find(f => f.id == id);
+                    feature.text = textarea.value;
+                    textSpan.textContent = textarea.value;
+                    endEditing();
+                }
+
+                // Handle edit cancel
+                if (target.matches('button') && target.textContent === 'إلغاء') {
+                     const textDiv = target.closest('.flex-grow');
+                    const textarea = textDiv.querySelector('textarea');
+                    const id = textDiv.querySelector('span').dataset.id;
+                    const feature = featuresData.flatMap(c => c.features).find(f => f.id == id);
+                    textarea.value = feature.text; // Reset textarea value
+                    endEditing();
+                }
+            });
+
+            copySelectedBtn.addEventListener('click', () => {
+                const selected = Array.from(document.querySelectorAll('input[type="checkbox"]:checked'));
+                if (selected.length === 0) return;
+                
+                const textToCopy = selected.map(checkbox => {
+                    const id = checkbox.dataset.id;
+                    return featuresData.flatMap(c => c.features).find(f => f.id == id).text;
+                }).join('\n\n---\n\n');
+                
+                copyToClipboard(textToCopy, copySelectedBtn);
+            });
+
+            clearSelectionBtn.addEventListener('click', () => {
+                document.querySelectorAll('input[type="checkbox"]:checked').forEach(checkbox => checkbox.checked = false);
+                updateSelectionCount();
+            });
+
+            render();
+            updateSelectionCount();
+        });
+    </script>
 </body>
 </html>
