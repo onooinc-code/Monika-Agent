@@ -1,6 +1,4 @@
 
-
-
 import React, { useState, useEffect } from 'react';
 import { Conversation, Agent } from '../types/index.ts';
 import { useAppContext } from '../contexts/StateProvider.tsx';
@@ -80,7 +78,7 @@ const DashboardHeader: React.FC<{ toggleSidebar: () => void }> = ({ toggleSideba
     const { agents, setIsSettingsOpen, setIsTeamGeneratorOpen, setIsApiUsageOpen } = useAppContext();
     return (
         <header 
-            className="p-2 flex justify-between items-stretch gap-2 flex-shrink-0 z-20 border-b border-white/10 shadow-lg"
+            className="sticky top-0 p-2 flex justify-between items-stretch gap-2 flex-shrink-0 z-30 border-b border-white/10 shadow-lg"
             style={{
                 background: 'linear-gradient(-45deg, #0a0a0f, #1e293b, #3b0764, #1e293b, #0a0a0f)',
                 backgroundSize: '400% 400%',
@@ -161,7 +159,7 @@ const ConversationHeader: React.FC<{ toggleSidebar: () => void, conversation: Co
     const bookmarkedCount = activeConversation?.messages.filter(m => m.isBookmarked).length || 0;
 
     return (
-        <header className="p-2 flex justify-between items-center flex-shrink-0 z-20 border-b border-white/10 shadow-md bg-[var(--color-primary-header)]">
+        <header className="sticky top-0 p-2 flex justify-between items-center flex-shrink-0 z-30 border-b border-white/10 shadow-md bg-[var(--color-primary-header)]">
             {/* Left */}
             <div className="flex items-center gap-2 flex-1 min-w-0">
                 <button onClick={toggleSidebar} className="p-2 rounded-full hover:bg-white/10 transition-colors" aria-label="Toggle Sidebar" title="Toggle conversation list">
@@ -205,7 +203,7 @@ const ConversationHeader: React.FC<{ toggleSidebar: () => void, conversation: Co
             <div className="flex-none mx-4">
                 <div className="flex items-center glass-pane rounded-full p-1 text-xs">
                     <button onClick={() => setConversationMode('Dynamic')} title="AI Manager creates a dynamic plan" className={`px-3 py-1 font-semibold rounded-full transition-all ${ conversationMode === 'Dynamic' ? 'bg-indigo-600 text-white neon-glow-indigo' : 'text-gray-300 hover:bg-white/5' }`}> Dynamic </button>
-                    <button onClick={() => setConversationMode('AI')} title="AI Agent manages the flow" className={`px-3 py-1 font-semibold rounded-full transition-all ${ conversationMode === 'AI' ? 'bg-indigo-600 text-white neon-glow-indigo' : 'text-gray-300 hover:bg-white/5' }`}> AI Agent </button>
+                    <button onClick={() => setConversationMode('Continuous')} title="A single, continuous conversation with multiple topics" className={`px-3 py-1 font-semibold rounded-full transition-all ${ conversationMode === 'Continuous' ? 'bg-indigo-600 text-white neon-glow-indigo' : 'text-gray-300 hover:bg-white/5' }`}> Continuous </button>
                     <button onClick={() => setConversationMode('Manual')} title="Manually choose the agent" className={`px-3 py-1 font-semibold rounded-full transition-all ${ conversationMode === 'Manual' ? 'bg-indigo-600 text-white neon-glow-indigo' : 'text-gray-300 hover:bg-white/5' }`}> Manual </button>
                 </div>
             </div>

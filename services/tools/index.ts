@@ -1,5 +1,4 @@
 
-
 import { calculator, calculatorSchema } from './calculator.ts';
 import { getCurrentWeather, getCurrentWeatherSchema } from './weather.ts';
 import { executeShellCommand, executeShellCommandSchema } from './shell.ts';

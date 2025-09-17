@@ -1,6 +1,4 @@
 
-
-
 import { useState } from 'react';
 import { Conversation, Agent, AgentManager, Attachment, ManualSuggestion, Message, ConversationMode, LongTermMemoryData, PlanStep } from '../../types/index.ts';
 import * as AgentService from '../../services/chat/agentService.ts';
@@ -204,7 +202,7 @@ export const useChatHandler = ({ agents, agentManager, globalApiKey, activeConve
                     currentMessages = currentMessages.map(m => m.id === aiMessageId ? finalMessage : m) as Message[];
                     logUsage(TokenCounter.estimateTokens(finalMessage as Message), step.agentId, 1);
                 }
-            } else if (conversationMode === 'AI') {
+            } else if (conversationMode === 'Continuous') {
                 setLoadingStage({ stage: 'deciding' });
                 const managerResponse = await ManagerService.decideNextSpeaker(text, agents, currentMessages, agentManager, activeConversation.systemInstructionOverride, globalApiKey);
                 logUsage(0, 'manager', 1);

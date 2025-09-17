@@ -1,6 +1,4 @@
 
-
-
 import React, { useEffect, useState } from 'react';
 import { Header } from './components/Header.tsx';
 import { MessageList } from './components/MessageList.tsx';
@@ -22,6 +20,7 @@ import { TeamGeneratorModal } from './components/TeamGeneratorModal.tsx';
 import { ApiUsageModal } from './components/ApiUsageModal.tsx';
 import { BookmarkedMessagesPanel } from './components/BookmarkedMessagesPanel.tsx';
 import { MessageArchiveModal } from './components/MessageArchiveModal.tsx';
+import { ContextMenu } from './components/ContextMenu.tsx';
 
 export default function App() {
   const { 
@@ -36,7 +35,8 @@ export default function App() {
     setIsConversationSettingsOpen,
     setConversationMode,
     handleShowHistory,
-    isBookmarksPanelOpen
+    isBookmarksPanelOpen,
+    closeContextMenu,
   } = useAppContext();
 
   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
@@ -46,7 +46,7 @@ export default function App() {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
   }, [activeConversation?.messages, messagesEndRef]);
 
-  // Global keyboard shortcuts
+  // Global keyboard shortcuts & click listeners
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
       // Close modals with Escape key
@@ -54,6 +54,7 @@ export default function App() {
         if (isSettingsOpen) setIsSettingsOpen(false);
         if (isHistoryOpen) setIsHistoryOpen(false);
         if (isConversationSettingsOpen) setIsConversationSettingsOpen(false);
+        closeContextMenu();
       }
 
       // Alt-based shortcuts
@@ -64,7 +65,7 @@ export default function App() {
             setConversationMode('Dynamic');
             break;
           case '2':
-            setConversationMode('AI');
+            setConversationMode('Continuous');
             break;
           case '3':
             setConversationMode('Manual');
@@ -92,18 +93,24 @@ export default function App() {
         }
       }
     };
+    
+    const handleClick = () => {
+        closeContextMenu();
+    };
 
     window.addEventListener('keydown', handleKeyDown);
+    window.addEventListener('click', handleClick);
     return () => {
       window.removeEventListener('keydown', handleKeyDown);
+      window.removeEventListener('click', handleClick);
     };
-  }, [isSettingsOpen, isHistoryOpen, isConversationSettingsOpen, setIsSettingsOpen, setIsHistoryOpen, setIsConversationSettingsOpen, setConversationMode, handleShowHistory, activeConversation]);
+  }, [isSettingsOpen, isHistoryOpen, isConversationSettingsOpen, setIsSettingsOpen, setIsHistoryOpen, setIsConversationSettingsOpen, setConversationMode, handleShowHistory, activeConversation, closeContextMenu]);
 
   return (
     <div className="flex h-screen bg-[#0a0a0f] text-gray-200 overflow-hidden" style={{fontFamily: "'Inter', sans-serif"}}>
         <ConversationList isOpen={isSidebarOpen} />
         <div className="flex flex-1 min-w-0">
-            <main className="flex flex-col flex-1">
+            <main className="flex flex-col flex-1 bg-[#0a0a0f]">
                 <Header 
                   isSidebarOpen={isSidebarOpen} 
                   toggleSidebar={() => setIsSidebarOpen(!isSidebarOpen)}
@@ -130,6 +137,7 @@ export default function App() {
         <TeamGeneratorModal />
         <ApiUsageModal />
         <MessageArchiveModal />
+        <ContextMenu />
     </div>
   );
 }

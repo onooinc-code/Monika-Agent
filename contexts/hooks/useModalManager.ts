@@ -1,9 +1,6 @@
 
-
-
-
 import { useState } from 'react';
-import { PipelineStep, Message } from '../../types/index.ts';
+import { PipelineStep, Message, ContextMenuItem } from '../../types/index.ts';
 
 export interface ActionModalButton {
     label: string;
@@ -16,6 +13,13 @@ export interface ActionModalState {
     title: string;
     content: string;
     actions: ActionModalButton[] | null;
+}
+
+export interface ContextMenuState {
+    isOpen: boolean;
+    x: number;
+    y: number;
+    menuItems: ContextMenuItem[];
 }
 
 export const useModalManager = () => {
@@ -39,6 +43,12 @@ export const useModalManager = () => {
     const [isApiUsageOpen, setIsApiUsageOpen] = useState(false);
     const [isArchiveOpen, setIsArchiveOpen] = useState(false);
     const [isBookmarksPanelOpen, setIsBookmarksPanelOpen] = useState(false);
+    const [contextMenuState, setContextMenuState] = useState<ContextMenuState>({
+        isOpen: false,
+        x: 0,
+        y: 0,
+        menuItems: []
+    });
 
     const handleShowHtmlPreview = (html: string) => {
         setHtmlPreviewContent(html);
@@ -83,6 +93,14 @@ export const useModalManager = () => {
         setPromptInspectorData(null);
     };
     
+    const openContextMenu = (x: number, y: number, menuItems: ContextMenuItem[]) => {
+        setContextMenuState({ isOpen: true, x, y, menuItems });
+    };
+
+    const closeContextMenu = () => {
+        setContextMenuState(prev => ({ ...prev, isOpen: false }));
+    };
+
     return {
         isSettingsOpen, setIsSettingsOpen,
         isHistoryOpen, setIsHistoryOpen,
@@ -99,5 +117,6 @@ export const useModalManager = () => {
         isApiUsageOpen, setIsApiUsageOpen,
         isArchiveOpen, setIsArchiveOpen,
         isBookmarksPanelOpen, setIsBookmarksPanelOpen,
+        contextMenuState, openContextMenu, closeContextMenu,
     };
 };

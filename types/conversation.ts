@@ -1,3 +1,4 @@
+
 import { Message } from './message.ts';
 
 export interface DiscussionSettings {
@@ -18,10 +19,11 @@ export interface Conversation {
     featureFlags?: {
         memoryExtraction: boolean;
         proactiveSuggestions: boolean;
+
         autoSummarization: boolean;
     };
     discussionSettings?: DiscussionSettings;
     managerSettings?: ManagerSettings;
 }
 
-export type ConversationMode = 'AI' | 'Manual' | 'Dynamic';
+export type ConversationMode = 'Continuous' | 'Manual' | 'Dynamic';

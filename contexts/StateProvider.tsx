@@ -1,9 +1,6 @@
 
-
-
-
 import React, { createContext, useContext, useRef, useCallback, useState } from 'react';
-import { Agent, AgentManager, ConversationMode, Attachment, ManualSuggestion, HistoryView, Conversation, PipelineStep, UsageMetrics, Message, LongTermMemoryData, BubbleSettings } from '../types/index.ts';
+import { Agent, AgentManager, ConversationMode, Attachment, ManualSuggestion, HistoryView, Conversation, PipelineStep, UsageMetrics, Message, LongTermMemoryData, BubbleSettings, ContextMenuItem } from '../types/index.ts';
 import { useLocalStorage } from '../hooks/useLocalStorage.ts';
 import { useConversationManager } from './hooks/useConversationManager.ts';
 import { useChatHandler, LoadingStage } from './hooks/useChatHandler.ts';
@@ -12,7 +9,7 @@ import { useModalManager } from './hooks/useModalManager.ts';
 import { useUsageTracker } from './hooks/useUsageTracker.ts';
 import { useMemoryManager } from './hooks/useMemoryManager.ts';
 import * as MemoryService from '../services/analysis/memoryService.ts';
-import { ActionModalState } from './hooks/useModalManager.ts';
+import { ActionModalState, ContextMenuState } from './hooks/useModalManager.ts';
 import * as AgentConstants from '../constants/agentConstants.ts';
 
 interface AppState {
@@ -136,6 +133,11 @@ interface AppState {
     // Agent Status
     handleToggleAgentEnabled: (agentId: string) => void;
     lastTurnAgentIds: Set<string>;
+    
+    // Context Menu
+    contextMenuState: ContextMenuState;
+    openContextMenu: (x: number, y: number, items: ContextMenuItem[]) => void;
+    closeContextMenu: () => void;
 }
 
 const AppContext = createContext<AppState | undefined>(undefined);
@@ -147,8 +149,8 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     const [conversationMode, setConversationMode] = useLocalStorage<ConversationMode>('conversation-mode', 'Dynamic');
     const [sendOnEnter, setSendOnEnter] = useLocalStorage<boolean>('send-on-enter', true);
     const [globalApiKey, setGlobalApiKey] = useLocalStorage<string>('global-api-key', '');
-    const [agentBubbleSettings, setAgentBubbleSettings] = useLocalStorage<BubbleSettings>('agent-bubble-settings', { alignment: 'left', scale: 1, textDirection: 'ltr', fontSize: 1.1 });
-    const [userBubbleSettings, setUserBubbleSettings] = useLocalStorage<BubbleSettings>('user-bubble-settings', { alignment: 'right', scale: 1, textDirection: 'ltr', fontSize: 1.1 });
+    const [agentBubbleSettings, setAgentBubbleSettings] = useLocalStorage<BubbleSettings>('agent-bubble-settings', { alignment: 'left', scale: 1, textDirection: 'ltr', fontSize: 1 });
+    const [userBubbleSettings, setUserBubbleSettings] = useLocalStorage<BubbleSettings>('user-bubble-settings', { alignment: 'right', scale: 1, textDirection: 'ltr', fontSize: 1 });
     
     // 2. Refs & Local State
     const messagesEndRef = useRef<HTMLDivElement>(null);
@@ -344,6 +346,11 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
         // Agent Status
         handleToggleAgentEnabled,
         lastTurnAgentIds,
+
+        // Context Menu
+        contextMenuState: modalManager.contextMenuState,
+        openContextMenu: modalManager.openContextMenu,
+        closeContextMenu: modalManager.closeContextMenu,
     };
 
     return (

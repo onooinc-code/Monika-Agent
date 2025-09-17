@@ -1,6 +1,4 @@
 
-
-
 import React from 'react';
 import { MessageBubble } from './MessageBubble.tsx';
 import { TopicDivider } from './TopicDivider.tsx';

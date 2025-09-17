@@ -1,5 +1,4 @@
 
-
 import { getGenAIClient } from '../gemini/client.ts';
 import { Agent, Message, AgentManager, ManualSuggestion, PipelineStep, PlanStep } from '../../types/index.ts';
 import { buildContext } from '../utils/contextBuilder.ts';
@@ -60,7 +59,7 @@ export const decideNextSpeaker = async (
                     type: Type.OBJECT,
                     properties: {
                         nextSpeaker: { type: Type.STRING, description: "The ID of the agent that should speak next." },
-                        newTopic: { type: Type.STRING, description: "The name of the new topic if one is detected, otherwise null." }
+                        new_topic: { type: Type.STRING, description: "The name of the new topic if one is detected, otherwise null." }
                     }
                 }
             }
@@ -79,7 +78,7 @@ export const decideNextSpeaker = async (
         }
 
         const nextSpeaker = typeof json.nextSpeaker === 'string' ? json.nextSpeaker : null;
-        const newTopic = typeof json.newTopic === 'string' && json.newTopic.trim() ? json.newTopic.trim() : undefined;
+        const newTopic = typeof json.new_topic === 'string' && json.new_topic.trim() ? json.new_topic.trim() : undefined;
 
 
         pipeline.push({

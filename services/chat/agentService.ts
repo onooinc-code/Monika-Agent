@@ -1,16 +1,10 @@
 
-
-
-
-
-
-
-
 import { getGenAIClient } from '../gemini/client.ts';
 import { Agent, Message, Attachment, PipelineStep, LongTermMemoryData } from '../../types/index.ts';
 import { handleAndThrowError } from '../utils/errorHandler.ts';
 import { availableTools, toolSchemas } from '../tools/index.ts';
 import { getFullMessageTextSchema } from '../tools/contextual.ts';
+import { buildAwarenessContext } from '../utils/contextBuilder.ts';
 import { Content } from '@google/genai';
 
 /**
@@ -61,7 +55,14 @@ export const generateResponse = async (
     const pipeline: PipelineStep[] = [];
     let fullText = '';
 
-    const baseSystemInstruction = systemInstructionOverride || agent.systemInstruction;
+    const { currentTopicMessages, recentTopicNames } = buildAwarenessContext(messages);
+
+    let baseSystemInstruction = systemInstructionOverride || agent.systemInstruction;
+    
+    if (recentTopicNames.length > 0) {
+        baseSystemInstruction = `RECENT TOPICS DISCUSSED (for context): ${recentTopicNames.join(', ')}\n\n---\n\n${baseSystemInstruction}`;
+    }
+    
     let finalSystemInstruction = baseSystemInstruction;
     
     finalSystemInstruction = `You have a tool 'get_full_message_text' to retrieve the full, unabbreviated text of a previous message if the summary is insufficient. Use it if you need more detail to answer accurately. Message IDs are provided in the format (msg_id: ...).\n\n${finalSystemInstruction}`;
@@ -94,15 +95,15 @@ export const generateResponse = async (
     
     const tools = agentToolSchemas.length > 0 ? [{ functionDeclarations: agentToolSchemas }] : undefined;
 
-    // Process the full conversation history for the model.
-    const history = convertMessagesToHistory(messages);
+    // Process the focused conversation history for the model.
+    const history = convertMessagesToHistory(currentTopicMessages);
     
     pipeline.push({
         stage: 'Context Assembly',
         input: {
             latestText,
             task,
-            messageCount: messages.length,
+            messageCount: currentTopicMessages.length,
             agentName: agent.name,
             hasAttachment: !!attachment,
         },

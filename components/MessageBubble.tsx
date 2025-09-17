@@ -1,6 +1,4 @@
 
-
-
 import React, { useEffect, useRef, useState } from 'react';
 import { Message, Agent, Conversation } from '../types/index.ts';
 import { MANAGER_COLOR } from '../constants/agentConstants.ts';
@@ -15,6 +13,7 @@ import {
 import { PlanDisplay } from './PlanDisplay.tsx';
 import * as TokenCounter from '../services/utils/tokenCounter.ts';
 import { safeRender } from '../services/utils/safeRender.ts';
+import { ContextMenuItem } from '../types/ui.ts';
 
 declare const marked: any;
 declare const DOMPurify: any;
@@ -25,12 +24,6 @@ interface MessageBubbleProps {
     agent?: Agent;
     featureFlags?: Conversation['featureFlags'];
 }
-
-const ActionButton: React.FC<{onClick: () => void, title: string, 'aria-label': string, children: React.ReactNode, className?: string, disabled?: boolean}> = ({ onClick, title, 'aria-label': ariaLabel, children, className, disabled }) => (
-    <button onClick={onClick} title={title} aria-label={ariaLabel} className={`p-1.5 rounded-full transition-colors disabled:opacity-50 disabled:cursor-not-allowed ${className}`} disabled={disabled}>
-        {children}
-    </button>
-);
 
 export const MessageBubble: React.FC<MessageBubbleProps> = ({ message, agent, featureFlags }) => {
     const { 
@@ -49,6 +42,7 @@ export const MessageBubble: React.FC<MessageBubbleProps> = ({ message, agent, fe
         setAgentBubbleSettings,
         userBubbleSettings,
         setUserBubbleSettings,
+        openContextMenu,
     } = useAppContext();
     
     const contentRef = useRef<HTMLDivElement>(null);
@@ -79,21 +73,7 @@ export const MessageBubble: React.FC<MessageBubbleProps> = ({ message, agent, fe
 
     const isUser = message.sender === 'user';
     const settings = isUser ? userBubbleSettings : agentBubbleSettings;
-    const setSettings = isUser ? setUserBubbleSettings : setAgentBubbleSettings;
-
-    const handleAlignment = (align: 'left' | 'right') => {
-        setSettings(prev => ({ ...prev, alignment: align }));
-    };
-    const handleTextDirection = (dir: 'ltr' | 'rtl') => {
-        setSettings(prev => ({ ...prev, textDirection: dir }));
-    };
-    const handleZoom = (direction: 'in' | 'out') => {
-        setSettings(prev => ({ ...prev, scale: Math.max(0.5, Math.min(1.5, prev.scale + (direction === 'in' ? 0.1 : -0.1))) }));
-    };
-    const handleFontSize = (direction: 'up' | 'down') => {
-        setSettings(prev => ({ ...prev, fontSize: Math.max(0.75, Math.min(1.5, prev.fontSize + (direction === 'up' ? 0.1 : -0.1))) }));
-    };
-
+    
     let _senderName = 'You';
     let _senderJob = 'User';
     let agentColorIndicator = 'bg-indigo-500';
@@ -176,6 +156,40 @@ export const MessageBubble: React.FC<MessageBubbleProps> = ({ message, agent, fe
             });
         }
     }, [currentMessage, handleShowHtmlPreview, isExpanded]);
+    
+    const handleContextMenu = (e: React.MouseEvent) => {
+        e.preventDefault();
+        const commonActions: ContextMenuItem[] = [
+            { label: 'Copy Text', icon: <CopyIcon className="w-5 h-5"/>, action: handleCopy },
+            { label: message.isBookmarked ? 'Unbookmark' : 'Bookmark', icon: message.isBookmarked ? <BookmarkFilledIcon className="w-5 h-5 text-indigo-400"/> : <BookmarkIcon className="w-5 h-5"/>, action: () => handleToggleMessageBookmark(message.id) },
+        ];
+        
+        let specificActions: ContextMenuItem[] = [];
+        if(isUser) {
+            specificActions = [
+                { label: 'Edit', icon: <EditIcon className="w-5 h-5"/>, action: () => handleToggleMessageEdit(message.id) },
+                { label: 'Rewrite with AI', icon: <RewriteIcon className="w-5 h-5"/>, action: () => handleRewritePrompt(message.id) },
+            ];
+        } else {
+            specificActions = [
+                { label: 'Summarize', icon: <SummarizeIcon className="w-5 h-5"/>, action: () => handleSummarizeMessage(message.id) },
+                { label: 'Regenerate', icon: <RegenerateIcon className="w-5 h-5"/>, action: () => handleRegenerateResponse(message.id) },
+            ];
+            if (message.pipeline && message.pipeline.length > 0) {
+                 specificActions.push({ label: 'Inspect Workflow', icon: <WorkflowIcon className="w-5 h-5"/>, action: () => openInspectorModal(message.pipeline!) });
+                 specificActions.push({ label: 'Inspect Prompt', icon: <CodeIcon className="w-5 h-5"/>, action: () => openPromptInspectorModal(message) });
+            }
+        }
+        
+        const finalActions: ContextMenuItem[] = [
+            ...specificActions,
+            ...commonActions,
+            { isSeparator: true },
+            { label: 'Delete Message', icon: <TrashIcon className="w-5 h-5"/>, action: () => handleDeleteMessage(message.id), isDestructive: true },
+        ];
+        
+        openContextMenu(e.clientX, e.clientY, finalActions);
+    };
 
     const formattedTime = new Date(message.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
 
@@ -219,7 +233,7 @@ export const MessageBubble: React.FC<MessageBubbleProps> = ({ message, agent, fe
     }[settings.alignment];
 
     return (
-        <div id={message.id} className={`w-full px-4 md:px-8 mb-6 animate-fade-in-up flex ${alignmentClass}`}>
+        <div id={message.id} className={`w-full px-4 md:px-8 mb-6 animate-fade-in-up flex ${alignmentClass}`} onContextMenu={handleContextMenu}>
             <div className={`flex items-start w-auto max-w-full ${isUser ? 'flex-row-reverse' : 'flex-row'}`}>
                 <Avatar name={senderName} color={agentColorIndicator} />
                 <div 
@@ -279,70 +293,6 @@ export const MessageBubble: React.FC<MessageBubbleProps> = ({ message, agent, fe
                                 <img src={`data:${message.attachment.mimeType};base64,${message.attachment.base64}`} alt="Attachment" className="max-w-xs rounded-lg border-2 border-gray-200" />
                             </div>
                         )}
-                    </div>
-                    
-                    {/* Footer Toolbar */}
-                    <div className={`flex items-center p-2 bg-primary-header/70 ${isUser ? 'flex-row-reverse' : ''} opacity-0 group-hover:opacity-100 transition-opacity duration-300`} style={{backgroundColor: 'var(--color-primary-header)'}}>
-                        <div className={`flex items-center gap-1 ${isUser ? 'text-white' : 'text-white'}`}>
-                           {!isUser && (
-                                <>
-                                    <ActionButton onClick={() => handleSummarizeMessage(message.id)} title="Summarize message" aria-label="Summarize message" className="hover:bg-gray-700 hover:text-white">
-                                        <SummarizeIcon className="w-5 h-5" />
-                                    </ActionButton>
-                                    <ActionButton onClick={() => handleRegenerateResponse(message.id)} title="Regenerate response" aria-label="Regenerate response" className="hover:bg-gray-700 hover:text-white">
-                                        <RegenerateIcon className="w-5 h-5" />
-                                    </ActionButton>
-                                </>
-                            )}
-                            {isUser && (
-                                <>
-                                     <ActionButton onClick={() => handleRewritePrompt(message.id)} title="Rewrite prompt with AI" aria-label="Rewrite prompt" className="hover:bg-indigo-500">
-                                        <RewriteIcon className="w-5 h-5" />
-                                    </ActionButton>
-                                    <ActionButton onClick={() => handleToggleMessageEdit(message.id)} title="Edit message" aria-label="Edit message" className="hover:bg-indigo-500">
-                                        <EditIcon className="w-5 h-5" />
-                                    </ActionButton>
-                                </>
-                            )}
-                            {message.pipeline && message.pipeline.length > 0 && !isUser && (
-                                 <ActionButton onClick={() => openPromptInspectorModal(message)} title="View full prompt & response" aria-label="Inspect prompt" className="hover:bg-gray-700 hover:text-white">
-                                    <CodeIcon className="w-5 h-5" />
-                                </ActionButton>
-                            )}
-                             {message.pipeline && message.pipeline.length > 0 && !isUser && (
-                                 <ActionButton onClick={() => openInspectorModal(message.pipeline!)} title="View Workflow" aria-label="View AI Workflow" className="hover:bg-gray-700 hover:text-white">
-                                    <WorkflowIcon className="w-5 h-5" />
-                                </ActionButton>
-                            )}
-                        </div>
-                        <div className="flex-grow"></div>
-                         <div className={`flex items-center gap-2 ${isUser ? 'text-white' : 'text-white'}`}>
-                            {tokenCount > 0 && (
-                                <span className="font-mono text-xs flex items-center gap-1 opacity-80" title={`Estimated Tokens (Full Text): ${tokenCount}`}>
-                                    <TokenIcon className="w-3.5 h-3.5" />
-                                    {tokenCount}
-                                </span>
-                            )}
-                            {message.responseTimeMs && <span className="font-mono text-xs opacity-80" title="Response Time">{message.responseTimeMs}ms</span>}
-                            
-                            {(tokenCount > 0 || message.responseTimeMs) && <div className="w-px h-4 bg-white/10 mx-1"></div>}
-
-                            <ActionButton onClick={() => handleAlignment('left')} title="Align Left" aria-label="Align message left" className={isUser ? "hover:bg-indigo-500" : "hover:bg-gray-700 hover:text-white"}><AlignLeftIcon className="w-5 h-5"/></ActionButton>
-                            <ActionButton onClick={() => handleAlignment('right')} title="Align Right" aria-label="Align message right" className={isUser ? "hover:bg-indigo-500" : "hover:bg-gray-700 hover:text-white"}><AlignRightIcon className="w-5 h-5"/></ActionButton>
-                            <ActionButton onClick={() => handleTextDirection('ltr')} title="Text LTR" aria-label="Set text direction to left-to-right" className={isUser ? "hover:bg-indigo-500" : "hover:bg-gray-700 hover:text-white"}><TextLtrIcon className="w-5 h-5"/></ActionButton>
-                            <ActionButton onClick={() => handleTextDirection('rtl')} title="Text RTL" aria-label="Set text direction to right-to-left" className={isUser ? "hover:bg-indigo-500" : "hover:bg-gray-700 hover:text-white"}><TextRtlIcon className="w-5 h-5"/></ActionButton>
-                            <ActionButton onClick={() => handleFontSize('down')} title="Decrease Font Size" aria-label="Decrease font size" disabled={settings.fontSize <= 0.75} className={isUser ? "hover:bg-indigo-500" : "hover:bg-gray-700 hover:text-white"}><ZoomOutIcon className="w-5 h-5"/></ActionButton>
-                            <ActionButton onClick={() => handleFontSize('up')} title="Increase Font Size" aria-label="Increase font size" disabled={settings.fontSize >= 1.5} className={isUser ? "hover:bg-indigo-500" : "hover:bg-gray-700 hover:text-white"}><ZoomInIcon className="w-5 h-5"/></ActionButton>
-                            <ActionButton onClick={handleCopy} title="Copy message text" aria-label="Copy message" className={isUser ? "hover:bg-indigo-500" : "hover:bg-gray-700 hover:text-white"}>
-                                <CopyIcon className="w-5 h-5" />
-                            </ActionButton>
-                            <ActionButton onClick={() => handleToggleMessageBookmark(message.id)} title="Bookmark message" aria-label="Bookmark message" className={isUser ? "hover:bg-indigo-500" : "hover:bg-gray-700 hover:text-white"}>
-                                {message.isBookmarked ? <BookmarkFilledIcon className="w-5 h-5 text-indigo-400" /> : <BookmarkIcon className="w-5 h-5" />}
-                            </ActionButton>
-                             <ActionButton onClick={() => handleDeleteMessage(message.id)} title="Delete message" aria-label="Delete message" className="text-red-400 hover:bg-red-500/50 hover:text-white">
-                                <TrashIcon className="w-5 h-5" />
-                            </ActionButton>
-                         </div>
                     </div>
                 </div>
             </div>
