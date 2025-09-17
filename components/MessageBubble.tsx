@@ -6,12 +6,10 @@ import { useAppContext } from '../contexts/StateProvider.tsx';
 import { Avatar } from './Avatar.tsx';
 import { 
     CopyIcon, BookmarkIcon, EditIcon, TrashIcon, RegenerateIcon, SummarizeIcon, RewriteIcon, 
-    CodeIcon, WorkflowIcon, AlignLeftIcon, AlignRightIcon, ZoomInIcon, ZoomOutIcon, 
-    TextLtrIcon, TextRtlIcon, TokenIcon, BookmarkFilledIcon
+    CodeIcon, WorkflowIcon, BookmarkFilledIcon
 } from './Icons.tsx';
 
 import { PlanDisplay } from './PlanDisplay.tsx';
-import * as TokenCounter from '../services/utils/tokenCounter.ts';
 import { safeRender } from '../services/utils/safeRender.ts';
 import { ContextMenuItem } from '../types/ui.ts';
 
@@ -38,10 +36,6 @@ export const MessageBubble: React.FC<MessageBubbleProps> = ({ message, agent, fe
         handleRegenerateResponse,
         openInspectorModal,
         openPromptInspectorModal,
-        agentBubbleSettings,
-        setAgentBubbleSettings,
-        userBubbleSettings,
-        setUserBubbleSettings,
         openContextMenu,
     } = useAppContext();
     
@@ -53,8 +47,6 @@ export const MessageBubble: React.FC<MessageBubbleProps> = ({ message, agent, fe
     const currentMessage = activeAlternativeIndex > -1 && message.alternatives?.[activeAlternativeIndex]
         ? { ...message, ...message.alternatives[activeAlternativeIndex] }
         : message;
-
-    const tokenCount = TokenCounter.estimateTokens(currentMessage);
 
     const [isExpanded, setIsExpanded] = useState(false);
 
@@ -72,7 +64,6 @@ export const MessageBubble: React.FC<MessageBubbleProps> = ({ message, agent, fe
     }, [message.isEditing, message.text]);
 
     const isUser = message.sender === 'user';
-    const settings = isUser ? userBubbleSettings : agentBubbleSettings;
     
     let _senderName = 'You';
     let _senderJob = 'User';
@@ -159,6 +150,7 @@ export const MessageBubble: React.FC<MessageBubbleProps> = ({ message, agent, fe
     
     const handleContextMenu = (e: React.MouseEvent) => {
         e.preventDefault();
+        e.stopPropagation();
         const commonActions: ContextMenuItem[] = [
             { label: 'Copy Text', icon: <CopyIcon className="w-5 h-5"/>, action: handleCopy },
             { label: message.isBookmarked ? 'Unbookmark' : 'Bookmark', icon: message.isBookmarked ? <BookmarkFilledIcon className="w-5 h-5 text-indigo-400"/> : <BookmarkIcon className="w-5 h-5"/>, action: () => handleToggleMessageBookmark(message.id) },
@@ -227,72 +219,66 @@ export const MessageBubble: React.FC<MessageBubbleProps> = ({ message, agent, fe
 
     const isInsight = message.messageType === 'insight';
 
-    const alignmentClass = {
-        left: 'justify-start',
-        right: 'justify-end',
-    }[settings.alignment];
-
     return (
-        <div id={message.id} className={`w-full px-4 md:px-8 mb-6 animate-fade-in-up flex ${alignmentClass}`} onContextMenu={handleContextMenu}>
-            <div className={`flex items-start w-auto max-w-full ${isUser ? 'flex-row-reverse' : 'flex-row'}`}>
-                <Avatar name={senderName} color={agentColorIndicator} />
-                <div 
-                    className={`group flex flex-col w-full max-w-3xl rounded-xl shadow-md overflow-hidden border ${isUser ? 'border-indigo-700' : 'border-slate-700'} ${isInsight ? '!border-yellow-500/50' : ''} ${isUser ? 'ml-0 mr-4' : 'ml-4'} transition-transform duration-300`}
-                    style={{ transform: `scale(${settings.scale})`}}
-                >
-                    {/* Header */}
-                    <div className={`flex items-center justify-between p-3 bg-primary-header ${isInsight ? '!bg-yellow-900/50' : ''} ${isUser ? 'flex-row-reverse' : ''}`} style={{backgroundColor: isInsight ? '' : 'var(--color-primary-header)'}}>
-                         <div className={`flex items-center ${isUser ? 'flex-row-reverse' : ''}`}>
-                            <div className={`w-3 h-3 rounded-sm ${agentColorIndicator}`}></div>
-                            <div className={`mx-3 text-sm font-semibold ${isUser ? 'text-right' : 'text-left'}`}>
-                                <p className="text-white">{senderName}</p>
-                                <p className="text-white text-xs">{senderJob}</p>
+        <div id={message.id} className="w-full px-4 md:px-8 mb-6 animate-fade-in-up" onContextMenu={handleContextMenu}>
+            <div className={`flex items-start w-full ${isUser ? 'justify-end' : 'justify-start'}`}>
+                <div className={`flex items-start w-auto max-w-3xl ${isUser ? 'flex-row-reverse' : 'flex-row'}`}>
+                    <Avatar name={senderName} color={agentColorIndicator} />
+                    <div 
+                        className={`group flex flex-col w-full rounded-xl shadow-md overflow-hidden border ${isUser ? 'border-indigo-700' : 'border-slate-700'} ${isInsight ? '!border-yellow-500/50' : ''} ${isUser ? 'ml-0 mr-4' : 'ml-4'} transition-transform duration-300`}
+                    >
+                        {/* Header */}
+                        <div className={`flex items-center justify-between p-3 bg-primary-header ${isInsight ? '!bg-yellow-900/50' : ''} ${isUser ? 'flex-row-reverse' : ''}`} style={{backgroundColor: isInsight ? '' : 'var(--color-primary-header)'}}>
+                             <div className={`flex items-center ${isUser ? 'flex-row-reverse' : ''}`}>
+                                <div className={`w-3 h-3 rounded-sm ${agentColorIndicator}`}></div>
+                                <div className={`mx-3 text-sm font-semibold ${isUser ? 'text-right' : 'text-left'}`}>
+                                    <p className="text-white">{senderName}</p>
+                                    <p className="text-white text-xs">{senderJob}</p>
+                                </div>
+                            </div>
+                             <div className="flex items-center text-xs text-gray-500">
+                                {hasAlternatives && (
+                                    <div className="flex items-center gap-2 mr-2 text-white">
+                                        <button onClick={() => handleChangeAlternativeResponse(message.id, 'prev')} disabled={currentResponseIndex <= -1} className="disabled:opacity-50">&lt;</button>
+                                        <span>{currentResponseIndex + 2} / {totalResponses}</span>
+                                        <button onClick={() => handleChangeAlternativeResponse(message.id, 'next')} disabled={currentResponseIndex >= totalResponses - 2} className="disabled:opacity-50">&gt;</button>
+                                    </div>
+                                )}
+                                <span>{formattedTime}</span>
                             </div>
                         </div>
-                         <div className="flex items-center text-xs text-gray-500">
-                            {hasAlternatives && (
-                                <div className="flex items-center gap-2 mr-2 text-white">
-                                    <button onClick={() => handleChangeAlternativeResponse(message.id, 'prev')} disabled={currentResponseIndex <= -1} className="disabled:opacity-50">&lt;</button>
-                                    <span>{currentResponseIndex + 2} / {totalResponses}</span>
-                                    <button onClick={() => handleChangeAlternativeResponse(message.id, 'next')} disabled={currentResponseIndex >= totalResponses - 2} className="disabled:opacity-50">&gt;</button>
+
+                        {/* Content */}
+                        <div
+                            className={`p-4 ${isUser ? 'content-bg-user prose-user' : 'content-bg-agent prose-agent'}`}
+                        >
+                            {message.plan ? (
+                                <PlanDisplay plan={message.plan} />
+                            ) : (
+                                <>
+                                    <div
+                                        ref={contentRef}
+                                        className="prose max-w-none prose-p:my-2 prose-headings:my-3"
+                                        dangerouslySetInnerHTML={{ __html: getMessageContent() }}
+                                    />
+                                    {message.isStreaming && <span className="streaming-cursor"></span>}
+                                </>
+                            )}
+                            
+                            {hasSummary && !isUser && (
+                                 <button
+                                    onClick={() => setIsExpanded(!isExpanded)}
+                                    className="text-indigo-400 hover:text-indigo-200 text-sm font-semibold mt-2 focus:outline-none bg-black bg-opacity-20 px-2 py-1 rounded"
+                                >
+                                    {isExpanded ? 'Show Summary' : 'Show Full Text'}
+                                </button>
+                            )}
+                             {message.attachment && (
+                                <div className="mt-2">
+                                    <img src={`data:${message.attachment.mimeType};base64,${message.attachment.base64}`} alt="Attachment" className="max-w-xs rounded-lg border-2 border-gray-200" />
                                 </div>
                             )}
-                            <span>{formattedTime}</span>
                         </div>
-                    </div>
-
-                    {/* Content */}
-                    <div
-                        className={`p-4 ${isUser ? 'content-bg-user prose-user' : 'content-bg-agent prose-agent'}`}
-                        dir={settings.textDirection}
-                        style={{ fontSize: `${settings.fontSize}rem` }}
-                    >
-                        {message.plan ? (
-                            <PlanDisplay plan={message.plan} />
-                        ) : (
-                            <>
-                                <div
-                                    ref={contentRef}
-                                    className="prose max-w-none prose-p:my-2 prose-headings:my-3"
-                                    dangerouslySetInnerHTML={{ __html: getMessageContent() }}
-                                />
-                                {message.isStreaming && <span className="streaming-cursor"></span>}
-                            </>
-                        )}
-                        
-                        {hasSummary && !isUser && (
-                             <button
-                                onClick={() => setIsExpanded(!isExpanded)}
-                                className="text-indigo-400 hover:text-indigo-200 text-sm font-semibold mt-2 focus:outline-none bg-black bg-opacity-20 px-2 py-1 rounded"
-                            >
-                                {isExpanded ? 'Show Summary' : 'Show Full Text'}
-                            </button>
-                        )}
-                         {message.attachment && (
-                            <div className="mt-2">
-                                <img src={`data:${message.attachment.mimeType};base64,${message.attachment.base64}`} alt="Attachment" className="max-w-xs rounded-lg border-2 border-gray-200" />
-                            </div>
-                        )}
                     </div>
                 </div>
             </div>

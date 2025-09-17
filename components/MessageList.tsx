@@ -1,32 +1,20 @@
-
 import React from 'react';
 import { MessageBubble } from './MessageBubble.tsx';
 import { TopicDivider } from './TopicDivider.tsx';
 import { useAppContext } from '../contexts/StateProvider.tsx';
-import { Conversation } from '../types/index.ts';
 
-interface MessageListProps {
-    conversation: Conversation | null;
-}
-
-export const MessageList: React.FC<MessageListProps> = ({ conversation }) => {
-    const { getAgent, messagesEndRef } = useAppContext();
+export const MessageList: React.FC = () => {
+    const { getAgent, activeConversation } = useAppContext();
     
-    if (!conversation) {
-        return (
-            <main className="flex-1 flex items-center justify-center p-6">
-                <div className="text-center">
-                    <h2 className="text-2xl font-semibold text-gray-400">Welcome to your AI Assistant</h2>
-                    <p className="text-gray-500 mt-2">Create a new chat or select one from the sidebar to get started.</p>
-                </div>
-            </main>
-        );
+    // The parent component now handles the case where there is no active conversation.
+    if (!activeConversation) {
+        return null;
     }
     
     return (
-        <main className="flex-1 overflow-y-auto p-6">
+        <div className="p-6">
             <div className="max-w-4xl mx-auto">
-                {conversation.messages.map(message => {
+                {activeConversation.messages.map(message => {
                     if (message.messageType === 'topic_divider') {
                         return <TopicDivider key={message.id} text={message.text} timestamp={message.timestamp} />;
                     }
@@ -35,12 +23,11 @@ export const MessageList: React.FC<MessageListProps> = ({ conversation }) => {
                             key={message.id} 
                             message={message} 
                             agent={getAgent(message.sender)}
-                            featureFlags={conversation.featureFlags}
+                            featureFlags={activeConversation.featureFlags}
                         />
                     );
                 })}
-                <div ref={messagesEndRef} />
             </div>
-        </main>
+        </div>
     );
 };

@@ -51,7 +51,7 @@ export const generateResponse = async (
     onStream: (chunk: string) => void,
     task: string | undefined,
     globalApiKey: string,
-): Promise<{ finalResult: string; pipeline: PipelineStep[] }> => {
+): Promise<{ finalResult: string; summary: string; pipeline: PipelineStep[] }> => {
     const pipeline: PipelineStep[] = [];
     let fullText = '';
 
@@ -194,7 +194,33 @@ export const generateResponse = async (
             fullText = text;
         }
 
-        return { finalResult: fullText, pipeline };
+        // Step 5: After getting the full text, ask the same agent to summarize it.
+        let summary = fullText; // Fallback
+        if (fullText.length > 250) { 
+            try {
+                const summaryStartTime = performance.now();
+                const summaryPrompt = `You just wrote the following text. Now, create a very short summary phrase (max 15 words) that captures its core essence for your own memory.\n\n---\n${fullText}\n---`;
+                const summaryResult = await ai.models.generateContent({
+                    model: agent.model,
+                    contents: summaryPrompt,
+                    config: {
+                        systemInstruction: "You are an expert at creating very brief summaries of your own writing for memory purposes. Respond with only the summary text.",
+                    }
+                });
+                summary = summaryResult.text.trim();
+                 pipeline.push({
+                    stage: 'Self-Summarization',
+                    input: `Text length: ${fullText.length}`,
+                    output: summary,
+                    durationMs: Math.round(performance.now() - summaryStartTime),
+                });
+            } catch (summaryError) {
+                console.error("Agent failed to summarize its own response, falling back to full text.", summaryError);
+                 pipeline.push({ stage: 'Self-Summarization Failed', input: null, output: (summaryError as Error).message });
+            }
+        }
+
+        return { finalResult: fullText, summary, pipeline };
     } catch (error) {
         handleAndThrowError(error, `generateResponse for ${agent.name}`, null, fullText);
     }

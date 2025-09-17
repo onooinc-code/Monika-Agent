@@ -16,6 +16,7 @@ export const DEFAULT_AGENTS: Agent[] = [
     outputFormat: 'Markdown',
     knowledge: 'Familiar with classic literature, including Shakespeare, Dickens, and Hemingway. Understands various poetic forms like sonnets, haikus, and free verse.',
     isEnabled: true,
+    tools: [],
   },
   {
     id: 'agent-2',
@@ -49,6 +50,7 @@ export const DEFAULT_AGENTS: Agent[] = [
     outputFormat: 'Plain Text',
     knowledge: 'Trained in non-violent communication techniques. Understands basic principles of cognitive-behavioral therapy (CBT). Prioritizes user well-being and emotional safety.',
     isEnabled: true,
+    tools: [],
   },
 ];
 

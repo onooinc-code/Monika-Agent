@@ -24,33 +24,6 @@ export const summarizeMessage = async (text: string, manager: AgentManager, glob
     }
 };
 
-export const summarizeForStorage = async (text: string, manager: AgentManager, globalApiKey: string): Promise<string> => {
-    // Use a character limit to decide if summarization is even needed.
-    if (text.length < 250) {
-        return text;
-    }
-    const prompt = `Summarize the following text into a very short phrase (max 15 words) that captures its core essence. This is for storage, so be brief.\n\n---\n${text}\n---`;
-    try {
-        const apiKey = manager.apiKey || globalApiKey;
-         if (!apiKey) {
-            // Don't throw, just return original text if no key
-            return text;
-        }
-        const ai = getGenAIClient(apiKey);
-        const response = await ai.models.generateContent({
-            model: manager.model,
-            contents: prompt,
-            config: {
-                systemInstruction: "You are an expert at creating very brief summaries.",
-            }
-        });
-        return response.text.trim();
-    } catch (error) {
-        console.error("Summarization for storage failed:", error);
-        return text; // Return original text on failure to avoid data loss.
-    }
-};
-
 export const rewritePrompt = async (prompt: string, manager: AgentManager, globalApiKey: string): Promise<string> => {
     const fullPrompt = `Rewrite the following user prompt to be clearer, more detailed, and more effective for an AI assistant. Return only the rewritten prompt.\n\n---\n${prompt}\n---`;
      try {

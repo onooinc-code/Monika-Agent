@@ -1,4 +1,3 @@
-
 import React, { useEffect, useState } from 'react';
 import { Header } from './components/Header.tsx';
 import { MessageList } from './components/MessageList.tsx';
@@ -21,6 +20,9 @@ import { ApiUsageModal } from './components/ApiUsageModal.tsx';
 import { BookmarkedMessagesPanel } from './components/BookmarkedMessagesPanel.tsx';
 import { MessageArchiveModal } from './components/MessageArchiveModal.tsx';
 import { ContextMenu } from './components/ContextMenu.tsx';
+import { ConversationSubHeader } from './components/ConversationSubHeader.tsx';
+import { ContextMenuItem } from './types/index.ts';
+import { PlusIcon, SettingsIcon, AlignLeftIcon } from './components/Icons.tsx';
 
 export default function App() {
   const { 
@@ -36,7 +38,10 @@ export default function App() {
     setConversationMode,
     handleShowHistory,
     isBookmarksPanelOpen,
+    openContextMenu,
     closeContextMenu,
+    handleNewConversation,
+    setIsArchiveOpen,
   } = useAppContext();
 
   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
@@ -87,8 +92,8 @@ export default function App() {
               document.exitFullscreen().catch(console.error);
             }
             break;
-          case 'n': // New chat
-            // handleNewConversation(); // will be in context
+          case 'n':
+            handleNewConversation();
             break;
         }
       }
@@ -104,27 +109,60 @@ export default function App() {
       window.removeEventListener('keydown', handleKeyDown);
       window.removeEventListener('click', handleClick);
     };
-  }, [isSettingsOpen, isHistoryOpen, isConversationSettingsOpen, setIsSettingsOpen, setIsHistoryOpen, setIsConversationSettingsOpen, setConversationMode, handleShowHistory, activeConversation, closeContextMenu]);
+  }, [isSettingsOpen, isHistoryOpen, isConversationSettingsOpen, setIsSettingsOpen, setIsHistoryOpen, setIsConversationSettingsOpen, setConversationMode, handleShowHistory, activeConversation, closeContextMenu, handleNewConversation]);
+
+  const handleGlobalContextMenu = (e: React.MouseEvent) => {
+    e.preventDefault();
+    const globalActions: ContextMenuItem[] = [
+       { label: 'New Chat', icon: <PlusIcon/>, action: handleNewConversation },
+       { isSeparator: true },
+       { label: `Mode: Dynamic`, action: () => setConversationMode('Dynamic') },
+       { label: `Mode: Continuous`, action: () => setConversationMode('Continuous') },
+       { label: `Mode: Manual`, action: () => setConversationMode('Manual') },
+       { isSeparator: true },
+       { label: 'Open Settings', icon: <SettingsIcon/>, action: () => setIsSettingsOpen(true) },
+       { label: 'Open Archive', icon: <AlignLeftIcon/>, action: () => setIsArchiveOpen(true) },
+    ];
+    openContextMenu(e.clientX, e.clientY, globalActions);
+  };
+
 
   return (
-    <div className="flex h-screen bg-[#0a0a0f] text-gray-200 overflow-hidden" style={{fontFamily: "'Inter', sans-serif"}}>
+    <div className="flex h-screen bg-[#0a0a0f] text-gray-200" style={{fontFamily: "'Inter', sans-serif"}}>
         <ConversationList isOpen={isSidebarOpen} />
-        <div className="flex flex-1 min-w-0">
-            <main className="flex flex-col flex-1 bg-[#0a0a0f]">
-                <Header 
-                  isSidebarOpen={isSidebarOpen} 
-                  toggleSidebar={() => setIsSidebarOpen(!isSidebarOpen)}
-                  conversation={activeConversation}
-                />
-                <div className="flex-1 flex flex-col min-h-0">
-                  <MessageList conversation={activeConversation} />
-                  {activeConversation && conversationMode === 'Manual' && <ManualSuggestions />}
-                  {activeConversation && <LiveStatusIndicator />}
-                  {activeConversation && <MessageInput />}
-                </div>
-                <StatusBar />
-            </main>
-            <BookmarkedMessagesPanel isOpen={isBookmarksPanelOpen} />
+        <div className="flex flex-1 flex-col min-w-0">
+             <Header 
+                isSidebarOpen={isSidebarOpen} 
+                toggleSidebar={() => setIsSidebarOpen(!isSidebarOpen)}
+            />
+            <div className="flex flex-1 min-h-0">
+                <main
+                    className="flex flex-col flex-1 bg-[#0a0a0f] min-h-0"
+                    onContextMenu={handleGlobalContextMenu}
+                >
+                    {activeConversation ? (
+                        <>
+                            <ConversationSubHeader conversation={activeConversation} />
+                            <div className="flex-1 overflow-y-auto">
+                                <MessageList />
+                                <div ref={messagesEndRef} />
+                            </div>
+                            {conversationMode === 'Manual' && <ManualSuggestions />}
+                            <LiveStatusIndicator />
+                            <MessageInput />
+                        </>
+                    ) : (
+                        <div className="flex-1 flex items-center justify-center p-6">
+                            <div className="text-center">
+                                <h2 className="text-2xl font-semibold text-gray-400">Welcome to Monica</h2>
+                                <p className="text-gray-500 mt-2">Create a new chat or select one from the sidebar to get started.</p>
+                            </div>
+                        </div>
+                    )}
+                    <StatusBar />
+                </main>
+                <BookmarkedMessagesPanel isOpen={isBookmarksPanelOpen} />
+            </div>
         </div>
         <SettingsModal />
         <HistoryModal />

@@ -1,9 +1,8 @@
 
-import React, { useState, useEffect } from 'react';
-import { Conversation, Agent } from '../types/index.ts';
+import React from 'react';
+import { Agent } from '../types/index.ts';
 import { useAppContext } from '../contexts/StateProvider.tsx';
-import { Spinner } from './Spinner.tsx';
-import { MenuIcon, EditIcon, CheckIcon, SparklesIcon, SettingsIcon, UsersIcon, CloudIcon, PowerIcon, HistoryIcon, BookmarkIcon, AlignLeftIcon } from './Icons.tsx';
+import { MenuIcon, SettingsIcon, UsersIcon, CloudIcon, PowerIcon } from './Icons.tsx';
 import { safeRender } from '../services/utils/safeRender.ts';
 
 // --- SHARED COMPONENTS ---
@@ -71,28 +70,26 @@ const AgentCard: React.FC<{ agent: Agent }> = ({ agent }) => {
     );
 };
 
-
-// --- HEADER VARIATIONS ---
-
-const DashboardHeader: React.FC<{ toggleSidebar: () => void }> = ({ toggleSidebar }) => {
+// Main Header component is now the Dashboard Header
+export const Header: React.FC<{ isSidebarOpen: boolean, toggleSidebar: () => void }> = ({ toggleSidebar }) => {
     const { agents, setIsSettingsOpen, setIsTeamGeneratorOpen, setIsApiUsageOpen } = useAppContext();
     return (
         <header 
-            className="sticky top-0 p-2 flex justify-between items-stretch gap-2 flex-shrink-0 z-30 border-b border-white/10 shadow-lg"
+            className="sticky top-0 p-2 flex justify-between items-center md:items-stretch gap-2 flex-shrink-0 z-30 border-b border-white/10 shadow-lg"
             style={{
                 background: 'linear-gradient(-45deg, #0a0a0f, #1e293b, #3b0764, #1e293b, #0a0a0f)',
                 backgroundSize: '400% 400%',
                 animation: 'animated-gradient-bg 15s ease infinite'
             }}
         >
-            <div className="w-[30%] flex items-center gap-2">
+            <div className="flex-shrink-0 md:w-[30%] flex items-center gap-2">
                 <button onClick={toggleSidebar} className="p-2 rounded-full hover:bg-white/10 transition-colors" aria-label="Toggle Sidebar" title="Toggle conversation list">
                     <MenuIcon className="w-6 h-6" />
                 </button>
             </div>
 
-            <div className="w-[40%] flex flex-col">
-                 <div className="h-[40%] flex items-center justify-center">
+            <div className="flex-1 md:w-[40%] flex flex-col">
+                 <div className="flex items-center justify-center md:h-[40%]">
                     <h1 
                         className="text-2xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-indigo-400 via-cyan-400 to-indigo-400"
                         style={{ backgroundSize: '200% 200%', animation: 'animated-gradient-text 5s ease infinite' }}
@@ -100,137 +97,20 @@ const DashboardHeader: React.FC<{ toggleSidebar: () => void }> = ({ toggleSideba
                         Monica
                     </h1>
                 </div>
-                <div className="flex-1 flex items-center justify-center gap-2">
+                <div className="hidden md:flex flex-1 items-center justify-center gap-2">
                     {agents.map(agent => <AgentCard key={agent.id} agent={agent} />)}
                 </div>
             </div>
 
-            <div className="w-[30%] flex items-end justify-end">
-                <div className="flex items-center gap-1 text-xs">
+            <div className="flex-shrink-0 md:w-[30%] flex items-end justify-end">
+                <div className="hidden md:flex items-center gap-1 text-xs">
                     <HeaderButton onClick={() => setIsTeamGeneratorOpen(true)} title="Generate Team" aria-label="Open Team Generator"><UsersIcon className="w-5 h-5"/></HeaderButton>
                     <HeaderButton onClick={() => setIsApiUsageOpen(true)} title="API Usage" aria-label="Open API Usage"><CloudIcon className="w-5 h-5"/></HeaderButton>
                     <HeaderButton onClick={() => setIsSettingsOpen(true)} title="Settings" aria-label="Open Settings"><SettingsIcon className="w-5 h-5"/></HeaderButton>
                 </div>
+                {/* Placeholder for mobile to balance flexbox */}
+                <div className="w-6 h-6 md:hidden"></div>
             </div>
         </header>
     );
-};
-
-const ConversationHeader: React.FC<{ toggleSidebar: () => void, conversation: Conversation }> = ({ toggleSidebar, conversation }) => {
-    const {
-        conversationMode, 
-        setConversationMode, 
-        setIsSettingsOpen,
-        setIsTeamGeneratorOpen,
-        setIsConversationSettingsOpen,
-        setIsApiUsageOpen,
-        isBookmarksPanelOpen,
-        setIsBookmarksPanelOpen,
-        setIsArchiveOpen,
-        handleShowHistory, 
-        handleUpdateConversationTitle,
-        handleGenerateTitle,
-        activeConversation,
-    } = useAppContext();
-    
-    const [isEditingTitle, setIsEditingTitle] = useState(false);
-    const [title, setTitle] = useState(conversation.title || '');
-
-    useEffect(() => {
-        setTitle(conversation.title || '');
-        setIsEditingTitle(false);
-    }, [conversation]);
-
-    const handleTitleSave = () => {
-        if (title.trim()) {
-            handleUpdateConversationTitle(conversation.id, title.trim());
-        }
-        setIsEditingTitle(false);
-    };
-
-    const handleTitleKeydown = (e: React.KeyboardEvent<HTMLInputElement>) => {
-        if (e.key === 'Enter') handleTitleSave();
-        else if (e.key === 'Escape') {
-            setTitle(conversation.title || '');
-            setIsEditingTitle(false);
-        }
-    };
-
-    const bookmarkedCount = activeConversation?.messages.filter(m => m.isBookmarked).length || 0;
-
-    return (
-        <header className="sticky top-0 p-2 flex justify-between items-center flex-shrink-0 z-30 border-b border-white/10 shadow-md bg-[var(--color-primary-header)]">
-            {/* Left */}
-            <div className="flex items-center gap-2 flex-1 min-w-0">
-                <button onClick={toggleSidebar} className="p-2 rounded-full hover:bg-white/10 transition-colors" aria-label="Toggle Sidebar" title="Toggle conversation list">
-                    <MenuIcon className="w-6 h-6" />
-                </button>
-                 <div className="flex items-center gap-2 flex-1 min-w-0">
-                    {isEditingTitle ? (
-                        <input 
-                            type="text"
-                            value={title}
-                            onChange={(e) => setTitle(e.target.value)}
-                            onKeyDown={handleTitleKeydown}
-                            onBlur={handleTitleSave}
-                            className="bg-transparent text-white text-lg font-bold rounded px-2 py-0.5 outline-none ring-2 ring-indigo-500 w-full"
-                            autoFocus
-                        />
-                    ) : (
-                         <div className="flex items-center gap-2">
-                            <h1 className="text-lg font-bold text-white truncate">{safeRender(conversation.title)}</h1>
-                            {conversation.discussionSettings?.enabled && (
-                                <span className="bg-purple-500/50 text-purple-200 text-xs font-semibold px-2.5 py-1 rounded-full border border-purple-400/50 flex-shrink-0">Moderated</span>
-                            )}
-                        </div>
-                    )}
-                    
-                    {isEditingTitle ? (
-                        <button onClick={handleTitleSave} className="p-1.5 rounded-full hover:bg-white/10" aria-label="Save title" title="Save title">
-                            <CheckIcon className="w-5 h-5" />
-                        </button>
-                    ) : (
-                         <div className="flex items-center gap-1">
-                            <button onClick={() => setIsEditingTitle(true)} className="p-1.5 rounded-full hover:bg-white/10" aria-label="Edit title" title="Edit conversation title"><EditIcon className="w-4 h-4" /></button>
-                            <button onClick={() => handleGenerateTitle(conversation.id)} className="p-1.5 rounded-full hover:bg-white/10 text-yellow-400 hover-glow-indigo" disabled={conversation.isGeneratingTitle} title="Generate title with AI">{conversation.isGeneratingTitle ? <Spinner/> : <SparklesIcon className="w-5 h-5" />}</button>
-                            <button onClick={() => setIsConversationSettingsOpen(true)} className="p-1.5 rounded-full hover:bg-white/10" disabled={!conversation} title="Open conversation settings"><SettingsIcon className="w-5 h-5" /></button>
-                        </div>
-                    )}
-                </div>
-            </div>
-            
-            {/* Middle */}
-            <div className="flex-none mx-4">
-                <div className="flex items-center glass-pane rounded-full p-1 text-xs">
-                    <button onClick={() => setConversationMode('Dynamic')} title="AI Manager creates a dynamic plan" className={`px-3 py-1 font-semibold rounded-full transition-all ${ conversationMode === 'Dynamic' ? 'bg-indigo-600 text-white neon-glow-indigo' : 'text-gray-300 hover:bg-white/5' }`}> Dynamic </button>
-                    <button onClick={() => setConversationMode('Continuous')} title="A single, continuous conversation with multiple topics" className={`px-3 py-1 font-semibold rounded-full transition-all ${ conversationMode === 'Continuous' ? 'bg-indigo-600 text-white neon-glow-indigo' : 'text-gray-300 hover:bg-white/5' }`}> Continuous </button>
-                    <button onClick={() => setConversationMode('Manual')} title="Manually choose the agent" className={`px-3 py-1 font-semibold rounded-full transition-all ${ conversationMode === 'Manual' ? 'bg-indigo-600 text-white neon-glow-indigo' : 'text-gray-300 hover:bg-white/5' }`}> Manual </button>
-                </div>
-            </div>
-
-            {/* Right */}
-            <div className="flex items-center gap-1 text-xs justify-end flex-1">
-                <HeaderButton onClick={() => setIsTeamGeneratorOpen(true)} title="Generate Team" aria-label="Open Team Generator"><UsersIcon className="w-5 h-5"/></HeaderButton>
-                <HeaderButton onClick={() => setIsApiUsageOpen(true)} title="API Usage" aria-label="Open API Usage"><CloudIcon className="w-5 h-5"/></HeaderButton>
-                <HeaderButton onClick={() => setIsSettingsOpen(true)} title="Settings" aria-label="Open Settings"><SettingsIcon className="w-5 h-5"/></HeaderButton>
-                <HeaderButton onClick={() => setIsArchiveOpen(true)} title="Message Archive" aria-label="View Message Archive">
-                    <AlignLeftIcon className="w-5 h-5" />
-                </HeaderButton>
-                <HeaderButton onClick={() => setIsBookmarksPanelOpen(!isBookmarksPanelOpen)} disabled={!conversation} title="Bookmarks" aria-label="View Bookmarks">
-                    <BookmarkIcon className="w-5 h-5" />
-                    {bookmarkedCount > 0 && <span className="absolute -top-1 -right-1 flex h-4 w-4 items-center justify-center rounded-full bg-indigo-500 text-xs font-bold ring-2 ring-[#1e293b]">{bookmarkedCount}</span>}
-                </HeaderButton>
-                <HeaderButton onClick={handleShowHistory} disabled={!conversation} title="History" aria-label="View History"><HistoryIcon className="w-5 h-5"/></HeaderButton>
-            </div>
-        </header>
-    );
-};
-
-
-// Main Header component conditionally renders the correct version
-export const Header: React.FC<{ isSidebarOpen: boolean, toggleSidebar: () => void, conversation: Conversation | null }> = ({ isSidebarOpen, toggleSidebar, conversation }) => {
-    if (conversation) {
-        return <ConversationHeader toggleSidebar={toggleSidebar} conversation={conversation} />;
-    }
-    return <DashboardHeader toggleSidebar={toggleSidebar} />;
 };

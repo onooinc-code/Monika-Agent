@@ -124,9 +124,9 @@ export const useChatHandler = ({ agents, agentManager, globalApiKey, activeConve
                         currentMessages = [...currentMessages, placeholderMessage];
                         onUpdateConversation(conversationId, { messages: currentMessages });
 
-                        const agentResponse = await AgentService.generateResponse('Continue the discussion.', respondingAgent, currentMessages, undefined, discussionSettings.rules, longTermMemory, (chunk) => onAppendToMessageText(conversationId, aiMessageId, chunk), taskForNextSpeaker || undefined, globalApiKey);
+                        const { finalResult, summary, pipeline: agentPipeline } = await AgentService.generateResponse('Continue the discussion.', respondingAgent, currentMessages, undefined, discussionSettings.rules, longTermMemory, (chunk) => onAppendToMessageText(conversationId, aiMessageId, chunk), taskForNextSpeaker || undefined, globalApiKey);
                         
-                        const finalMessageData: Partial<Message> = { text: agentResponse.finalResult, isStreaming: false, pipeline: [...moderationResponse.pipeline, ...agentResponse.pipeline], responseTimeMs: agentResponse.pipeline.find(s => s.stage.startsWith('Model Invocation'))?.durationMs };
+                        const finalMessageData: Partial<Message> = { text: finalResult, summary, isStreaming: false, pipeline: [...moderationResponse.pipeline, ...agentPipeline], responseTimeMs: agentPipeline.find(s => s.stage.startsWith('Model Invocation'))?.durationMs };
                         onFinalizeMessage(conversationId, aiMessageId, finalMessageData);
 
                         const finalMessage = { ...placeholderMessage, ...finalMessageData };
@@ -189,12 +189,9 @@ export const useChatHandler = ({ agents, agentManager, globalApiKey, activeConve
                     currentMessages = [...currentMessages, placeholderMessage];
                     onUpdateConversation(conversationId, { messages: currentMessages });
 
-                    const agentResponse = await AgentService.generateResponse('Based on the plan, execute your task.', respondingAgent, currentMessages, undefined, undefined, longTermMemory, (chunk) => onAppendToMessageText(conversationId, aiMessageId, chunk), step.task, globalApiKey);
+                    const { finalResult, summary, pipeline: agentPipeline } = await AgentService.generateResponse('Based on the plan, execute your task.', respondingAgent, currentMessages, undefined, undefined, longTermMemory, (chunk) => onAppendToMessageText(conversationId, aiMessageId, chunk), step.task, globalApiKey);
                     
-                    const finalMessageData: Partial<Message> = { text: agentResponse.finalResult, isStreaming: false, pipeline: agentResponse.pipeline, responseTimeMs: agentResponse.pipeline.find(s => s.stage.startsWith('Model Invocation'))?.durationMs };
-                    
-                    const summary = await MessageActionsService.summarizeForStorage(agentResponse.finalResult, agentManager, globalApiKey);
-                    finalMessageData.summary = summary;
+                    const finalMessageData: Partial<Message> = { text: finalResult, summary, isStreaming: false, pipeline: agentPipeline, responseTimeMs: agentPipeline.find(s => s.stage.startsWith('Model Invocation'))?.durationMs };
                     
                     onFinalizeMessage(conversationId, aiMessageId, finalMessageData);
 
@@ -233,18 +230,16 @@ export const useChatHandler = ({ agents, agentManager, globalApiKey, activeConve
                         currentMessages = [...currentMessages, placeholderMessage];
                         onUpdateConversation(conversationId, { messages: currentMessages });
 
-                        const agentResponse = await AgentService.generateResponse(text, respondingAgent, currentMessages, attachment, activeConversation.systemInstructionOverride, longTermMemory, (chunk) => onAppendToMessageText(conversationId, aiMessageId, chunk), undefined, globalApiKey);
+                        const { finalResult, summary, pipeline: agentPipeline } = await AgentService.generateResponse(text, respondingAgent, currentMessages, attachment, activeConversation.systemInstructionOverride, longTermMemory, (chunk) => onAppendToMessageText(conversationId, aiMessageId, chunk), undefined, globalApiKey);
                         
                         const finalMessageData: Partial<Message> = {
-                            text: agentResponse.finalResult,
-                            pipeline: [...managerResponse.pipeline, ...agentResponse.pipeline],
+                            text: finalResult,
+                            summary: summary,
+                            pipeline: [...managerResponse.pipeline, ...agentPipeline],
                             isStreaming: false,
-                            responseTimeMs: agentResponse.pipeline.find(s => s.stage.startsWith('Model Invocation'))?.durationMs,
+                            responseTimeMs: agentPipeline.find(s => s.stage.startsWith('Model Invocation'))?.durationMs,
                         };
                         
-                        const summary = await MessageActionsService.summarizeForStorage(agentResponse.finalResult, agentManager, globalApiKey);
-                        finalMessageData.summary = summary;
-
                         onFinalizeMessage(conversationId, aiMessageId, finalMessageData);
                         const finalMessage = { ...placeholderMessage, ...finalMessageData };
                         currentMessages = currentMessages.map(m => m.id === aiMessageId ? finalMessage : m) as Message[];
@@ -313,18 +308,16 @@ export const useChatHandler = ({ agents, agentManager, globalApiKey, activeConve
                 currentMessages = [...currentMessages, placeholderMessage];
                 onUpdateConversation(conversationId, { messages: currentMessages});
 
-                const agentResponse = await AgentService.generateResponse(userMessage.text, respondingAgent, activeConversation.messages, userMessage.attachment, systemInstructionOverride, longTermMemory, (chunk) => onAppendToMessageText(conversationId, aiMessageId, chunk), undefined, globalApiKey);
+                const { finalResult, summary, pipeline } = await AgentService.generateResponse(userMessage.text, respondingAgent, activeConversation.messages, userMessage.attachment, systemInstructionOverride, longTermMemory, (chunk) => onAppendToMessageText(conversationId, aiMessageId, chunk), undefined, globalApiKey);
                 
                 const finalMessageData: Partial<Message> = {
-                    text: agentResponse.finalResult,
-                    pipeline: agentResponse.pipeline,
+                    text: finalResult,
+                    summary: summary,
+                    pipeline: pipeline,
                     isStreaming: false,
-                    responseTimeMs: agentResponse.pipeline.find(s => s.stage.startsWith('Model Invocation'))?.durationMs,
+                    responseTimeMs: pipeline.find(s => s.stage.startsWith('Model Invocation'))?.durationMs,
                 };
                 
-                const summary = await MessageActionsService.summarizeForStorage(agentResponse.finalResult, agentManager, globalApiKey);
-                finalMessageData.summary = summary;
-
                 onFinalizeMessage(conversationId, aiMessageId, finalMessageData);
                 const finalMessage = { ...placeholderMessage, ...finalMessageData };
                 currentMessages = currentMessages.map(m => m.id === aiMessageId ? finalMessage : m) as Message[];
@@ -414,14 +407,14 @@ export const useChatHandler = ({ agents, agentManager, globalApiKey, activeConve
             setLoadingStage({ stage: 'generating', agentId: agent.id });
             
             // For regeneration, we don't want to stream the response, just get the final result
-            const agentResponse = await AgentService.generateResponse(userMessage.text, agent, activeConversation.messages.slice(0, aiMessageIndex), userMessage.attachment, systemInstructionOverride, longTermMemory, () => {}, undefined, globalApiKey);
+            const { finalResult, pipeline } = await AgentService.generateResponse(userMessage.text, agent, activeConversation.messages.slice(0, aiMessageIndex), userMessage.attachment, systemInstructionOverride, longTermMemory, () => {}, undefined, globalApiKey);
             
             const newResponse = {
-                text: agentResponse.finalResult,
+                text: finalResult,
                 sender: agent.id,
                 timestamp: new Date().toISOString(),
-                responseTimeMs: agentResponse.pipeline.find(s => s.stage.startsWith('Model Invocation'))?.durationMs,
-                pipeline: agentResponse.pipeline,
+                responseTimeMs: pipeline.find(s => s.stage.startsWith('Model Invocation'))?.durationMs,
+                pipeline: pipeline,
             };
 
             const updatedMessages = activeConversation.messages.map(m => {
