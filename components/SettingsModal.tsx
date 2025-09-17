@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect, useRef } from 'react';
 import { Agent, AgentManager } from '../types/index.ts';
 import { useAppContext } from '../contexts/StateProvider.tsx';
@@ -6,6 +5,8 @@ import { ToggleSwitch } from './ToggleSwitch.tsx';
 import { LongTermMemoryData } from '../types/index.ts';
 import { CloseIcon, CpuIcon } from './Icons.tsx';
 import { safeRender } from '../services/utils/safeRender.ts';
+import { SecureInput } from './SecureInput.tsx';
+import { CopyClearWrapper } from './CopyClearWrapper.tsx';
 
 export const SettingsModal: React.FC = () => {
     const { 
@@ -99,11 +100,10 @@ export const SettingsModal: React.FC = () => {
                         <div>
                             <label className="block text-sm font-medium text-gray-300 mb-1">Global Fallback API Key</label>
                             <p className="text-xs text-white mb-2">This key will be used for any agent that does not have its own specific key assigned below.</p>
-                            <input 
-                                type="password" 
+                            <SecureInput
+                                id="global-api-key"
                                 value={localGlobalApiKey} 
                                 onChange={e => setLocalGlobalApiKey(e.target.value)} 
-                                className="w-full bg-black/20 border border-white/10 rounded-md p-2 text-white focus:ring-green-500 focus:border-green-500 font-mono text-sm"
                                 placeholder="Enter your global Gemini API key"
                             />
                         </div>
@@ -148,13 +148,15 @@ export const SettingsModal: React.FC = () => {
                             <h3 className="text-lg font-semibold text-purple-400">Long-Term Memory</h3>
                         </div>
                         <p className="text-sm text-white mb-2">This is the persistent memory shared by all agents, stored as a JSON object. Edit with caution.</p>
-                        <textarea 
-                            value={localMemory}
-                            onChange={e => setLocalMemory(e.target.value)}
-                            rows={8} 
-                            className="w-full bg-black/20 border border-white/10 rounded-md p-2 text-white focus:ring-purple-500 focus:border-purple-500 font-mono text-sm"
-                            placeholder="{}"
-                        />
+                         <CopyClearWrapper value={localMemory} onClear={() => setLocalMemory('')}>
+                            <textarea 
+                                value={localMemory}
+                                onChange={e => setLocalMemory(e.target.value)}
+                                rows={8} 
+                                className="w-full bg-black/20 border border-white/10 rounded-md p-2 text-white focus:ring-purple-500 focus:border-purple-500 font-mono text-sm"
+                                placeholder="{}"
+                            />
+                        </CopyClearWrapper>
                         <div className="flex justify-end gap-2 mt-2">
                             <button onClick={clearMemory} className="bg-red-600 text-white font-bold py-2 px-4 rounded-lg hover:bg-red-500 transition-colors">
                                 Clear Memory
@@ -174,15 +176,19 @@ export const SettingsModal: React.FC = () => {
                         <div className="grid grid-cols-1 gap-4">
                              <div>
                                 <label className="block text-sm font-medium text-gray-300 mb-1">Manager API Key (Optional)</label>
-                                <input type="password" value={localManager.apiKey || ''} onChange={e => handleManagerChange('apiKey', e.target.value)} className="w-full bg-black/20 border border-white/10 rounded-md p-2 text-white font-mono text-sm" placeholder="Uses Global API Key" />
+                                <SecureInput id="manager-api-key" value={localManager.apiKey || ''} onChange={e => handleManagerChange('apiKey', e.target.value)} placeholder="Uses Global API Key" />
                             </div>
                             <div>
                                 <label className="block text-sm font-medium text-gray-300 mb-1">Model</label>
-                                <input type="text" value={localManager.model} onChange={e => handleManagerChange('model', e.target.value)} className="w-full bg-black/20 border border-white/10 rounded-md p-2 text-white focus:ring-indigo-500 focus:border-indigo-500" />
+                                <CopyClearWrapper value={localManager.model} onClear={() => handleManagerChange('model', '')}>
+                                    <input type="text" value={localManager.model} onChange={e => handleManagerChange('model', e.target.value)} className="w-full bg-black/20 border border-white/10 rounded-md p-2 text-white focus:ring-indigo-500 focus:border-indigo-500" />
+                                </CopyClearWrapper>
                             </div>
                             <div>
                                 <label className="block text-sm font-medium text-gray-300 mb-1">System Instruction</label>
-                                <textarea value={localManager.systemInstruction} onChange={e => handleManagerChange('systemInstruction', e.target.value)} rows={4} className="w-full bg-black/20 border border-white/10 rounded-md p-2 text-white focus:ring-indigo-500 focus:border-indigo-500 font-mono text-sm"></textarea>
+                                 <CopyClearWrapper value={localManager.systemInstruction} onClear={() => handleManagerChange('systemInstruction', '')}>
+                                    <textarea value={localManager.systemInstruction} onChange={e => handleManagerChange('systemInstruction', e.target.value)} rows={4} className="w-full bg-black/20 border border-white/10 rounded-md p-2 text-white focus:ring-indigo-500 focus:border-indigo-500 font-mono text-sm"></textarea>
+                                </CopyClearWrapper>
                             </div>
                         </div>
                     </div>
@@ -197,51 +203,73 @@ export const SettingsModal: React.FC = () => {
                                     <div className="space-y-4">
                                         <div>
                                             <label className="block text-sm font-medium text-gray-300 mb-1">API Key (Optional)</label>
-                                            <input type="password" value={agent.apiKey || ''} onChange={e => handleAgentChange(agent.id, 'apiKey', e.target.value)} className="w-full bg-black/20 border border-white/10 rounded-md p-2 text-white font-mono text-sm" placeholder="Uses Global API Key"/>
+                                            <SecureInput id={`${agent.id}-api-key`} value={agent.apiKey || ''} onChange={e => handleAgentChange(agent.id, 'apiKey', e.target.value)} placeholder="Uses Global API Key"/>
                                         </div>
                                         <div>
                                             <label className="block text-sm font-medium text-gray-300 mb-1">Name</label>
-                                            <input type="text" value={safeRender(agent.name)} onChange={e => handleAgentChange(agent.id, 'name', e.target.value)} className="w-full bg-black/20 border border-white/10 rounded-md p-2 text-white" />
+                                            <CopyClearWrapper value={agent.name} onClear={() => handleAgentChange(agent.id, 'name', '')}>
+                                                <input type="text" value={safeRender(agent.name)} onChange={e => handleAgentChange(agent.id, 'name', e.target.value)} className="w-full bg-black/20 border border-white/10 rounded-md p-2 text-white" />
+                                            </CopyClearWrapper>
                                         </div>
                                         <div>
                                             <label className="block text-sm font-medium text-gray-300 mb-1">Job Title</label>
-                                            <input type="text" value={safeRender(agent.job)} onChange={e => handleAgentChange(agent.id, 'job', e.target.value)} className="w-full bg-black/20 border border-white/10 rounded-md p-2 text-white" />
+                                            <CopyClearWrapper value={agent.job} onClear={() => handleAgentChange(agent.id, 'job', '')}>
+                                                <input type="text" value={safeRender(agent.job)} onChange={e => handleAgentChange(agent.id, 'job', e.target.value)} className="w-full bg-black/20 border border-white/10 rounded-md p-2 text-white" />
+                                            </CopyClearWrapper>
                                         </div>
                                         <div>
                                             <label className="block text-sm font-medium text-gray-300 mb-1">Role</label>
-                                            <input type="text" value={safeRender(agent.role || '')} onChange={e => handleAgentChange(agent.id, 'role', e.target.value)} className="w-full bg-black/20 border border-white/10 rounded-md p-2 text-white" />
+                                            <CopyClearWrapper value={agent.role || ''} onClear={() => handleAgentChange(agent.id, 'role', '')}>
+                                                <input type="text" value={safeRender(agent.role || '')} onChange={e => handleAgentChange(agent.id, 'role', e.target.value)} className="w-full bg-black/20 border border-white/10 rounded-md p-2 text-white" />
+                                            </CopyClearWrapper>
                                         </div>
                                         <div>
                                             <label className="block text-sm font-medium text-gray-300 mb-1">Goals (one per line)</label>
-                                            <textarea value={agent.goals?.map(safeRender).join('\n') || ''} onChange={e => handleAgentChange(agent.id, 'goals', e.target.value.split('\n'))} rows={3} className="w-full bg-black/20 border border-white/10 rounded-md p-2 text-white font-mono text-sm"></textarea>
+                                            <CopyClearWrapper value={agent.goals?.join('\n') || ''} onClear={() => handleAgentChange(agent.id, 'goals', [])}>
+                                                <textarea value={agent.goals?.map(safeRender).join('\n') || ''} onChange={e => handleAgentChange(agent.id, 'goals', e.target.value.split('\n'))} rows={3} className="w-full bg-black/20 border border-white/10 rounded-md p-2 text-white font-mono text-sm"></textarea>
+                                            </CopyClearWrapper>
                                         </div>
                                         <div>
                                             <label className="block text-sm font-medium text-gray-300 mb-1">Specializations (one per line)</label>
-                                            <textarea value={agent.specializations?.map(safeRender).join('\n') || ''} onChange={e => handleAgentChange(agent.id, 'specializations', e.target.value.split('\n'))} rows={3} className="w-full bg-black/20 border border-white/10 rounded-md p-2 text-white font-mono text-sm"></textarea>
+                                            <CopyClearWrapper value={agent.specializations?.join('\n') || ''} onClear={() => handleAgentChange(agent.id, 'specializations', [])}>
+                                                <textarea value={agent.specializations?.map(safeRender).join('\n') || ''} onChange={e => handleAgentChange(agent.id, 'specializations', e.target.value.split('\n'))} rows={3} className="w-full bg-black/20 border border-white/10 rounded-md p-2 text-white font-mono text-sm"></textarea>
+                                            </CopyClearWrapper>
                                         </div>
                                         <div>
                                             <label className="block text-sm font-medium text-gray-300 mb-1">Model</label>
-                                            <input type="text" value={safeRender(agent.model)} onChange={e => handleAgentChange(agent.id, 'model', e.target.value)} className="w-full bg-black/20 border border-white/10 rounded-md p-2 text-white" />
+                                            <CopyClearWrapper value={agent.model} onClear={() => handleAgentChange(agent.id, 'model', '')}>
+                                                <input type="text" value={safeRender(agent.model)} onChange={e => handleAgentChange(agent.id, 'model', e.target.value)} className="w-full bg-black/20 border border-white/10 rounded-md p-2 text-white" />
+                                            </CopyClearWrapper>
                                         </div>
                                         <div>
                                             <label className="block text-sm font-medium text-gray-300 mb-1">System Instruction</label>
-                                            <textarea value={safeRender(agent.systemInstruction)} onChange={e => handleAgentChange(agent.id, 'systemInstruction', e.target.value)} rows={5} className="w-full bg-black/20 border border-white/10 rounded-md p-2 text-white font-mono text-sm"></textarea>
+                                            <CopyClearWrapper value={agent.systemInstruction} onClear={() => handleAgentChange(agent.id, 'systemInstruction', '')}>
+                                                <textarea value={safeRender(agent.systemInstruction)} onChange={e => handleAgentChange(agent.id, 'systemInstruction', e.target.value)} rows={5} className="w-full bg-black/20 border border-white/10 rounded-md p-2 text-white font-mono text-sm"></textarea>
+                                            </CopyClearWrapper>
                                         </div>
                                          <div>
                                             <label className="block text-sm font-medium text-gray-300 mb-1">Tools (comma-separated)</label>
-                                            <textarea value={agent.tools?.join(', ') || ''} onChange={e => handleAgentChange(agent.id, 'tools', e.target.value)} rows={2} className="w-full bg-black/20 border border-white/10 rounded-md p-2 text-white font-mono text-sm" placeholder="e.g., calculator, search"></textarea>
+                                            <CopyClearWrapper value={agent.tools?.join(', ') || ''} onClear={() => handleAgentChange(agent.id, 'tools', [])}>
+                                                <textarea value={agent.tools?.join(', ') || ''} onChange={e => handleAgentChange(agent.id, 'tools', e.target.value)} rows={2} className="w-full bg-black/20 border border-white/10 rounded-md p-2 text-white font-mono text-sm" placeholder="e.g., calculator, search"></textarea>
+                                            </CopyClearWrapper>
                                         </div>
                                         <div>
                                             <label className="block text-sm font-medium text-gray-300 mb-1">Knowledge Base</label>
-                                            <textarea value={safeRender(agent.knowledge || '')} onChange={e => handleAgentChange(agent.id, 'knowledge', e.target.value)} rows={4} className="w-full bg-black/20 border border-white/10 rounded-md p-2 text-white font-mono text-sm" placeholder="Provide background info or data..."></textarea>
+                                            <CopyClearWrapper value={agent.knowledge || ''} onClear={() => handleAgentChange(agent.id, 'knowledge', '')}>
+                                                <textarea value={safeRender(agent.knowledge || '')} onChange={e => handleAgentChange(agent.id, 'knowledge', e.target.value)} rows={4} className="w-full bg-black/20 border border-white/10 rounded-md p-2 text-white font-mono text-sm" placeholder="Provide background info or data..."></textarea>
+                                            </CopyClearWrapper>
                                         </div>
                                         <div>
                                             <label className="block text-sm font-medium text-gray-300 mb-1">Color Class</label>
-                                            <input type="text" value={safeRender(agent.color)} onChange={e => handleAgentChange(agent.id, 'color', e.target.value)} className="w-full bg-black/20 border border-white/10 rounded-md p-2 text-white" placeholder="e.g., bg-blue-500" />
+                                            <CopyClearWrapper value={agent.color} onClear={() => handleAgentChange(agent.id, 'color', '')}>
+                                                <input type="text" value={safeRender(agent.color)} onChange={e => handleAgentChange(agent.id, 'color', e.target.value)} className="w-full bg-black/20 border border-white/10 rounded-md p-2 text-white" placeholder="e.g., bg-blue-500" />
+                                            </CopyClearWrapper>
                                         </div>
                                         <div>
                                             <label className="block text-sm font-medium text-gray-300 mb-1">Text Color Class</label>
-                                            <input type="text" value={safeRender(agent.textColor)} onChange={e => handleAgentChange(agent.id, 'textColor', e.target.value)} className="w-full bg-black/20 border border-white/10 rounded-md p-2 text-white" placeholder="e.g., text-white" />
+                                            <CopyClearWrapper value={agent.textColor} onClear={() => handleAgentChange(agent.id, 'textColor', '')}>
+                                                <input type="text" value={safeRender(agent.textColor)} onChange={e => handleAgentChange(agent.id, 'textColor', e.target.value)} className="w-full bg-black/20 border border-white/10 rounded-md p-2 text-white" placeholder="e.g., text-white" />
+                                            </CopyClearWrapper>
                                         </div>
                                     </div>
                                 </div>

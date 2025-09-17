@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { useAppContext } from '../contexts/StateProvider.tsx';
 import { Agent, TeamComponent } from '../types/index.ts';
@@ -6,6 +5,7 @@ import { Spinner } from './Spinner.tsx';
 import * as TeamGenerationService from '../services/creation/teamGenerationService.ts';
 import { CloseIcon, SparklesIcon } from './Icons.tsx';
 import { safeRender } from '../services/utils/safeRender.ts';
+import { CopyClearWrapper } from './CopyClearWrapper.tsx';
 
 type LoadingStage = 'idle' | 'prompt' | 'components' | 'final';
 
@@ -125,11 +125,15 @@ export const TeamGeneratorModal: React.FC = () => {
                     <div className="glass-pane p-4 rounded-lg grid grid-cols-1 md:grid-cols-2 gap-4">
                         <div>
                             <label className="block text-sm font-medium text-gray-300 mb-1">Topic</label>
-                            <input type="text" value={topic} onChange={e => setTopic(e.target.value)} className="w-full bg-black/20 border border-white/10 rounded-md p-2 text-white" placeholder="What is the team's subject matter?" />
+                            <CopyClearWrapper value={topic} onClear={() => setTopic('')}>
+                                <input type="text" value={topic} onChange={e => setTopic(e.target.value)} className="w-full bg-black/20 border border-white/10 rounded-md p-2 text-white" placeholder="What is the team's subject matter?" />
+                            </CopyClearWrapper>
                         </div>
                         <div>
                             <label className="block text-sm font-medium text-gray-300 mb-1">Goal</label>
-                            <input type="text" value={goal} onChange={e => setGoal(e.target.value)} className="w-full bg-black/20 border border-white/10 rounded-md p-2 text-white" placeholder="What is the team's primary objective?" />
+                            <CopyClearWrapper value={goal} onClear={() => setGoal('')}>
+                                <input type="text" value={goal} onChange={e => setGoal(e.target.value)} className="w-full bg-black/20 border border-white/10 rounded-md p-2 text-white" placeholder="What is the team's primary objective?" />
+                            </CopyClearWrapper>
                         </div>
                     </div>
 
@@ -148,7 +152,9 @@ export const TeamGeneratorModal: React.FC = () => {
                             {generatedPrompt && (
                                 <div className="glass-pane p-4 rounded-lg">
                                     <h3 className="text-lg font-semibold text-indigo-400 mb-2">Generated Prompt</h3>
-                                    <textarea value={generatedPrompt} onChange={e => setGeneratedPrompt(e.target.value)} rows={4} className="w-full bg-black/20 border border-white/10 rounded-md p-2 text-white font-mono text-sm"></textarea>
+                                    <CopyClearWrapper value={generatedPrompt} onClear={() => setGeneratedPrompt('')}>
+                                        <textarea value={generatedPrompt} onChange={e => setGeneratedPrompt(e.target.value)} rows={4} className="w-full bg-black/20 border border-white/10 rounded-md p-2 text-white font-mono text-sm"></textarea>
+                                    </CopyClearWrapper>
                                 </div>
                             )}
                             {teamComponents && (

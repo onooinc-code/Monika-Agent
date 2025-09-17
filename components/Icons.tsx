@@ -39,3 +39,8 @@ export { ChartBarIcon as StatsIcon } from './icons/ChartBarIcon.tsx';
 export { MessageCountIcon } from './icons/MessageCountIcon.tsx';
 export { EllipsisVerticalIcon } from './icons/EllipsisVerticalIcon.tsx';
 export { InformationCircleIcon } from './icons/InformationCircleIcon.tsx';
+export { EyeIcon } from './icons/EyeIcon.tsx';
+export { EyeOffIcon } from './icons/EyeOffIcon.tsx';
+export { LockOpenIcon } from './icons/LockOpenIcon.tsx';
+export { LockClosedIcon } from './icons/LockClosedIcon.tsx';
+export { XCircleIcon } from './icons/XCircleIcon.tsx';

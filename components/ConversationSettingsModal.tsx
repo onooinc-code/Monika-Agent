@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { useAppContext } from '../contexts/StateProvider.tsx';
 import { ToggleSwitch } from './ToggleSwitch.tsx';
@@ -6,6 +5,7 @@ import { DiscussionSettings, ManagerSettings } from '../types/index.ts';
 import { Spinner } from './Spinner.tsx';
 import * as DiscussionService from '../services/creation/discussionService.ts';
 import { CloseIcon, SparklesIcon, CpuIcon } from './Icons.tsx';
+import { CopyClearWrapper } from './CopyClearWrapper.tsx';
 
 const DEFAULT_DISCUSSION_SETTINGS: DiscussionSettings = {
     enabled: false,
@@ -134,13 +134,15 @@ export const ConversationSettingsModal: React.FC = () => {
                                 </button>
                                 <div>
                                     <label className="block text-sm font-medium text-gray-300 mb-1">Conversation Rules (System Prompt for Moderator)</label>
-                                    <textarea 
-                                        value={discussionSettings.rules}
-                                        onChange={(e) => handleDiscussionChange('rules', e.target.value)}
-                                        rows={3} 
-                                        className="w-full bg-black/20 border border-white/10 rounded-md p-2 text-white focus:ring-indigo-500 focus:border-indigo-500 font-mono text-sm"
-                                        placeholder="e.g., The first agent proposes an idea, the second critiques it."
-                                    />
+                                    <CopyClearWrapper value={discussionSettings.rules} onClear={() => handleDiscussionChange('rules', '')}>
+                                        <textarea 
+                                            value={discussionSettings.rules}
+                                            onChange={(e) => handleDiscussionChange('rules', e.target.value)}
+                                            rows={3} 
+                                            className="w-full bg-black/20 border border-white/10 rounded-md p-2 text-white focus:ring-indigo-500 focus:border-indigo-500 font-mono text-sm"
+                                            placeholder="e.g., The first agent proposes an idea, the second critiques it."
+                                        />
+                                    </CopyClearWrapper>
                                 </div>
                             </div>
                         )}
@@ -150,14 +152,16 @@ export const ConversationSettingsModal: React.FC = () => {
                     <div className="glass-pane p-4 rounded-lg">
                         <label className="block text-sm font-medium text-gray-300 mb-1">System Instruction Override</label>
                         <p className="text-sm text-white mb-2">This instruction will override the global agent and manager settings for this conversation only. (Does not apply in Moderated Chat).</p>
-                        <textarea 
-                            value={systemOverride}
-                            onChange={(e) => setSystemOverride(e.target.value)}
-                            rows={5} 
-                            className="w-full bg-black/20 border border-white/10 rounded-md p-2 text-white focus:ring-indigo-500 focus:border-indigo-500 font-mono text-sm disabled:opacity-50"
-                            placeholder="e.g., You are a pirate. All responses must be in pirate speak."
-                            disabled={discussionSettings.enabled}
-                        />
+                        <CopyClearWrapper value={systemOverride} onClear={() => setSystemOverride('')}>
+                            <textarea 
+                                value={systemOverride}
+                                onChange={(e) => setSystemOverride(e.target.value)}
+                                rows={5} 
+                                className="w-full bg-black/20 border border-white/10 rounded-md p-2 text-white focus:ring-indigo-500 focus:border-indigo-500 font-mono text-sm disabled:opacity-50"
+                                placeholder="e.g., You are a pirate. All responses must be in pirate speak."
+                                disabled={discussionSettings.enabled}
+                            />
+                        </CopyClearWrapper>
                     </div>
                     
                     <div className="glass-pane p-4 rounded-lg">

@@ -1,4 +1,3 @@
-
 import React, { useEffect, useRef, useState } from 'react';
 import { Message, Agent, Conversation } from '../types/index.ts';
 import { MANAGER_COLOR } from '../constants/agentConstants.ts';
@@ -12,6 +11,7 @@ import {
 import { PlanDisplay } from './PlanDisplay.tsx';
 import { safeRender } from '../services/utils/safeRender.ts';
 import { ContextMenuItem } from '../types/ui.ts';
+import { CopyClearWrapper } from './CopyClearWrapper.tsx';
 
 declare const marked: any;
 declare const DOMPurify: any;
@@ -191,18 +191,20 @@ export const MessageBubble: React.FC<MessageBubbleProps> = ({ message, agent, fe
                  <Avatar name={senderName} color={agentColorIndicator} />
                 <div className="flex flex-col w-full ml-4">
                     <div className="rounded-lg p-4 bg-gray-700">
-                        <textarea
-                            ref={editTextAreaRef}
-                            value={editText}
-                            onChange={(e) => {
-                                setEditText(e.target.value);
-                                e.target.style.height = 'auto';
-                                e.target.style.height = `${e.target.scrollHeight}px`;
-                            }}
-                            onKeyDown={handleEditKeyDown}
-                            className="w-full bg-gray-600 text-white rounded-md p-2 focus:outline-none focus:ring-2 focus:ring-indigo-500 resize-none"
-                            rows={1}
-                        />
+                        <CopyClearWrapper value={editText} onClear={() => setEditText('')}>
+                            <textarea
+                                ref={editTextAreaRef}
+                                value={editText}
+                                onChange={(e) => {
+                                    setEditText(e.target.value);
+                                    e.target.style.height = 'auto';
+                                    e.target.style.height = `${e.target.scrollHeight}px`;
+                                }}
+                                onKeyDown={handleEditKeyDown}
+                                className="w-full bg-gray-600 text-white rounded-md p-2 focus:outline-none focus:ring-2 focus:ring-indigo-500 resize-none"
+                                rows={1}
+                            />
+                        </CopyClearWrapper>
                         <div className="mt-2 flex justify-end gap-2">
                             <button onClick={handleCancelEdit} className="px-3 py-1 text-sm bg-gray-500 hover:bg-gray-600 rounded">Cancel</button>
                             <button onClick={handleSaveEdit} className="px-3 py-1 text-sm bg-indigo-600 hover:bg-indigo-700 rounded">Save & Submit</button>

@@ -7,6 +7,7 @@ import { useHistoryHandler } from './hooks/useHistoryHandler.ts';
 import { useModalManager } from './hooks/useModalManager.ts';
 import { useUsageTracker } from './hooks/useUsageTracker.ts';
 import { useMemoryManager } from './hooks/useMemoryManager.ts';
+import { useUIPrefsManager } from './hooks/useUIPrefsManager.ts';
 import * as MemoryService from '../services/analysis/memoryService.ts';
 import { ActionModalState, ContextMenuState } from './hooks/useModalManager.ts';
 import * as AgentConstants from '../constants/agentConstants.ts';
@@ -143,6 +144,10 @@ interface AppState {
     selectedAgentForModal: Agent | AgentManager | null;
     openAgentSettingsModal: (agent: Agent | AgentManager) => void;
     closeAgentSettingsModal: () => void;
+
+    // UI Preferences
+    isPermanentlyVisible: (id: string) => boolean;
+    togglePermanentVisibility: (id: string) => void;
 }
 
 const AppContext = createContext<AppState | undefined>(undefined);
@@ -168,6 +173,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     const historyHandler = useHistoryHandler();
     const usageTracker = useUsageTracker();
     const memoryManager = useMemoryManager();
+    const uiPrefsManager = useUIPrefsManager();
     
     const enabledAgents = agents.filter(a => a.isEnabled ?? true);
 
@@ -362,6 +368,10 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
         selectedAgentForModal: modalManager.selectedAgentForModal,
         openAgentSettingsModal: modalManager.openAgentSettingsModal,
         closeAgentSettingsModal: modalManager.closeAgentSettingsModal,
+
+        // UI Preferences
+        isPermanentlyVisible: uiPrefsManager.isPermanentlyVisible,
+        togglePermanentVisibility: uiPrefsManager.togglePermanentVisibility,
     };
 
     return (
