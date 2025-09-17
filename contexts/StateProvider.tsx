@@ -129,10 +129,6 @@ interface AppState {
     // Agent Status
     handleToggleAgentEnabled: (agentId: string) => void;
     lastTurnAgentIds: Set<string>;
-
-    // MCP Server Manager
-    isMcpServerManagerOpen: boolean;
-    setIsMcpServerManagerOpen: (isOpen: boolean) => void;
 }
 
 const AppContext = createContext<AppState | undefined>(undefined);
@@ -291,8 +287,6 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
         setIsApiUsageOpen: modalManager.setIsApiUsageOpen,
         isBookmarksPanelOpen: modalManager.isBookmarksPanelOpen,
         setIsBookmarksPanelOpen: modalManager.setIsBookmarksPanelOpen,
-        isMcpServerManagerOpen: modalManager.isMcpServerManagerOpen,
-        setIsMcpServerManagerOpen: modalManager.setIsMcpServerManagerOpen,
 
         // Message actions from useConversationManager
         handleToggleMessageBookmark: conversationManager.handleToggleMessageBookmark,
