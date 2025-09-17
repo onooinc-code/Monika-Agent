@@ -3,7 +3,7 @@ import React, { useState, useEffect } from 'react';
 import { Conversation, Agent } from '../types/index.ts';
 import { useAppContext } from '../contexts/StateProvider.tsx';
 import { Spinner } from './Spinner.tsx';
-import { MenuIcon, EditIcon, CheckIcon, SparklesIcon, SettingsIcon, UsersIcon, CloudIcon, PowerIcon, HistoryIcon, BookmarkIcon, ServerStackIcon } from './Icons.tsx';
+import { MenuIcon, EditIcon, CheckIcon, SparklesIcon, SettingsIcon, UsersIcon, CloudIcon, PowerIcon, HistoryIcon, BookmarkIcon } from './Icons.tsx';
 import { safeRender } from '../services/utils/safeRender.ts';
 
 // --- SHARED COMPONENTS ---
@@ -130,7 +130,6 @@ const ConversationHeader: React.FC<{ toggleSidebar: () => void, conversation: Co
         handleUpdateConversationTitle,
         handleGenerateTitle,
         activeConversation,
-        setIsMcpServerManagerOpen,
     } = useAppContext();
     
     const [isEditingTitle, setIsEditingTitle] = useState(false);
@@ -210,7 +209,6 @@ const ConversationHeader: React.FC<{ toggleSidebar: () => void, conversation: Co
 
             {/* Right */}
             <div className="flex items-center gap-1 text-xs justify-end flex-1">
-                <HeaderButton onClick={() => setIsMcpServerManagerOpen(true)} title="MCP Server Manager" aria-label="Open MCP Server Manager"><ServerStackIcon className="w-5 h-5"/></HeaderButton>
                 <HeaderButton onClick={() => setIsTeamGeneratorOpen(true)} title="Generate Team" aria-label="Open Team Generator"><UsersIcon className="w-5 h-5"/></HeaderButton>
                 <HeaderButton onClick={() => setIsApiUsageOpen(true)} title="API Usage" aria-label="Open API Usage"><CloudIcon className="w-5 h-5"/></HeaderButton>
                 <HeaderButton onClick={() => setIsSettingsOpen(true)} title="Settings" aria-label="Open Settings"><SettingsIcon className="w-5 h-5"/></HeaderButton>

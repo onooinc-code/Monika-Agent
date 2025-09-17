@@ -37,4 +37,3 @@ export { CpuChipIcon as CpuIcon } from './icons/CpuChipIcon.tsx';
 export { ClipboardListIcon as PlanIcon } from './icons/ClipboardListIcon.tsx';
 export { ChartBarIcon as StatsIcon } from './icons/ChartBarIcon.tsx';
 export { MessageCountIcon } from './icons/MessageCountIcon.tsx';
-export { ServerStackIcon } from './icons/ServerStackIcon.tsx';

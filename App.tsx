@@ -19,7 +19,6 @@ import { AgentStatsModal } from './components/AgentStatsModal.tsx';
 import { TeamGeneratorModal } from './components/TeamGeneratorModal.tsx';
 import { ApiUsageModal } from './components/ApiUsageModal.tsx';
 import { BookmarkedMessagesPanel } from './components/BookmarkedMessagesPanel.tsx';
-import { McpServerManagerModal } from './components/McpServerManagerModal.tsx';
 
 export default function App() {
   const { 
@@ -127,7 +126,6 @@ export default function App() {
         <AgentStatsModal />
         <TeamGeneratorModal />
         <ApiUsageModal />
-        <McpServerManagerModal />
     </div>
   );
 }

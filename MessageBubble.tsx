@@ -1,7 +1,6 @@
 
 import React, { useEffect, useRef, useState } from 'react';
 import { Message, Agent, Conversation } from '../types/index.ts';
-// FIX: Corrected import path for MANAGER_COLOR. It was moved to constants/agentConstants.ts.
 import { MANAGER_COLOR } from '../constants/agentConstants.ts';
 import { useAppContext } from '../contexts/StateProvider.tsx';
 import { Avatar } from './Avatar.tsx';

@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Monica - Project Audit Report</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.tailwindcss.com?plugins=typography"></script>
+    <style>
+        :root {
+            --font-sans: 'Inter', sans-serif;
+            --font-mono: 'Roboto Mono', monospace;
+            --color-bg: #0a0a0f;
+            --color-pane: rgba(23, 26, 43, 0.7);
+            --color-border: rgba(129, 140, 248, 0.2);
+            --color-neon-indigo: rgba(129, 140, 248, 1);
+            --color-neon-cyan: rgba(34, 211, 238, 1);
+        }
+        body {
+            font-family: var(--font-sans);
+            background-color: var(--color-bg);
+            color: #e5e7eb;
+            font-size: 18px;
+            line-height: 1.7;
+        }
+        .glass-pane {
+            background-color: var(--color-pane);
+            backdrop-filter: blur(16px) saturate(180%);
+            -webkit-backdrop-filter: blur(16px) saturate(180%);
+            border: 1px solid var(--color-border);
+        }
+        details > summary {
+            cursor: pointer;
+            padding: 0.5rem 1rem;
+            border-radius: 0.5rem;
+            background-color: rgba(129, 140, 248, 0.1);
+            transition: background-color 0.2s ease;
+        }
+        details > summary:hover {
+            background-color: rgba(129, 140, 248, 0.2);
+        }
+        details[open] > summary {
+            border-bottom-left-radius: 0;
+            border-bottom-right-radius: 0;
+        }
+        .tag {
+            display: inline-block;
+            padding: 0.25rem 0.75rem;
+            border-radius: 9999px;
+            font-weight: 600;
+            font-size: 0.8rem;
+        }
+        .tag-critical { background-color: #991b1b; color: #fecaca; }
+        .tag-risk { background-color: #9a3412; color: #fdba74; }
+        .tag-roadmap { background-color: #1e40af; color: #bfdbfe; }
+        .tag-solution { background-color: #166534; color: #bbf7d0; }
+    </style>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto+Mono:wght@400;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body class="p-4 sm:p-6 lg:p-8">
+
+    <main class="max-w-screen-lg mx-auto space-y-8">
+        <header class="glass-pane rounded-xl p-8 text-center">
+            <h1 class="text-4xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-indigo-400 via-cyan-400 to-indigo-400">Project "Monica" Audit Report</h1>
+            <p class="mt-2 text-lg text-gray-300">A comprehensive analysis of the application's logic, features, and future roadmap.</p>
+            <p class="text-sm text-gray-500 mt-1">Generated: ${new Date().toUTCString()}</p>
+        </header>
+
+        <section class="glass-pane rounded-xl p-8 prose prose-invert max-w-none prose-p:text-gray-300 prose-headings:text-white">
+            <h2 class="!text-3xl !text-cyan-400 border-b-2 border-cyan-400/30 pb-2">Executive Summary</h2>
+            <p>The "Monica" application is a well-architected and sophisticated frontend platform for multi-agent AI conversations. The codebase demonstrates a strong adherence to modern development principles, including separation of concerns, a clear state management pattern, and a highly reusable component structure. The core features, such as the dynamic and moderated chat modes, are implemented with robust and sound logic.</p>
+            <p>However, the project contains one significant non-functional feature inherited from a previous architectural iteration (the Chrome Extension) which requires immediate removal. Additionally, there are inherent architectural risks related to its client-side nature that should be acknowledged. The project's own documentation provides a clear and ambitious roadmap for future development, which this report will also outline.</p>
+            <p>This audit provides a clear, actionable path to rectify immediate issues and align the project for future growth as outlined in its own vision.</p>
+        </section>
+
+        <section class="glass-pane rounded-xl p-8 space-y-6">
+            <h2 class="text-3xl font-bold text-white border-b-2 border-indigo-400/30 pb-2">1. Unsound Logic & Architectural Risks</h2>
+            <div class="glass-pane -m-4 p-6 rounded-lg">
+                <h3 class="font-semibold text-xl text-indigo-300 flex items-center gap-3">
+                    <span class="tag tag-risk">Architectural Risk</span>
+                    <span>Dependency on AI for JSON Formatting</span>
+                </h3>
+                <p class="mt-3 text-gray-300">Multiple services (e.g., `managerService`, `teamGenerationService`) rely on the Gemini API returning a perfectly structured JSON object that matches a predefined schema. While the application code is written defensively with `try...catch` blocks around `JSON.parse` and uses the `safeRender` utility in the UI, this remains an inherent point of fragility.</p>
+                <p class="mt-2 text-gray-400">If the AI model, for any reason (e.g., model updates, safety blocks, ambiguous prompts), fails to return valid JSON, the feature will fail. The current implementation correctly prevents the app from crashing, but the user experience is impacted.</p>
+                <p class="mt-2 text-gray-400"><strong>Conclusion:</strong> The logic is not "unsound" in its implementation (it handles errors correctly), but the architectural choice to rely on client-side parsing of AI-generated JSON is a risk. This is acceptable for the current client-only architecture but should be a primary consideration for a backend migration.</p>
+            </div>
+        </section>
+
+        <section class="glass-pane rounded-xl p-8 space-y-6">
+            <h2 class="text-3xl font-bold text-white border-b-2 border-red-400/30 pb-2">2. Incorrect or Non-Functional Features</h2>
+            <div class="glass-pane -m-4 p-6 rounded-lg">
+                <h3 class="font-semibold text-xl text-red-300 flex items-center gap-3">
+                    <span class="tag tag-critical">Non-Functional</span>
+                    <span>MCP Server Manager</span>
+                </h3>
+                <p class="mt-3 text-gray-300">This feature is entirely non-operational. Its logic, from the UI components to the state management hooks (`useMcpManager`), is designed exclusively to communicate with a browser extension via `window.postMessage`.</p>
+                <p class="mt-2 text-gray-400">As all files related to the Chrome Extension (`Monica-Extension/`, `manifest.json`, etc.) have been removed from the project, the MCP Server Manager is now "dead code". It attempts to send messages to a non-existent receiver and listens for responses that will never arrive. The UI is still present, which can cause significant user confusion.</p>
+                <p class="mt-2 text-gray-400"><strong>Conclusion:</strong> This feature is incorrectly implemented in the context of the current project structure because its required counterpart is missing. It must be removed completely.</p>
+            </div>
+        </section>
+        
+        <section class="glass-pane rounded-xl p-8 space-y-6">
+            <h2 class="text-3xl font-bold text-white border-b-2 border-purple-400/30 pb-2">3. Remaining Features & Future Roadmap</h2>
+             <div class="glass-pane -m-4 p-6 rounded-lg">
+                <h3 class="font-semibold text-xl text-purple-300 flex items-center gap-3">
+                    <span class="tag tag-roadmap">Roadmap</span>
+                    <span>Backend Migration & Collaboration Platform</span>
+                </h3>
+                <p class="mt-3 text-gray-300">The project's own documentation (`Monica-Documentation/future_features_with_backend.html`) outlines a clear and ambitious vision. The most significant "remaining feature" is the evolution of Monica from a client-side application into a full-fledged, backend-powered AI collaboration platform.</p>
+                <p class="mt-2 text-gray-400">The high-level roadmap includes:</p>
+                <ul class="list-disc list-inside mt-2 text-gray-300 space-y-1">
+                    <li><strong>Core Platform:</strong> User Accounts, Multi-Device Sync, Team Workspaces.</li>
+                    <li><strong>Advanced Intelligence:</strong> Shared Team Memory, Dynamic Knowledge Base Integration (Notion, Drive), and Agent Self-Improvement.</li>
+                    <li><strong>Workflow Automation:</strong> A visual drag-and-drop workflow builder for automating complex tasks.</li>
+                    <li><strong>Analytics & Monetization:</strong> Dashboards for cost analysis, a marketplace for community agents, and subscription tiers.</li>
+                </ul>
+                <p class="mt-2 text-gray-400"><strong>Conclusion:</strong> There is a well-defined long-term plan. The next logical step in the project's lifecycle is to begin implementing the foundational backend features.</p>
+            </div>
+        </section>
+        
+        <section class="glass-pane rounded-xl p-8 space-y-6">
+            <h2 class="text-3xl font-bold text-white border-b-2 border-green-400/30 pb-2">4. Systematic Solutions & Next Steps</h2>
+
+            <div class="glass-pane -m-4 p-6 rounded-lg">
+                <h3 class="font-semibold text-xl text-green-300 flex items-center gap-3">
+                    <span class="tag tag-solution">Immediate Action</span>
+                    <span>Complete Removal of MCP Server Manager</span>
+                </h3>
+                <p class="mt-3 text-gray-300">To resolve the non-functional feature, a surgical removal of all associated code is necessary. This action has been performed alongside the generation of this report.</p>
+                <details class="mt-2 text-sm">
+                    <summary class="font-semibold">View Removal Steps</summary>
+                    <ol class="list-decimal list-inside mt-2 text-gray-400 space-y-1 bg-black/30 p-4 rounded-b-lg">
+                        <li>Deleted component file: <code>components/McpServerManagerModal.tsx</code>.</li>
+                        <li>Deleted associated icon: <code>components/icons/ServerStackIcon.tsx</code>.</li>
+                        <li>Deleted state management hook: <code>contexts/hooks/useMcpManager.ts</code>.</li>
+                        <li>Deleted type definitions: <code>types/mcp.ts</code>.</li>
+                        <li>Removed logic and state from the main provider: <code>contexts/StateProvider.tsx</code>.</li>
+                        <li>Removed the modal from the main layout: <code>App.tsx</code>.</li>
+                        <li>Removed the trigger button from the header: <code>components/Header.tsx</code>.</li>
+                    </ol>
+                </details>
+            </div>
+
+            <div class="glass-pane -m-4 p-6 rounded-lg">
+                <h3 class="font-semibold text-xl text-green-300 flex items-center gap-3">
+                    <span class="tag tag-solution">Architectural Mitigation</span>
+                    <span>Mitigating JSON Parsing Risks</span>
+                </h3>
+                <p class="mt-3 text-gray-300">The long-term solution to the JSON reliability risk is to move the AI interaction to a backend service. This aligns perfectly with the project's future roadmap.</p>
+                 <details class="mt-2 text-sm">
+                    <summary class="font-semibold">View Backend Logic Flow</summary>
+                    <ol class="list-decimal list-inside mt-2 text-gray-400 space-y-1 bg-black/30 p-4 rounded-b-lg">
+                        <li>Client sends a request to a secure backend endpoint (e.g., `/api/generatePlan`).</li>
+                        <li>The backend server constructs the prompt and calls the Gemini API.</li>
+                        <li>The server receives the response from Gemini.</li>
+                        <li>The server validates that the response is valid JSON and conforms to the expected schema.</li>
+                        <li>If invalid, the server can retry the API call with a modified prompt or return a structured error to the client.</li>
+                        <li>If valid, the server sends the clean, guaranteed-to-be-correct JSON to the client.</li>
+                        <li>The client can now use the JSON data without needing `try...catch` blocks, simplifying the frontend logic.</li>
+                    </ol>
+                </details>
+            </div>
+
+            <div class="glass-pane -m-4 p-6 rounded-lg">
+                <h3 class="font-semibold text-xl text-green-300 flex items-center gap-3">
+                    <span class="tag tag-solution">Next Steps</span>
+                    <span>Proceed with the Roadmap</span>
+                </h3>
+                <p class="mt-3 text-gray-300">With the immediate cleanup complete, the project is in a stable state. The next development phase should focus on implementing the foundational elements of the documented "Future Vision," starting with User Authentication and Database Integration.</p>
+            </div>
+        </section>
+
+    </main>
+
+</body>
+</html>

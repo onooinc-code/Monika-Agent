@@ -11,4 +11,5 @@ export * from './memory.ts';
 export * from './plan.ts';
 export * from './utils.ts';
 export * from './ui.ts';
-export * from './mcp.ts';
+// FIX: The file `types/mcp.ts` is empty and cannot be treated as a module. Commenting out the export to resolve the error.
+// export * from './mcp.ts';

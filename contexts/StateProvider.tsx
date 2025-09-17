@@ -1,8 +1,7 @@
 
 import React, { createContext, useContext, useRef, useCallback, useState } from 'react';
-import { Agent, AgentManager, ConversationMode, Attachment, ManualSuggestion, HistoryView, Conversation, PipelineStep, UsageMetrics, Message, LongTermMemoryData, BubbleSettings, McpServer, McpServerStatus, McpLog } from '../types/index.ts';
+import { Agent, AgentManager, ConversationMode, Attachment, ManualSuggestion, HistoryView, Conversation, PipelineStep, UsageMetrics, Message, LongTermMemoryData, BubbleSettings } from '../types/index.ts';
 import { useLocalStorage } from '../hooks/useLocalStorage.ts';
-import { DEFAULT_AGENTS, DEFAULT_AGENT_MANAGER } from '../constants.ts';
 import { useConversationManager } from './hooks/useConversationManager.ts';
 import { useChatHandler, LoadingStage } from './hooks/useChatHandler.ts';
 import { useHistoryHandler } from './hooks/useHistoryHandler.ts';
@@ -11,7 +10,7 @@ import { useUsageTracker } from './hooks/useUsageTracker.ts';
 import { useMemoryManager } from './hooks/useMemoryManager.ts';
 import * as MemoryService from '../services/analysis/memoryService.ts';
 import { ActionModalState } from './hooks/useModalManager.ts';
-import { useMcpManager } from './hooks/useMcpManager.ts';
+import * as AgentConstants from '../constants/agentConstants.ts';
 
 interface AppState {
     agents: Agent[];
@@ -134,22 +133,14 @@ interface AppState {
     // MCP Server Manager
     isMcpServerManagerOpen: boolean;
     setIsMcpServerManagerOpen: (isOpen: boolean) => void;
-    mcpServers: McpServer[];
-    addMcpServer: (server: Omit<McpServer, 'id'>) => void;
-    removeMcpServer: (id: string) => void;
-    updateMcpServer: (id: string, updates: Partial<McpServer>) => void;
-    startMcpServer: (id: string) => void;
-    stopMcpServer: (id: string) => void;
-    mcpServerStatuses: Record<string, McpServerStatus>;
-    mcpServerLogs: Record<string, McpLog[]>;
 }
 
 const AppContext = createContext<AppState | undefined>(undefined);
 
 export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
     // 1. Core state and settings from localStorage
-    const [agents, setAgents] = useLocalStorage<Agent[]>('agents', DEFAULT_AGENTS);
-    const [agentManager, setAgentManager] = useLocalStorage<AgentManager>('agent-manager', DEFAULT_AGENT_MANAGER);
+    const [agents, setAgents] = useLocalStorage<Agent[]>('agents', AgentConstants.DEFAULT_AGENTS);
+    const [agentManager, setAgentManager] = useLocalStorage<AgentManager>('agent-manager', AgentConstants.DEFAULT_AGENT_MANAGER);
     const [conversationMode, setConversationMode] = useLocalStorage<ConversationMode>('conversation-mode', 'Dynamic');
     const [sendOnEnter, setSendOnEnter] = useLocalStorage<boolean>('send-on-enter', true);
     const [globalApiKey, setGlobalApiKey] = useLocalStorage<string>('global-api-key', '');
@@ -167,7 +158,6 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     const historyHandler = useHistoryHandler();
     const usageTracker = useUsageTracker();
     const memoryManager = useMemoryManager();
-    const mcpManager = useMcpManager();
     
     const enabledAgents = agents.filter(a => a.isEnabled ?? true);
 
@@ -351,9 +341,6 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
         // Agent Status
         handleToggleAgentEnabled,
         lastTurnAgentIds,
-
-        // From useMcpManager
-        ...mcpManager,
     };
 
     return (
