@@ -1,3 +1,6 @@
+
+
+
 import { useState } from 'react';
 import { Conversation, Agent, AgentManager, Attachment, ManualSuggestion, Message, ConversationMode, LongTermMemoryData, PlanStep } from '../../types/index.ts';
 import * as AgentService from '../../services/chat/agentService.ts';
@@ -191,17 +194,34 @@ export const useChatHandler = ({ agents, agentManager, globalApiKey, activeConve
                     const agentResponse = await AgentService.generateResponse('Based on the plan, execute your task.', respondingAgent, currentMessages, undefined, undefined, longTermMemory, (chunk) => onAppendToMessageText(conversationId, aiMessageId, chunk), step.task, globalApiKey);
                     
                     const finalMessageData: Partial<Message> = { text: agentResponse.finalResult, isStreaming: false, pipeline: agentResponse.pipeline, responseTimeMs: agentResponse.pipeline.find(s => s.stage.startsWith('Model Invocation'))?.durationMs };
+                    
+                    const summary = await MessageActionsService.summarizeForStorage(agentResponse.finalResult, agentManager, globalApiKey);
+                    finalMessageData.summary = summary;
+                    
                     onFinalizeMessage(conversationId, aiMessageId, finalMessageData);
 
                     const finalMessage = { ...placeholderMessage, ...finalMessageData };
-                    currentMessages = [...currentMessages, finalMessage as Message];
+                    currentMessages = currentMessages.map(m => m.id === aiMessageId ? finalMessage : m) as Message[];
                     logUsage(TokenCounter.estimateTokens(finalMessage as Message), step.agentId, 1);
                 }
             } else if (conversationMode === 'AI') {
                 setLoadingStage({ stage: 'deciding' });
                 const managerResponse = await ManagerService.decideNextSpeaker(text, agents, currentMessages, agentManager, activeConversation.systemInstructionOverride, globalApiKey);
                 logUsage(0, 'manager', 1);
-                const nextSpeakerId = managerResponse.result;
+                
+                const { nextSpeaker: nextSpeakerId, newTopic } = managerResponse.result;
+
+                if (newTopic) {
+                    const topicMessage: Message = {
+                        id: `${Date.now()}-topic`,
+                        text: newTopic,
+                        sender: 'system',
+                        timestamp: new Date().toISOString(),
+                        messageType: 'topic_divider'
+                    };
+                    currentMessages = [...currentMessages, topicMessage];
+                    onUpdateConversation(conversationId, { messages: currentMessages });
+                }
 
                 if (nextSpeakerId) {
                     const respondingAgent = agents.find(a => a.id === nextSpeakerId);
@@ -211,18 +231,27 @@ export const useChatHandler = ({ agents, agentManager, globalApiKey, activeConve
                         
                         const aiMessageId = `${Date.now()}-ai`;
                         const placeholderMessage: Message = { id: aiMessageId, text: '', sender: nextSpeakerId, timestamp: new Date().toISOString(), isStreaming: true };
-                        onUpdateConversation(conversationId, { messages: [...currentMessages, placeholderMessage] });
+                        
+                        currentMessages = [...currentMessages, placeholderMessage];
+                        onUpdateConversation(conversationId, { messages: currentMessages });
 
                         const agentResponse = await AgentService.generateResponse(text, respondingAgent, currentMessages, attachment, activeConversation.systemInstructionOverride, longTermMemory, (chunk) => onAppendToMessageText(conversationId, aiMessageId, chunk), undefined, globalApiKey);
                         
-                        onFinalizeMessage(conversationId, aiMessageId, {
+                        const finalMessageData: Partial<Message> = {
                             text: agentResponse.finalResult,
                             pipeline: [...managerResponse.pipeline, ...agentResponse.pipeline],
                             isStreaming: false,
                             responseTimeMs: agentResponse.pipeline.find(s => s.stage.startsWith('Model Invocation'))?.durationMs,
-                        });
+                        };
+                        
+                        const summary = await MessageActionsService.summarizeForStorage(agentResponse.finalResult, agentManager, globalApiKey);
+                        finalMessageData.summary = summary;
 
-                        logUsage(TokenCounter.estimateTokens({ ...placeholderMessage, text: agentResponse.finalResult }), nextSpeakerId, 1);
+                        onFinalizeMessage(conversationId, aiMessageId, finalMessageData);
+                        const finalMessage = { ...placeholderMessage, ...finalMessageData };
+                        currentMessages = currentMessages.map(m => m.id === aiMessageId ? finalMessage : m) as Message[];
+
+                        logUsage(TokenCounter.estimateTokens(finalMessage as Message), nextSpeakerId, 1);
                     }
                 } else {
                      const systemMessage: Message = { 
@@ -287,15 +316,22 @@ export const useChatHandler = ({ agents, agentManager, globalApiKey, activeConve
                 onUpdateConversation(conversationId, { messages: currentMessages});
 
                 const agentResponse = await AgentService.generateResponse(userMessage.text, respondingAgent, activeConversation.messages, userMessage.attachment, systemInstructionOverride, longTermMemory, (chunk) => onAppendToMessageText(conversationId, aiMessageId, chunk), undefined, globalApiKey);
-
-                onFinalizeMessage(conversationId, aiMessageId, {
+                
+                const finalMessageData: Partial<Message> = {
                     text: agentResponse.finalResult,
                     pipeline: agentResponse.pipeline,
                     isStreaming: false,
                     responseTimeMs: agentResponse.pipeline.find(s => s.stage.startsWith('Model Invocation'))?.durationMs,
-                });
+                };
                 
-                logUsage(TokenCounter.estimateTokens({ ...placeholderMessage, text: agentResponse.finalResult }), agentId, 1);
+                const summary = await MessageActionsService.summarizeForStorage(agentResponse.finalResult, agentManager, globalApiKey);
+                finalMessageData.summary = summary;
+
+                onFinalizeMessage(conversationId, aiMessageId, finalMessageData);
+                const finalMessage = { ...placeholderMessage, ...finalMessageData };
+                currentMessages = currentMessages.map(m => m.id === aiMessageId ? finalMessage : m) as Message[];
+                
+                logUsage(TokenCounter.estimateTokens(finalMessage as Message), agentId, 1);
             }
         } catch (error) {
             let errorMessageText: string;

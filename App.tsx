@@ -1,4 +1,6 @@
 
+
+
 import React, { useEffect, useState } from 'react';
 import { Header } from './components/Header.tsx';
 import { MessageList } from './components/MessageList.tsx';
@@ -19,6 +21,7 @@ import { AgentStatsModal } from './components/AgentStatsModal.tsx';
 import { TeamGeneratorModal } from './components/TeamGeneratorModal.tsx';
 import { ApiUsageModal } from './components/ApiUsageModal.tsx';
 import { BookmarkedMessagesPanel } from './components/BookmarkedMessagesPanel.tsx';
+import { MessageArchiveModal } from './components/MessageArchiveModal.tsx';
 
 export default function App() {
   const { 
@@ -126,6 +129,7 @@ export default function App() {
         <AgentStatsModal />
         <TeamGeneratorModal />
         <ApiUsageModal />
+        <MessageArchiveModal />
     </div>
   );
 }

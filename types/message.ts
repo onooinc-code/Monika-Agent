@@ -1,3 +1,5 @@
+
+
 import { PipelineStep } from './pipeline.ts';
 import { PlanStep } from './plan.ts';
 
@@ -9,6 +11,7 @@ export interface Attachment {
 export interface Message {
   id: string;
   text: string;
+  summary?: string;
   sender: 'user' | string; // agent id or 'user' or 'system'
   attachment?: Attachment;
   timestamp: string;
@@ -20,5 +23,5 @@ export interface Message {
   activeAlternativeIndex?: number;
   pipeline?: PipelineStep[];
   plan?: PlanStep[];
-  messageType?: 'insight';
+  messageType?: 'insight' | 'topic_divider';
 }

@@ -1,4 +1,7 @@
 
+
+
+
 import { useState } from 'react';
 import { PipelineStep, Message } from '../../types/index.ts';
 
@@ -34,6 +37,7 @@ export const useModalManager = () => {
     const [isAgentStatsOpen, setIsAgentStatsOpen] = useState(false);
     const [isTeamGeneratorOpen, setIsTeamGeneratorOpen] = useState(false);
     const [isApiUsageOpen, setIsApiUsageOpen] = useState(false);
+    const [isArchiveOpen, setIsArchiveOpen] = useState(false);
     const [isBookmarksPanelOpen, setIsBookmarksPanelOpen] = useState(false);
 
     const handleShowHtmlPreview = (html: string) => {
@@ -93,6 +97,7 @@ export const useModalManager = () => {
         isAgentStatsOpen, setIsAgentStatsOpen,
         isTeamGeneratorOpen, setIsTeamGeneratorOpen,
         isApiUsageOpen, setIsApiUsageOpen,
+        isArchiveOpen, setIsArchiveOpen,
         isBookmarksPanelOpen, setIsBookmarksPanelOpen,
     };
 };

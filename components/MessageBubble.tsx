@@ -1,7 +1,8 @@
 
+
+
 import React, { useEffect, useRef, useState } from 'react';
 import { Message, Agent, Conversation } from '../types/index.ts';
-// FIX: Corrected import path for MANAGER_COLOR. It was moved to constants/agentConstants.ts.
 import { MANAGER_COLOR } from '../constants/agentConstants.ts';
 import { useAppContext } from '../contexts/StateProvider.tsx';
 import { Avatar } from './Avatar.tsx';
@@ -24,9 +25,6 @@ interface MessageBubbleProps {
     agent?: Agent;
     featureFlags?: Conversation['featureFlags'];
 }
-
-const LONG_MESSAGE_LINES = 20;
-const LONG_MESSAGE_CHARS = 1000;
 
 const ActionButton: React.FC<{onClick: () => void, title: string, 'aria-label': string, children: React.ReactNode, className?: string, disabled?: boolean}> = ({ onClick, title, 'aria-label': ariaLabel, children, className, disabled }) => (
     <button onClick={onClick} title={title} aria-label={ariaLabel} className={`p-1.5 rounded-full transition-colors disabled:opacity-50 disabled:cursor-not-allowed ${className}`} disabled={disabled}>
@@ -56,12 +54,15 @@ export const MessageBubble: React.FC<MessageBubbleProps> = ({ message, agent, fe
     const contentRef = useRef<HTMLDivElement>(null);
     const [editText, setEditText] = useState(() => safeRender(message.text));
     const editTextAreaRef = useRef<HTMLTextAreaElement>(null);
-    const tokenCount = TokenCounter.estimateTokens(message);
-
+    
     const activeAlternativeIndex = message.activeAlternativeIndex ?? -1;
-    const currentMessageText = activeAlternativeIndex > -1 && message.alternatives?.[activeAlternativeIndex]
-        ? message.alternatives[activeAlternativeIndex].text
-        : message.text;
+    const currentMessage = activeAlternativeIndex > -1 && message.alternatives?.[activeAlternativeIndex]
+        ? { ...message, ...message.alternatives[activeAlternativeIndex] }
+        : message;
+
+    const tokenCount = TokenCounter.estimateTokens(currentMessage);
+
+    const [isExpanded, setIsExpanded] = useState(false);
 
     useEffect(() => {
         if (message.isEditing) {
@@ -93,11 +94,6 @@ export const MessageBubble: React.FC<MessageBubbleProps> = ({ message, agent, fe
         setSettings(prev => ({ ...prev, fontSize: Math.max(0.75, Math.min(1.5, prev.fontSize + (direction === 'up' ? 0.1 : -0.1))) }));
     };
 
-
-    const isPotentiallyLong = !isUser && (safeRender(currentMessageText).split('\n').length > LONG_MESSAGE_LINES || safeRender(currentMessageText).length > LONG_MESSAGE_CHARS);
-    const isLongMessageEnabled = !message.isStreaming && isPotentiallyLong && featureFlags?.autoSummarization;
-    const [isExpanded, setIsExpanded] = useState(!isLongMessageEnabled);
-    
     let _senderName = 'You';
     let _senderJob = 'User';
     let agentColorIndicator = 'bg-indigo-500';
@@ -137,21 +133,13 @@ export const MessageBubble: React.FC<MessageBubbleProps> = ({ message, agent, fe
         }
     };
     
-    const handleCopy = () => navigator.clipboard.writeText(safeRender(currentMessageText));
+    const handleCopy = () => navigator.clipboard.writeText(safeRender(currentMessage.text));
+    
+    const hasSummary = !!currentMessage.summary && currentMessage.summary !== currentMessage.text;
 
     const getMessageContent = () => {
-        const textToRender = safeRender(currentMessageText);
-        if (isExpanded) {
-            return DOMPurify.sanitize(marked.parse(textToRender));
-        }
-        const lines = textToRender.split('\n');
-        let truncatedText = textToRender;
-        if (lines.length > LONG_MESSAGE_LINES) {
-            truncatedText = lines.slice(0, LONG_MESSAGE_LINES).join('\n') + '\n...';
-        } else if (truncatedText.length > LONG_MESSAGE_CHARS) {
-            truncatedText = truncatedText.substring(0, LONG_MESSAGE_CHARS) + '...';
-        }
-        return DOMPurify.sanitize(marked.parse(truncatedText));
+        const textToRender = safeRender(isExpanded ? currentMessage.text : (currentMessage.summary || currentMessage.text));
+        return DOMPurify.sanitize(marked.parse(textToRender));
     };
 
     useEffect(() => {
@@ -187,7 +175,7 @@ export const MessageBubble: React.FC<MessageBubbleProps> = ({ message, agent, fe
                 preElement.parentNode?.insertBefore(toolbar, preElement);
             });
         }
-    }, [currentMessageText, handleShowHtmlPreview, isExpanded]);
+    }, [currentMessage, handleShowHtmlPreview, isExpanded]);
 
     const formattedTime = new Date(message.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
 
@@ -278,12 +266,12 @@ export const MessageBubble: React.FC<MessageBubbleProps> = ({ message, agent, fe
                             </>
                         )}
                         
-                        {isLongMessageEnabled && (
+                        {hasSummary && !isUser && (
                              <button
                                 onClick={() => setIsExpanded(!isExpanded)}
-                                className="text-indigo-600 hover:text-indigo-800 text-sm font-semibold mt-2 focus:outline-none bg-black bg-opacity-5 px-2 py-1 rounded"
+                                className="text-indigo-400 hover:text-indigo-200 text-sm font-semibold mt-2 focus:outline-none bg-black bg-opacity-20 px-2 py-1 rounded"
                             >
-                                {isExpanded ? 'Show Less' : 'Show More'}
+                                {isExpanded ? 'Show Summary' : 'Show Full Text'}
                             </button>
                         )}
                          {message.attachment && (
@@ -330,7 +318,7 @@ export const MessageBubble: React.FC<MessageBubbleProps> = ({ message, agent, fe
                         <div className="flex-grow"></div>
                          <div className={`flex items-center gap-2 ${isUser ? 'text-white' : 'text-white'}`}>
                             {tokenCount > 0 && (
-                                <span className="font-mono text-xs flex items-center gap-1 opacity-80" title={`Estimated Tokens: ${tokenCount}`}>
+                                <span className="font-mono text-xs flex items-center gap-1 opacity-80" title={`Estimated Tokens (Full Text): ${tokenCount}`}>
                                     <TokenIcon className="w-3.5 h-3.5" />
                                     {tokenCount}
                                 </span>

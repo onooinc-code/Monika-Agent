@@ -1,6 +1,9 @@
 
+
+
 import React from 'react';
 import { MessageBubble } from './MessageBubble.tsx';
+import { TopicDivider } from './TopicDivider.tsx';
 import { useAppContext } from '../contexts/StateProvider.tsx';
 import { Conversation } from '../types/index.ts';
 
@@ -25,14 +28,19 @@ export const MessageList: React.FC<MessageListProps> = ({ conversation }) => {
     return (
         <main className="flex-1 overflow-y-auto p-6">
             <div className="max-w-4xl mx-auto">
-                {conversation.messages.map(message => (
-                    <MessageBubble 
-                        key={message.id} 
-                        message={message} 
-                        agent={getAgent(message.sender)}
-                        featureFlags={conversation.featureFlags}
-                    />
-                ))}
+                {conversation.messages.map(message => {
+                    if (message.messageType === 'topic_divider') {
+                        return <TopicDivider key={message.id} text={message.text} timestamp={message.timestamp} />;
+                    }
+                    return (
+                        <MessageBubble 
+                            key={message.id} 
+                            message={message} 
+                            agent={getAgent(message.sender)}
+                            featureFlags={conversation.featureFlags}
+                        />
+                    );
+                })}
                 <div ref={messagesEndRef} />
             </div>
         </main>

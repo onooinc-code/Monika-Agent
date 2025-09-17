@@ -1,3 +1,5 @@
+
+
 import { getGenAIClient } from '../gemini/client.ts';
 import { Agent, Message, AgentManager, ManualSuggestion, PipelineStep, PlanStep } from '../../types/index.ts';
 import { buildContext } from '../utils/contextBuilder.ts';
@@ -24,13 +26,13 @@ export const decideNextSpeaker = async (
     manager: AgentManager,
     systemInstructionOverride: string | undefined,
     globalApiKey: string,
-): Promise<{ result: string | null; pipeline: PipelineStep[] }> => {
+): Promise<{ result: { nextSpeaker: string | null; newTopic?: string }; pipeline: PipelineStep[] }> => {
     const pipeline: PipelineStep[] = [];
     const startTime = performance.now();
 
     const context = buildContext(messages);
     const systemInstruction = systemInstructionOverride || manager.systemInstruction;
-    const prompt = `Conversation History:\n${context}\n\nUser's latest message: "${latestText}"\n\nBased on the user's message and history, which agent should respond next?`;
+    const prompt = `Conversation History:\n${context}\n\nUser's latest message: "${latestText}"\n\nAnalyze the user's latest message. First, determine if it introduces a new topic distinct from the prior conversation. Second, based on the message and history, decide which agent should respond next.`;
     
     pipeline.push({
         stage: 'Context Assembly',
@@ -57,7 +59,8 @@ export const decideNextSpeaker = async (
                 responseSchema: {
                     type: Type.OBJECT,
                     properties: {
-                        nextSpeaker: { type: Type.STRING }
+                        nextSpeaker: { type: Type.STRING, description: "The ID of the agent that should speak next." },
+                        newTopic: { type: Type.STRING, description: "The name of the new topic if one is detected, otherwise null." }
                     }
                 }
             }
@@ -76,6 +79,8 @@ export const decideNextSpeaker = async (
         }
 
         const nextSpeaker = typeof json.nextSpeaker === 'string' ? json.nextSpeaker : null;
+        const newTopic = typeof json.newTopic === 'string' && json.newTopic.trim() ? json.newTopic.trim() : undefined;
+
 
         pipeline.push({
             stage: 'Model Invocation: decideNextSpeaker',
@@ -84,7 +89,7 @@ export const decideNextSpeaker = async (
             durationMs: Math.round(modelDuration),
         });
 
-        return { result: nextSpeaker, pipeline };
+        return { result: { nextSpeaker, newTopic }, pipeline };
     } catch (error) {
         handleAndThrowError(error, 'decideNextSpeaker', prompt);
     }

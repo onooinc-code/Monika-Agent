@@ -1,9 +1,11 @@
 
+
+
 import React, { useState, useEffect } from 'react';
 import { Conversation, Agent } from '../types/index.ts';
 import { useAppContext } from '../contexts/StateProvider.tsx';
 import { Spinner } from './Spinner.tsx';
-import { MenuIcon, EditIcon, CheckIcon, SparklesIcon, SettingsIcon, UsersIcon, CloudIcon, PowerIcon, HistoryIcon, BookmarkIcon } from './Icons.tsx';
+import { MenuIcon, EditIcon, CheckIcon, SparklesIcon, SettingsIcon, UsersIcon, CloudIcon, PowerIcon, HistoryIcon, BookmarkIcon, AlignLeftIcon } from './Icons.tsx';
 import { safeRender } from '../services/utils/safeRender.ts';
 
 // --- SHARED COMPONENTS ---
@@ -126,6 +128,7 @@ const ConversationHeader: React.FC<{ toggleSidebar: () => void, conversation: Co
         setIsApiUsageOpen,
         isBookmarksPanelOpen,
         setIsBookmarksPanelOpen,
+        setIsArchiveOpen,
         handleShowHistory, 
         handleUpdateConversationTitle,
         handleGenerateTitle,
@@ -212,6 +215,9 @@ const ConversationHeader: React.FC<{ toggleSidebar: () => void, conversation: Co
                 <HeaderButton onClick={() => setIsTeamGeneratorOpen(true)} title="Generate Team" aria-label="Open Team Generator"><UsersIcon className="w-5 h-5"/></HeaderButton>
                 <HeaderButton onClick={() => setIsApiUsageOpen(true)} title="API Usage" aria-label="Open API Usage"><CloudIcon className="w-5 h-5"/></HeaderButton>
                 <HeaderButton onClick={() => setIsSettingsOpen(true)} title="Settings" aria-label="Open Settings"><SettingsIcon className="w-5 h-5"/></HeaderButton>
+                <HeaderButton onClick={() => setIsArchiveOpen(true)} title="Message Archive" aria-label="View Message Archive">
+                    <AlignLeftIcon className="w-5 h-5" />
+                </HeaderButton>
                 <HeaderButton onClick={() => setIsBookmarksPanelOpen(!isBookmarksPanelOpen)} disabled={!conversation} title="Bookmarks" aria-label="View Bookmarks">
                     <BookmarkIcon className="w-5 h-5" />
                     {bookmarkedCount > 0 && <span className="absolute -top-1 -right-1 flex h-4 w-4 items-center justify-center rounded-full bg-indigo-500 text-xs font-bold ring-2 ring-[#1e293b]">{bookmarkedCount}</span>}

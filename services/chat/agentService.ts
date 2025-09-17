@@ -2,22 +2,30 @@
 
 
 
+
+
+
+
 import { getGenAIClient } from '../gemini/client.ts';
 import { Agent, Message, Attachment, PipelineStep, LongTermMemoryData } from '../../types/index.ts';
 import { handleAndThrowError } from '../utils/errorHandler.ts';
 import { availableTools, toolSchemas } from '../tools/index.ts';
+import { getFullMessageTextSchema } from '../tools/contextual.ts';
 import { Content } from '@google/genai';
 
 /**
  * Converts the application's message format to the Gemini API's `Content` format.
  * It also filters out system messages which are not part of the conversational context for the AI.
+ * It prioritizes using message summaries to save tokens.
  */
 const convertMessagesToHistory = (messages: Message[]): Content[] => {
-    const filteredMessages = messages.filter(m => m.sender !== 'system');
+    const filteredMessages = messages.filter(m => m.sender !== 'system' && m.messageType !== 'topic_divider');
     const history: Content[] = [];
     for (const message of filteredMessages) {
         const role = message.sender === 'user' ? 'user' : 'model';
-        const parts: any[] = [{ text: message.text }];
+        const textToUse = message.summary || message.text;
+        const parts: any[] = [{ text: `(msg_id: ${message.id}) ${textToUse}` }];
+        
         if (message.attachment) {
             parts.unshift({
                 inlineData: {
@@ -55,6 +63,8 @@ export const generateResponse = async (
 
     const baseSystemInstruction = systemInstructionOverride || agent.systemInstruction;
     let finalSystemInstruction = baseSystemInstruction;
+    
+    finalSystemInstruction = `You have a tool 'get_full_message_text' to retrieve the full, unabbreviated text of a previous message if the summary is insufficient. Use it if you need more detail to answer accurately. Message IDs are provided in the format (msg_id: ...).\n\n${finalSystemInstruction}`;
 
     if (agent.knowledge && agent.knowledge.trim()) {
         finalSystemInstruction = `You have the following background knowledge. Use it to inform your responses, but do not mention it directly unless asked.\n\n--- BACKGROUND KNOWLEDGE ---\n${agent.knowledge}\n--- END KNOWLEDGE ---\n\nYour instructions are:\n${finalSystemInstruction}`;
@@ -71,8 +81,18 @@ export const generateResponse = async (
     }
     const ai = getGenAIClient(apiKey);
     
-    const agentToolSchemas = agent.tools?.map(name => toolSchemas[name]).filter(Boolean);
-    const tools = agentToolSchemas?.length > 0 ? [{ functionDeclarations: agentToolSchemas }] : undefined;
+    // Create contextual tool for this specific request
+    const get_full_message_text = async ({ message_id }: { message_id: string }) => {
+        const msg = messages.find(m => m.id === message_id);
+        return { full_text: msg ? msg.text : "Error: Message not found." };
+    };
+    
+    const dynamicAvailableTools = { ...availableTools, get_full_message_text };
+
+    const agentToolSchemas = agent.tools?.map(name => toolSchemas[name]).filter(Boolean) || [];
+    agentToolSchemas.push(getFullMessageTextSchema);
+    
+    const tools = agentToolSchemas.length > 0 ? [{ functionDeclarations: agentToolSchemas }] : undefined;
 
     // Process the full conversation history for the model.
     const history = convertMessagesToHistory(messages);
@@ -118,7 +138,7 @@ export const generateResponse = async (
             
             pipeline.push({ stage: 'Tool Call Detected', input: null, output: functionCall });
 
-            const toolFunction = availableTools[functionCall.name];
+            const toolFunction = dynamicAvailableTools[functionCall.name];
             if (!toolFunction) {
                 throw new Error(`Unknown tool "${functionCall.name}" requested by the model.`);
             }
