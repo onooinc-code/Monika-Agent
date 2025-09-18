@@ -1,8 +1,9 @@
 import React from 'react';
 import { Agent, AgentManager } from '../types/index.ts';
 import { useAppContext } from '../contexts/StateProvider.tsx';
-import { MenuIcon, SettingsIcon, UsersIcon, CloudIcon, PowerIcon, InformationCircleIcon, CpuIcon } from './Icons.tsx';
+import { MenuIcon, PowerIcon, InformationCircleIcon, CpuIcon } from './Icons.tsx';
 import { safeRender } from '../services/utils/safeRender.ts';
+import { GlassIconButton } from './GlassIconButton.tsx';
 
 // --- SHARED COMPONENTS ---
 
@@ -136,10 +137,31 @@ export const Header: React.FC<{ isSidebarOpen: boolean, toggleSidebar: () => voi
             </div>
 
             <div className="flex-shrink-0 md:w-[25%] flex items-end justify-end">
-                <div className="hidden md:flex items-center gap-1 text-xs">
-                    <HeaderButton onClick={() => setIsTeamGeneratorOpen(true)} title="Generate Team" aria-label="Open Team Generator"><UsersIcon className="w-5 h-5"/></HeaderButton>
-                    <HeaderButton onClick={() => setIsApiUsageOpen(true)} title="API Usage" aria-label="Open API Usage"><CloudIcon className="w-5 h-5"/></HeaderButton>
-                    <HeaderButton onClick={() => setIsSettingsOpen(true)} title="Settings" aria-label="Open Settings"><SettingsIcon className="w-5 h-5"/></HeaderButton>
+                <div className="hidden md:flex items-center gap-2 text-xs">
+                    <GlassIconButton
+                        onClick={() => setIsTeamGeneratorOpen(true)}
+                        title="Generate Team"
+                        aria-label="Open Team Generator"
+                        gradient="purple"
+                        // To use your PNG icon, uncomment the line below and replace the URL
+                        // iconUrl="URL_TO_YOUR_TEAM_ICON.png"
+                    />
+                     <GlassIconButton
+                        onClick={() => setIsApiUsageOpen(true)}
+                        title="API Usage"
+                        aria-label="Open API Usage"
+                        gradient="cyan"
+                        // To use your PNG icon, uncomment the line below and replace the URL
+                        // iconUrl="URL_TO_YOUR_API_ICON.png"
+                    />
+                    <GlassIconButton
+                        onClick={() => setIsSettingsOpen(true)}
+                        title="Settings"
+                        aria-label="Open Settings"
+                        gradient="indigo"
+                         // To use your PNG icon, uncomment the line below and replace the URL
+                        // iconUrl="URL_TO_YOUR_SETTINGS_ICON.png"
+                    />
                 </div>
                 {/* Placeholder for mobile to balance flexbox */}
                 <div className="w-6 h-6 md:hidden"></div>
