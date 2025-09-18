@@ -3,7 +3,7 @@ import React from 'react';
 interface GlassIconButtonProps {
     onClick: () => void;
     title: string;
-    'aria-label': string;
+    ariaLabel: string;
     gradient: 'indigo' | 'cyan' | 'purple';
     iconUrl?: string;
 }
@@ -33,7 +33,7 @@ const FALLBACK_ICONS = {
 };
 
 
-export const GlassIconButton: React.FC<GlassIconButtonProps> = ({ onClick, title, 'aria-label': ariaLabel, gradient, iconUrl }) => {
+export const GlassIconButton: React.FC<GlassIconButtonProps> = ({ onClick, title, ariaLabel, gradient, iconUrl }) => {
     
     const gradients = {
         indigo: { id: 'grad-glass-indigo-btn', stop1: '#818cf8', stop2: '#4f46e5' },

@@ -1,6 +1,6 @@
 import React from 'react';
-import { useAppContext } from '../contexts/StateProvider.tsx';
-import { GlassIconButton } from './GlassIconButton.tsx';
+import { useAppContext } from '../contexts/StateProvider';
+import { GlassIconButton } from './GlassIconButton';
 
 export const HeaderActions = () => {
     const { setIsSettingsOpen, setIsTeamGeneratorOpen, setIsApiUsageOpen } = useAppContext();
@@ -11,14 +11,14 @@ export const HeaderActions = () => {
                     <GlassIconButton
                         onClick={() => setIsApiUsageOpen(true)}
                         title="API Usage"
-                        aria-label="Open API Usage"
+                        ariaLabel="Open API Usage"
                         iconUrl="./assets/api-usage.png"
                         gradient="cyan"
                     />
                     <GlassIconButton
                         onClick={() => setIsSettingsOpen(true)}
                         title="Settings"
-                        aria-label="Open Settings"
+                        ariaLabel="Open Settings"
                         iconUrl="./assets/setting.png"
                         gradient="indigo"
                     />
@@ -26,7 +26,7 @@ export const HeaderActions = () => {
                          <GlassIconButton
                             onClick={() => setIsTeamGeneratorOpen(true)}
                             title="Generate Team"
-                            aria-label="Open Team Generator"
+                            ariaLabel="Open Team Generator"
                             iconUrl="./assets/generate-team.png"
                             gradient="purple"
                         />

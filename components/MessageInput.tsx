@@ -1,54 +1,8 @@
 import React, { useState, useRef } from "react";
 import { Attachment } from "../types/index.ts";
 import { useAppContext } from "../contexts/StateProvider.tsx";
+import { ActionToolbar } from "./ActionToolbar.tsx";
 
-const AttachmentIconV2 = () => (
-  <svg
-    xmlns="http://www.w3.org/2000/svg"
-    width={20}
-    height={20}
-    viewBox="0 0 24 24"
-  >
-    <path
-      fill="none"
-      stroke="currentColor"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-      strokeWidth={2}
-      d="M7 8v8a5 5 0 1 0 10 0V6.5a3.5 3.5 0 1 0-7 0V15a2 2 0 0 0 4 0V8"
-    />
-  </svg>
-);
-const GridIcon = () => (
-  <svg
-    viewBox="0 0 24 24"
-    height={20}
-    width={20}
-    xmlns="http://www.w3.org/2000/svg"
-  >
-    <path
-      d="M4 5a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v4a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1zm0 10a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v4a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1zm10 0a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v4a1 1 0 0 1-1 1h-4a1 1 0 0 1-1-1zm0-8h6m-3-3v6"
-      strokeWidth={2}
-      strokeLinejoin="round"
-      strokeLinecap="round"
-      stroke="currentColor"
-      fill="none"
-    />
-  </svg>
-);
-const GlobeIcon = () => (
-  <svg
-    viewBox="0 0 24 24"
-    height={20}
-    width={20}
-    xmlns="http://www.w3.org/2000/svg"
-  >
-    <path
-      d="M12 22C6.477 22 2 17.523 2 12S6.477 2 12 2s10 4.477 10 10s-4.477 10-10 10m-2.29-2.333A17.9 17.9 0 0 1 8.027 13H4.062a8.01 8.01 0 0 0 5.648 6.667M10.03 13c.151 2.439.848 4.73 1.97 6.752A15.9 15.9 0 0 0 13.97 13zm9.908 0h-3.965a17.9 17.9 0 0 1-1.683 6.667A8.01 8.01 0 0 0 19.938 13M4.062 11h3.965A17.9 17.9 0 0 1 9.71 4.333A8.01 8.01 0 0 0 4.062 11m5.969 0h3.938A15.9 15.9 0 0 0 12 4.248A15.9 15.9 0 0 0 10.03 11m4.259-6.667A17.9 17.9 0 0 1 15.973 11h3.965a8.01 8.01 0 0 0-5.648-6.667"
-      fill="currentColor"
-    />
-  </svg>
-);
 const SendIconV2 = () => (
   <svg viewBox="0 0 512 512">
     <path
@@ -115,11 +69,11 @@ export const MessageInput: React.FC = () => {
   };
 
   return (
-    <footer className="flex flex-col items-center p-2">
+    <footer className="flex flex-col w-full">
       {error && (
         <p className="text-red-400 text-sm text-center mb-2">{error}</p>
       )}
-      <div className="w-full max-w-4xl mx-auto flex flex-col">
+      <div className="w-full flex flex-col">
         <div className="message-input-wrapper">
             <div className="message-input-inner flex flex-col">
                 <div className="relative flex">
@@ -128,11 +82,11 @@ export const MessageInput: React.FC = () => {
                         onChange={(e) => setText(e.target.value)}
                         onKeyDown={handleKeyPress}
                         placeholder="Imagine Something...✦˚"
-                        className="message-input-textarea min-h-[50px] max-h-40"
+                        className="message-input-textarea min-h-[30px] max-h-24 p-1.5"
                         disabled={isLoading}
                     />
                 </div>
-                <div className="flex justify-between items-end p-2.5">
+                <div className="flex justify-between items-end p-1.5">
                     <div className="flex items-center gap-2">
                         <input
                             type="file"
@@ -142,15 +96,7 @@ export const MessageInput: React.FC = () => {
                             className="hidden"
                             id="file-input-v2"
                         />
-                        <button onClick={() => fileInputRef.current?.click()} className="message-input-actions-btn" title="Attach an image">
-                            <AttachmentIconV2 />
-                        </button>
-                        <button className="message-input-actions-btn" title="Add template">
-                            <GridIcon />
-                        </button>
-                        <button className="message-input-actions-btn" title="Browse web">
-                            <GlobeIcon />
-                        </button>
+                        <ActionToolbar onAttachClick={() => fileInputRef.current?.click()} />
                     </div>
                     <button
                         onClick={handleSend}
@@ -165,11 +111,7 @@ export const MessageInput: React.FC = () => {
                 </div>
             </div>
         </div>
-        <div className="pt-3.5 pb-1 px-0 flex text-white text-xs gap-1">
-          <span className="message-input-tags">Create An Image</span>
-          <span className="message-input-tags">Analyse Data</span>
-          <span className="message-input-tags">More</span>
-        </div>
+
       </div>
     </footer>
   );
