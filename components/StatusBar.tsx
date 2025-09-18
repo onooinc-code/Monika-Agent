@@ -48,7 +48,7 @@ export const StatusBar: React.FC = () => {
                 </div>
             </div>
             
-            {/* Global Usage Stats */}
+            {/* Global Usage Stats & Version */}
             <div className="flex items-center gap-4">
                  <span className="font-semibold text-gray-300">Global Usage:</span>
                 <div className="flex items-center gap-1.5" title={`Today's estimated usage: ${todayUsage.tokens} tokens / ${todayUsage.requests} requests`}>
@@ -67,6 +67,13 @@ export const StatusBar: React.FC = () => {
                 >
                     <StatsIcon className="w-4 h-4" />
                 </button>
+                <div className="w-px h-5 bg-white/10"></div>
+                <div
+                    className="font-mono px-3 py-1 rounded-full bg-black/20 border border-white/10"
+                    title="Current Version"
+                >
+                    v2.1.0
+                </div>
             </div>
         </footer>
     );
