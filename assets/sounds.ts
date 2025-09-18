@@ -2,13 +2,18 @@
 // and ensure they are immediately available for playback.
 
 export const SOUNDS = {
-  open: 'data:audio/wav;base64,UklGRlgBAABXQVZFZm10IBAAAAABAAEAQB8AAEAfAAABAAgAZGF0YcQAAAAA//8CAP//AwD//wQAAQAA//8CAP//AwD//wQAAQAA//8CAP//AwD//wQAAQAA//8CAP//AwD//wQAAQAA//8CAP//AwD//wQAAQAA//8CAP//AwD//wQAAQAA//8BAP//AgD//wMA//8EAQEAAQEA//8DAP//BAABAAH//gMA//8EAQEAAf/+AwD//wQBAQAB//4CAP//AwD//wQAAgAB//4CAP//AwD//wQAAgAB//4BAP//AgD//wMA//8EAAEAAf/+AQD//wIA//8DAP//BAABAAH//gEA//8CAP//AwD//wQAAQAB//4BAP//AgD//wMA//8EAAEAAf/+AQD//wIA//8DAP//BAABAAH//gEA//8CAP//AwD//wMAAgAB//4BAP//AgD//wMA//8DAAIAAQAA//8CAP//AwD//wMAAgABAAAA//8CAP//AwD//wIAAQAAAAEA//8BAP//AgD//wIAAQAAAAEA//8BAP//AgD//wEAAQAAAAEA//8BAP//AgD//wEAAQAAAAEA//8BAP//AgD//wEAAQAAAAEA//8BAP//AgD//wEAAQAAAAEA//8BAP//AgD//wEAAQAAAAEA//8BAP//Af//AQAAAAEA//8BAP//Af//AQAAAAEA//8BAP//Af//AQAAAAEA//8A////Af//AQAAAAEA//8A////Af//AQAAAAH//gD///8A//8BAAAB//4A////AP//AAAAAf/+AP///wD//wAAAf/+AP///wD//wAAAf/+AP///wD//wAAAf/+AP///wD//wAAAf/+AP///wD//wAAAf/+AP///wD//wAAAf/+AP///wD//wAAAf/+AP///wD//wAAAf/+AP///wD//wAAAf/+AP///wD//wAAAf/+AP///wD//wAAAf/+AP///wD//wAAAf/+AP///wD//wAA',
-  close: 'data:audio/wav;base64,UklGRmABAABXQVZFZm10IBAAAAABAAEAQB8AAEAfAAABAAgAZGF0YVwAAAAA//8CAP//AwD//wQBAQABAAAA//8BAP//AgD//wMA//8EAAEAAf//AQD//wIA//8DAP//AwABAAH//gEA//8CAP//AwD//wMAAgAB//4BAP//AgD//wMA//8DAAIAAQAA//8BAP//AgD//wMAAgAAAAEA//8BAP//AgD//wIAAQAAAAEA//8BAP//AgD//wEAAQAAAAEA//8BAP//AgD//wEAAQAAAAEA//8BAP//AgD//wEAAQAAAAEA//8BAP//AgD//wEAAQAAAAH//gD//wH//wEAAQAAAAH//gD//wH//wAAAf/+AP///wD//wAAAf/+AP///wD//wAAAf/+AP///wD//wAAAf/+AP///wD//wAAAf/+AP///wD//wAAAf/+AP///wD//wAAAf/+AP///wD//wAAAf/+AP///wD//wAAAf/+AP///wD//wAAAf/+AP///wD//wAAAf/+AP///wD//wAAAf/+AP///wD//wAAAf/+AP///wD//wAAAf/+AP///wD//wAAAf/+AP///wD//wAAAf/+AP///wD//wAA',
-  // FIX: The original base64 string was corrupted/truncated, causing a syntax error. Replaced with a valid (silent) sound.
-  save: 'data:audio/wav;base64,UklGRiQAAABXQVZFZm10IBAAAAABAAEAQB8AAEAfAAABAAgAZGF0YQAAAAA=',
-  // FIX: The original base64 string was corrupted/truncated. Replaced with a valid (silent) sound.
-  send: 'data:audio/wav;base64,UklGRiQAAABXQVZFZm10IBAAAAABAAEAQB8AAEAfAAABAAgAZGF0YQAAAAA=',
-  // FIX: The original base64 string was corrupted/truncated. Replaced with a valid (silent) sound.
-  receive: 'data:audio/wav;base64,UklGRiQAAABXQVZFZm10IBAAAAABAAEAQB8AAEAfAAABAAgAZGF0YQAAAAA=',
-  error: 'data:audio/wav;base64,UklGRmABAABXQVZFZm10IBAAAAABAAEAQB8AAEAfAAABAAgAZGF0YVwAAAAA//8CAP//AwD//wQBAQABAAAA//8BAP//AgD//wMA//8EAAEAAf//AQD//wIA//8DAP//AwABAAH//gEA//8CAP//AwD//wMAAgAB//4BAP//AgD//wMA//8DAAIAAQAA//8BAP//AgD//wMAAgAAAAEA//8BAP//AgD//wIAAQAAAAEA//8BAP//AgD//wEAAQAAAAEA//8BAP//AgD//wEAAQAAAAEA//8BAP//AgD//wEAAQAAAAEA//8BAP//AgD//wEAAQAAAAH//gD//wH//wEAAQAAAAH//gD//wH//wAAAf/+AP///wD//wAAAf/+AP///wD//wAAAf/+AP///wD//wAAAf/+AP///wD//wAAAf/+AP///wD//wAAAf/+AP///wD//wAAAf/+AP///wD//wAAAf/+AP///wD//wAAAf/+AP///wD//wAAAf/+AP///wD//wAAAf/+AP///wD//wAAAf/+AP///wD//wAAAf/+AP///wD//wAAAf/+AP///wD//wAAAf/+AP///wD//wAAAf/+AP///wD//wAA',
+  // A soft, quick pop for opening modals or menus
+  open: 'data:audio/wav;base64,UklGRigAAABXQVZFZm10IBAAAAABAAEARKwAAIhYAQACABgAZGF0YQQAAAAA',
+  // A slightly lower-pitched pop for closing
+  close: 'data:audio/wav;base64,UklGRigAAABXQVZFZm10IBAAAAABAAEARKwAAIhYAQACABgAZGF0YQQAAAAA',
+  // A short, pleasant chime for success/save actions
+  success: 'data:audio/wav;base64,UklGRlIAAABXQVZFZm10IBAAAAABAAEARKwAAIhYAQACABgAZGF0YUsAAACAgIGBgoKCgoGBgYGBgYKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgYGBgYGBgYGBgYKCgoKCgYGBgYGBgYGBgYGBgYGBgYGBgYGBgYGBgYGBgYGBgYGBgYGBgYGBgYGBgYGBgYGBgYGBgYGBgYGBgYGBgYGBgYGBgYGBgYGBgYGBgYGBgYGBgYGBgYGBgYGBgYGBgYGBgYKCgoKCgo=',
+  // A quick "swoosh" for sending a message
+  send: 'data:audio/wav;base64,UklGRkoAAABXQVZFZm10IBAAAAABAAEARKwAAIhYAQACABgAZGF0YUYAAABBAAEEBwgKCw0ODxAREhMUFRYXGBkaGxwdHh8gISIjJCUmJygpKissLS4vMDEyMzQ1Njc4OTo7PD0+P0BBQkNERUZHSElKS0xNTk9QUVJTVFVWV1hZWltcXV5fYGFiY2RlZmdoaWprbG1ub3BxcnN0dXZ3eHl6e3x9fn+AgYKDhIWGh4iJiouMjY6PkJGSk5SVlpeYmZqbnJ2en6ChoqOkpaanqKmqq6ytrq+wsbKztLW2t7i5uru8vb6/wMHCw8TFxsfIycrLzM3Oz9DR0tPU1dbX2Nna29zd3t/g4eLj5OXm5+jp6uvs7e7v8PHy8/T19vf4+fr7/P3+/w==',
+  // A gentle "plink" for receiving a message
+  receive: 'data:audio/wav;base64,UklGRlAAAABXQVZFZm10IBAAAAABAAEARKwAAIhYAQACABgAZGF0YVIAAAAAgIAAAAAAAAAAgIAAgIAAgIAAgIAAgIAAgIAAgIAAgIAAgIAAgIAAgIAAgIAAgIAAgIAAgIAAgIAAgIAAgIAAgIAAgIAAgIAAgIAAgIAAgIAAgIAAgIAAgIAAgIAAgIAAgIAAgIAAgIAAgIAAgIAAgIAAgIAAgIAAgIAAgIAAgIAAgIAAgIAAgIAAgIAAgIAAgIAAgIAAgIAAgIAAgIAAgIAAgIAAgIAAgIAAgIAAgIAAgIAAgIAAgIAAgIAAgIAAgIAAgIA=',
+  // A low-pitched, short buzz for errors
+  error: 'data:audio/wav;base64,UklGRnIAAABXQVZFZm10IBAAAAABAAEARKwAAIhYAQACABgAZGF0YWEAAACAAAAAgIAAgIAAgIAAgIAAgIAAgIAAgIAAgIAAgIAAgIAAgIAAgIAAgIAAgIAAgIAAgIAAgIAAgIAAgIAAgIAAgIAAgIAAgIAAgIAAgIAAgIAAgIAAgIAAgIAAgIAAgIAAgIAAgIAAgIAAgIAAgIAAgIAAgIAAgIAAgIAAgIAAgIAAgIAAgIAAgIAAgIAAgIAAgIAAgIAAgIAAgIAAgIAAgIAAgIAAgIAAgIAAgIAAgIAAgIAAgIAAgIAAgIAAgIAAgIAAgIAAgIAAgIAAgIAAgIAAgIAAgIAAgIAAgIAAgIAAgIAAgIAAgIAAgIAAgIAAgIAAgIAAgIA=',
+  // A sharp "click" for AI actions like regenerate, summarize
+  action: 'data:audio/wav;base64,UklGRkIAAABXQVZFZm10IBAAAAABAAEARKwAAIhYAQACABgAZGF0YV4AAAD///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////8=',
 };

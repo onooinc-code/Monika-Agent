@@ -239,7 +239,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
                 globalApiKey
             );
             memoryManager.setLongTermMemory(newFacts);
-            playSound('save');
+            playSound('success');
             alert('Memory updated successfully!');
         } catch (error) {
             playSound('error');

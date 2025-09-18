@@ -376,6 +376,7 @@ export const useChatHandler = ({ agents, agentManager, globalApiKey, activeConve
         const message = activeConversation.messages.find(m => m.id === messageId);
         if (!message) return;
         
+        playSound('action');
         openActionModal({ title: 'Summarizing...', content: 'Please wait...' });
         try {
             const summary = await MessageActionsService.summarizeMessage(message.text, agentManager, globalApiKey);
@@ -393,6 +394,7 @@ export const useChatHandler = ({ agents, agentManager, globalApiKey, activeConve
         const message = activeConversation.messages.find(m => m.id === messageId);
         if (!message || message.sender !== 'user') return;
         
+        playSound('action');
         openActionModal({ title: 'Rewriting...', content: 'Please wait...' });
         try {
             const rewrittenText = await MessageActionsService.rewritePrompt(message.text, agentManager, globalApiKey);
@@ -417,6 +419,7 @@ export const useChatHandler = ({ agents, agentManager, globalApiKey, activeConve
         const usedAgentIds = new Set<string>();
         setLastTurnAgentIds(new Set());
         
+        playSound('action');
         setLoadingStage({ stage: 'generating' });
         const systemInstructionOverride = activeConversation.systemInstructionOverride;
 

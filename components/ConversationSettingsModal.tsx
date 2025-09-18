@@ -56,7 +56,7 @@ export const ConversationSettingsModal: React.FC = () => {
             discussionSettings: discussionSettings,
             managerSettings: managerSettings,
         });
-        playSound('save');
+        playSound('success');
         setIsConversationSettingsOpen(false);
     };
     

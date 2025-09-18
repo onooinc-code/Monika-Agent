@@ -50,7 +50,8 @@ export const AgentSettingsModal: React.FC = () => {
         } else {
             handleUpdateAgentManager(localAgent);
         }
-        playSound('save');
+        // FIX: The sound event 'save' does not exist. Changed to 'success'.
+        playSound('success');
         closeAgentSettingsModal();
     };
 

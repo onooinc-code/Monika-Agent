@@ -72,7 +72,7 @@ export const StatusBar: React.FC = () => {
                     className="font-mono px-3 py-1 rounded-full bg-black/20 border border-white/10"
                     title="Current Version"
                 >
-                    v2.1.0
+                    v2.2.0
                 </div>
             </div>
         </footer>

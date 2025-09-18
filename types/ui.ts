@@ -15,4 +15,4 @@ export interface ContextMenuItem {
     isSeparator?: boolean;
 }
 
-export type SoundEvent = 'open' | 'close' | 'save' | 'send' | 'receive' | 'error';
+export type SoundEvent = 'open' | 'close' | 'success' | 'send' | 'receive' | 'error' | 'action';

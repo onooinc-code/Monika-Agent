@@ -62,7 +62,7 @@ export const SettingsModal: React.FC = () => {
         setGlobalApiKey(localGlobalApiKey);
         setAgents(localAgents);
         setAgentManager(localManager);
-        playSound('save');
+        playSound('success');
         setIsSettingsOpen(false);
     };
 
@@ -81,7 +81,7 @@ export const SettingsModal: React.FC = () => {
         try {
             const parsedMemory: LongTermMemoryData = JSON.parse(localMemory);
             setLongTermMemory(parsedMemory);
-            playSound('save');
+            playSound('success');
             alert('Memory saved successfully!');
         } catch (e) {
             playSound('error');
