@@ -5,6 +5,12 @@ import { MenuIcon, PowerIcon, InformationCircleIcon, CpuIcon } from './Icons.tsx
 import { safeRender } from '../services/utils/safeRender.ts';
 import { GlassIconButton } from './GlassIconButton.tsx';
 
+// Import the new PNG icons from the local project folder
+import teamIcon from './icons/png/team-generator.png';
+import apiIcon from './icons/png/api-usage.png';
+import settingsIcon from './icons/png/settings.png';
+
+
 // --- SHARED COMPONENTS ---
 
 const HeaderButton: React.FC<{onClick: () => void, disabled?: boolean, title: string, 'aria-label': string, children: React.ReactNode}> = ({ onClick, disabled, title, 'aria-label': ariaLabel, children }) => (
@@ -143,24 +149,21 @@ export const Header: React.FC<{ isSidebarOpen: boolean, toggleSidebar: () => voi
                         title="Generate Team"
                         aria-label="Open Team Generator"
                         gradient="purple"
-                        // To use your PNG icon, uncomment the line below and replace the URL
-                        // iconUrl="URL_TO_YOUR_TEAM_ICON.png"
+                        iconUrl={teamIcon}
                     />
                      <GlassIconButton
                         onClick={() => setIsApiUsageOpen(true)}
                         title="API Usage"
                         aria-label="Open API Usage"
                         gradient="cyan"
-                        // To use your PNG icon, uncomment the line below and replace the URL
-                        // iconUrl="URL_TO_YOUR_API_ICON.png"
+                        iconUrl={apiIcon}
                     />
                     <GlassIconButton
                         onClick={() => setIsSettingsOpen(true)}
                         title="Settings"
                         aria-label="Open Settings"
                         gradient="indigo"
-                         // To use your PNG icon, uncomment the line below and replace the URL
-                        // iconUrl="URL_TO_YOUR_SETTINGS_ICON.png"
+                        iconUrl={settingsIcon}
                     />
                 </div>
                 {/* Placeholder for mobile to balance flexbox */}
