@@ -220,6 +220,60 @@
         filter: drop-shadow(0 0 5px #ffffff);
         transform: scale(1.2) rotate(45deg) translateX(-2px) translateY(1px);
       }
+
+      /* CONTEXT MENU BUTTON STYLES */
+      .context-menu-btn {
+        width: 100%;
+        display: flex;
+        align-items: center;
+        gap: 0.75rem; /* 12px */
+        text-align: left;
+        padding: 0.6rem 0.75rem; /* 8px 12px */
+        font-size: 0.875rem; /* 14px */
+        font-weight: 500;
+        border-radius: 6px;
+        border: 0;
+        cursor: pointer;
+        transition: all 0.2s ease-in-out;
+        color: #FFFFFF;
+        box-sizing: border-box;
+        text-decoration: none;
+        user-select: none;
+        -webkit-user-select: none;
+        touch-action: manipulation;
+      }
+
+      .context-menu-btn:active {
+        transform: scale(0.98);
+      }
+
+      /* Primary actions: blue/indigo */
+      .context-menu-btn-primary {
+        background-image: linear-gradient(-180deg, #37AEE2 0%, #1E96C8 100%);
+        box-shadow: rgba(0, 0, 0, 0.1) 0 2px 4px;
+      }
+      .context-menu-btn-primary:hover {
+        background-image: linear-gradient(-180deg, #1D95C9 0%, #17759C 100%);
+      }
+
+      /* Secondary/Mode actions: purple/violet */
+      .context-menu-btn-secondary {
+        background-color: #6200ee;
+        box-shadow: rgba(0, 0, 0, .2) 0 3px 1px -2px,rgba(0, 0, 0, .14) 0 2px 2px 0,rgba(0, 0, 0, .12) 0 1px 5px 0;
+      }
+      .context-menu-btn-secondary:hover {
+        background-color: #7c3aed; /* purple-600 */
+        box-shadow: rgba(0, 0, 0, .2) 0 2px 4px -1px, rgba(0, 0, 0, .14) 0 4px 5px 0, rgba(0, 0, 0, .12) 0 1px 10px 0;
+      }
+
+      /* Destructive actions: red/orange */
+      .context-menu-btn-destructive {
+        background-image: linear-gradient(-180deg, #FF7E31, #E62C03);
+        box-shadow: rgba(0, 0, 0, 0.1) 0 2px 4px;
+      }
+      .context-menu-btn-destructive:hover {
+        box-shadow: rgba(253, 76, 0, 0.5) 0 3px 8px;
+      }
     </style>
   </head>
   <body>
