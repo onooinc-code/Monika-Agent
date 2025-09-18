@@ -23,7 +23,7 @@
     "react-dom/client": "https://esm.sh/react-dom@18.3.1/client",
     "react/": "https://esm.sh/react@18.3.1/",
     "react-dom/": "https://esm.sh/react-dom@18.3.1/",
-    "@google/genai": "https://aistudiocdn.com/@google/genai@^1.19.0"
+    "@google/genai": "https://aistudiocdn.com/@google/genai@^1.20.0"
   }
 }
 </script>
@@ -97,6 +97,15 @@
       .flashing-dot {
         animation: flashing-dot 1.5s ease-in-out infinite;
       }
+      
+      @keyframes rotBGimg {
+        from { transform: rotate(0deg); }
+        to { transform: rotate(360deg); }
+      }
+      
+      @keyframes anime1 { to { background-color: rgb(77, 124, 255); } }
+      @keyframes anime2 { to { fill: rgba(77, 124, 255, 0.642); } }
+
 
       /* Modal Styles */
       .modal-overlay {
@@ -204,22 +213,6 @@
         --tw-prose-pre-code: #c7d2fe;
         --tw-prose-pre-bg: rgba(0, 0, 0, 0.3);
       }
-      
-      /* New classes for MessageInput submit button */
-      .submit-btn-shadow {
-        box-shadow: inset 0 6px 2px -4px rgba(255, 255, 255, 0.5);
-      }
-      .submit-btn-icon-wrapper {
-        background: rgba(0, 0, 0, 0.1);
-        backdrop-filter: blur(3px);
-      }
-      .submit-btn-svg:hover {
-        filter: drop-shadow(0 0 5px #ffffff);
-      }
-      .submit-btn-svg:focus {
-        filter: drop-shadow(0 0 5px #ffffff);
-        transform: scale(1.2) rotate(45deg) translateX(-2px) translateY(1px);
-      }
 
       /* CONTEXT MENU BUTTON STYLES */
       .context-menu-btn {
@@ -274,6 +267,153 @@
       .context-menu-btn-destructive:hover {
         box-shadow: rgba(253, 76, 0, 0.5) 0 3px 8px;
       }
+      
+      /* New Header Actions Card */
+      .header-action-card {
+        width: 120px;
+        height: 120px;
+        background: #07182E;
+        position: relative;
+        display: flex;
+        place-content: center;
+        place-items: center;
+        overflow: hidden;
+        border-radius: 20px;
+      }
+      .header-action-card::before {
+        content: '';
+        position: absolute;
+        width: 100px;
+        background-image: linear-gradient(180deg, rgb(0, 183, 255), rgb(255, 48, 255));
+        height: 150%;
+        animation: rotBGimg 3s linear infinite;
+        transition: all 0.2s linear;
+      }
+      .header-action-card::after {
+        content: '';
+        position: absolute;
+        background: #07182E;
+        inset: 5px;
+        border-radius: 15px;
+      }
+      
+      /* New Fancy Switch */
+      .fancy-switch input { display: none; }
+      .fancy-switch .button {
+        position: relative;
+        background-image: linear-gradient(#ffffff 33%,#414751 58%,#837b52,#c5baa1,#c3adaa);
+        border-radius: 50px;
+        padding: 6px;
+        border: none;
+        outline: none;
+        box-shadow: 0.1em 0 0 #2726267f inset, -0.1em 0 0 #27262600 inset, 0 0.1em 0 #afa490 inset, 0 -0.1em 0 #ffffff3f, 0 0.2em 0.5em #0000007f, 0 -0.1em 0 #151616 inset, -0.1em -0.2em 0 #ffffff7f inset;
+        cursor: pointer;
+        width: 4rem;
+        height: 4rem;
+        -webkit-appearance: none;
+        -moz-appearance: none;
+        appearance: none;
+        font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        transition: .3s ease-in-out;
+      }
+      .fancy-switch .button::before {
+        position: absolute; content: ""; width: 4.1rem; height: 4.1rem; border-radius: inherit; background-color: #606060; z-index: -1; transition: background-image .3s ease-in-out;
+      }
+      .fancy-switch .button .icon { width: 4rem; height: 4rem; display: inline-block; }
+      .fancy-switch .button .icon svg { height: 100%; width: 100%; fill: #000000; transition: fill; }
+      .fancy-switch input:checked + .button::before { background-image: rgb(77, 124, 255); animation: anime1 .3s linear alternate-reverse infinite; }
+      .fancy-switch input:checked + .button { box-shadow: none; }
+      .fancy-switch input:checked + .button .icon svg { fill: rgb(77, 124, 255); animation: anime2 .3s linear alternate-reverse infinite; }
+      
+       /* New Message Input */
+      .message-input-wrapper {
+        position: relative;
+        border-radius: 16px;
+        padding: 1.5px;
+        overflow: hidden;
+        background: linear-gradient( to bottom right, #7e7e7e, #363636, #363636, #363636, #363636 );
+      }
+      .message-input-wrapper::after {
+        position: absolute;
+        content: "";
+        top: -10px;
+        left: -10px;
+        background: radial-gradient( ellipse at center, #ffffff, rgba(255, 255, 255, 0.3), rgba(255, 255, 255, 0.1), rgba(0, 0, 0, 0), rgba(0, 0, 0, 0), rgba(0, 0, 0, 0), rgba(0, 0, 0, 0) );
+        width: 30px;
+        height: 30px;
+        filter: blur(1px);
+      }
+      .message-input-inner {
+        background-color: rgba(0, 0, 0, 0.5);
+        border-radius: 15px;
+        width: 100%;
+        overflow: hidden;
+      }
+      .message-input-textarea {
+        background-color: transparent;
+        border: none;
+        width: 100%;
+        color: #ffffff;
+        font-family: sans-serif;
+        font-size: 14px;
+        padding: 10px;
+        resize: none;
+        outline: none;
+      }
+       .message-input-textarea::placeholder {
+        color: #f3f6fd;
+        transition: all 0.3s ease;
+      }
+      .message-input-textarea:focus::placeholder {
+        color: #363636;
+      }
+      .message-input-actions-btn {
+        color: rgba(255, 255, 255, 0.4);
+        transition: all 0.3s ease;
+      }
+      .message-input-actions-btn:hover {
+        transform: translateY(-3px);
+        color: #ffffff;
+      }
+      .message-input-submit-btn {
+        padding: 2px;
+        background-image: linear-gradient(to top, #292929, #555555, #292929);
+        border-radius: 10px;
+        box-shadow: inset 0 6px 2px -4px rgba(255, 255, 255, 0.5);
+        transition: all 0.15s ease;
+      }
+      .message-input-submit-btn i {
+        width: 30px;
+        height: 30px;
+        padding: 6px;
+        background: rgba(0, 0, 0, 0.1);
+        border-radius: 8px;
+        backdrop-filter: blur(3px);
+        color: #8b8b8b;
+      }
+      .message-input-submit-btn svg { transition: all 0.3s ease; }
+      .message-input-submit-btn:hover svg {
+        color: #f3f6fd;
+        filter: drop-shadow(0 0 5px #ffffff);
+      }
+      .message-input-submit-btn:focus-within svg {
+        color: #f3f6fd;
+        filter: drop-shadow(0 0 5px #ffffff);
+        transform: scale(1.2) rotate(45deg) translateX(-2px) translateY(1px);
+      }
+      .message-input-submit-btn:active { transform: scale(0.92); }
+      .message-input-tags span {
+        padding: 4px 8px;
+        background-color: #1b1b1b;
+        border: 1.5px solid #363636;
+        border-radius: 10px;
+        cursor: pointer;
+        user-select: none;
+      }
+      
     </style>
   </head>
   <body>

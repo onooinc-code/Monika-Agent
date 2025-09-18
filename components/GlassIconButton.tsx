@@ -5,10 +5,9 @@ interface GlassIconButtonProps {
     title: string;
     'aria-label': string;
     gradient: 'indigo' | 'cyan' | 'purple';
-    iconUrl?: string; // Optional URL for a PNG icon
+    iconUrl?: string;
 }
 
-// Simple SVG paths for fallback icons
 const FALLBACK_ICONS = {
     purple: (
         <g transform="translate(16, 16) scale(0.5)">

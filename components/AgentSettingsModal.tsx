@@ -5,6 +5,7 @@ import { CloseIcon, CpuIcon } from './Icons.tsx';
 import { safeRender } from '../services/utils/safeRender.ts';
 import { SecureInput } from './SecureInput.tsx';
 import { CopyClearWrapper } from './CopyClearWrapper.tsx';
+import { FancySwitch } from './FancySwitch.tsx';
 
 // Type guard to check if it's an Agent
 const isAgent = (agent: Agent | AgentManager): agent is Agent => {
@@ -50,7 +51,6 @@ export const AgentSettingsModal: React.FC = () => {
         } else {
             handleUpdateAgentManager(localAgent);
         }
-        // FIX: The sound event 'save' does not exist. Changed to 'success'.
         playSound('success');
         closeAgentSettingsModal();
     };
@@ -74,6 +74,20 @@ export const AgentSettingsModal: React.FC = () => {
                 </div>
 
                 <div className="flex-1 overflow-y-auto p-6 space-y-4">
+                    {isAgent(agent) && (
+                         <div className="flex items-center justify-between glass-pane p-3 rounded-lg">
+                            <label className="font-medium text-gray-200">Agent Status</label>
+                            <div className="flex items-center gap-3">
+                                <span className={`text-sm font-semibold ${ (agent.isEnabled ?? true) ? 'text-green-400' : 'text-gray-500'}`}>
+                                    { (agent.isEnabled ?? true) ? 'Enabled' : 'Disabled'}
+                                </span>
+                                <FancySwitch 
+                                    checked={agent.isEnabled ?? true} 
+                                    onChange={(checked) => handleChange('isEnabled', checked)} 
+                                />
+                            </div>
+                        </div>
+                    )}
                     {isAgent(agent) ? (
                         <>
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">

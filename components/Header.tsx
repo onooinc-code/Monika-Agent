@@ -8,23 +8,8 @@ import {
   CpuIcon,
 } from "./Icons.tsx";
 import { safeRender } from "../services/utils/safeRender.ts";
+import { HeaderActions } from "./HeaderActions.tsx";
 
-// --- NEW COMPONENT ---
-const GlassIconButton: React.FC<{
-  onClick: () => void;
-  title: string;
-  "aria-label": string;
-  iconUrl: string;
-}> = ({ onClick, title, "aria-label": ariaLabel, iconUrl }) => (
-  <button
-    onClick={onClick}
-    title={title}
-    aria-label={ariaLabel}
-    className="w-12 h-12 glass-pane p-2 rounded-xl transition-all duration-300 transform hover:scale-110 hover-glow-indigo focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-[var(--color-primary-header)] focus:ring-cyan-500"
-  >
-    <img src={iconUrl} alt={title} className="w-full h-full object-contain" />
-  </button>
-);
 
 const getTodayDateString = (): string => {
   const today = new Date();
@@ -176,9 +161,6 @@ export const Header: React.FC<{
   const {
     agents,
     agentManager,
-    setIsSettingsOpen,
-    setIsTeamGeneratorOpen,
-    setIsApiUsageOpen,
   } = useAppContext();
   return (
     <header
@@ -221,37 +203,8 @@ export const Header: React.FC<{
       </div>
 
       <div className="flex-shrink-0 md:w-auto flex items-center justify-end">
-        <div className="hidden md:flex flex-row items-stretch ">
-          {/* Column 1 */}
-          <div className="flex flex-col items-stretch ">
-            <GlassIconButton
-              onClick={() => setIsApiUsageOpen(true)}
-              title="API Usage"
-              aria-label="Open API Usage"
-              iconUrl="./assets/api-usage.png"
-            />
-            <GlassIconButton
-              onClick={() => setIsSettingsOpen(true)}
-              title="Settings"
-              aria-label="Open Settings"
-              iconUrl="./assets/setting.png"
-            />
-          </div>
-          {/* Column 2 */}
-          <div className="flex flex-col items-stretch ">
-            <GlassIconButton
-              onClick={() => setIsTeamGeneratorOpen(true)}
-              title="Generate Team"
-              aria-label="Open Team Generator"
-              iconUrl="./assets/generate-team.png"
-            />
-            <GlassIconButton
-              onClick={() => setIsApiUsageOpen(true)}
-              title="API Usage"
-              aria-label="Open API Usage"
-              iconUrl="./assets/api-usage.png"
-            />
-          </div>
+        <div className="hidden md:flex">
+          <HeaderActions />
         </div>
         {/* Placeholder for mobile to balance flexbox */}
         <div className="w-6 h-6 md:hidden"></div>
