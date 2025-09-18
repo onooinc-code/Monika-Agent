@@ -205,6 +205,42 @@
         --tw-prose-pre-bg: rgba(0, 0, 0, 0.3);
       }
 
+      /* Custom Header Action Button */
+      .header-action-button {
+        cursor: pointer;
+        border: solid 2px #161616;
+        border-top: none;
+        border-radius: 12px;
+        position: relative;
+        box-shadow: 0px 2px 5px #00000062, 0px 5px 20px -5px #000000a6;
+        transition: all 0.3s ease;
+        height: 40px; /* Set a fixed height */
+      }
+      .header-action-button .inner {
+        padding: 0 16px; /* Adjusted padding */
+        height: 100%;
+        font-size: 0.8rem; /* Adjusted font size */
+        display: flex;
+        align-items: center;
+        gap: 8px; /* Adjusted gap */
+        font-weight: 600;
+        letter-spacing: 0.5px; /* Adjusted letter-spacing */
+        border-bottom: solid 2px #374e72;
+        border-radius: 10px; /* Adjusted border-radius */
+        background: linear-gradient(180deg, #5771a5, #000);
+        color: #fff;
+        text-shadow: 1px 1px #000, 0 0 9px #fff;
+      }
+      .header-action-button .icon {
+        width: 20px; /* Adjusted icon size */
+        height: 20px;
+        filter: drop-shadow(0 0 4px #fff) drop-shadow(1px 1px 0px #000);
+      }
+      .header-action-button:active {
+        box-shadow: none;
+        transform: translateY(2px);
+      }
+
     </style>
   </head>
   <body>

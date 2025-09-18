@@ -3,13 +3,7 @@ import { Agent, AgentManager } from '../types/index.ts';
 import { useAppContext } from '../contexts/StateProvider.tsx';
 import { MenuIcon, PowerIcon, InformationCircleIcon, CpuIcon } from './Icons.tsx';
 import { safeRender } from '../services/utils/safeRender.ts';
-import { GlassIconButton } from './GlassIconButton.tsx';
-
-// Import the new PNG icons from the local project folder
-import teamIcon from './icons/png/team-generator.png';
-import apiIcon from './icons/png/api-usage.png';
-import settingsIcon from './icons/png/settings.png';
-
+import { StyledHeaderButton } from './StyledHeaderButton.tsx';
 
 // --- SHARED COMPONENTS ---
 
@@ -143,27 +137,27 @@ export const Header: React.FC<{ isSidebarOpen: boolean, toggleSidebar: () => voi
             </div>
 
             <div className="flex-shrink-0 md:w-[25%] flex items-end justify-end">
-                <div className="hidden md:flex items-center gap-2 text-xs">
-                    <GlassIconButton
+                <div className="hidden md:flex items-center gap-4 text-xs">
+                    <StyledHeaderButton
                         onClick={() => setIsTeamGeneratorOpen(true)}
                         title="Generate Team"
                         aria-label="Open Team Generator"
-                        gradient="purple"
-                        iconUrl={teamIcon}
+                        label="Team Gen"
+                        iconUrl="./components/icons/png/team-generator.png"
                     />
-                     <GlassIconButton
+                     <StyledHeaderButton
                         onClick={() => setIsApiUsageOpen(true)}
                         title="API Usage"
                         aria-label="Open API Usage"
-                        gradient="cyan"
-                        iconUrl={apiIcon}
+                        label="API Usage"
+                        iconUrl="./components/icons/png/api-usage.png"
                     />
-                    <GlassIconButton
+                    <StyledHeaderButton
                         onClick={() => setIsSettingsOpen(true)}
                         title="Settings"
                         aria-label="Open Settings"
-                        gradient="indigo"
-                        iconUrl={settingsIcon}
+                        label="Settings"
+                        iconUrl="./components/icons/png/settings.png"
                     />
                 </div>
                 {/* Placeholder for mobile to balance flexbox */}
