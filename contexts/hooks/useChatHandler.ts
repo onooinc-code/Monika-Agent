@@ -1,6 +1,5 @@
-
-import { useState } from 'react';
-import { Conversation, Agent, AgentManager, Attachment, ManualSuggestion, Message, ConversationMode, LongTermMemoryData, PlanStep } from '../../types/index.ts';
+import { useState, useRef } from 'react';
+import { Conversation, Agent, AgentManager, Attachment, ManualSuggestion, Message, ConversationMode, LongTermMemoryData, PlanStep, SoundEvent } from '../../types/index.ts';
 import * as AgentService from '../../services/chat/agentService.ts';
 import * as ManagerService from '../../services/chat/managerService.ts';
 import * as MessageActionsService from '../../services/chat/messageActionsService.ts';
@@ -32,18 +31,23 @@ interface ChatHandlerProps {
     closeActionModal: () => void;
     logUsage: (tokens: number, agentId?: string, requestCount?: number) => void;
     setLastTurnAgentIds: (ids: Set<string>) => void;
+    playSound: (event: SoundEvent) => void;
 }
 
 const delay = (ms: number) => new Promise(resolve => setTimeout(resolve, ms));
 
-export const useChatHandler = ({ agents, agentManager, globalApiKey, activeConversation, conversationMode, longTermMemory, onUpdateConversation, onAppendToMessageText, onFinalizeMessage, openActionModal, closeActionModal, logUsage, setLastTurnAgentIds }: ChatHandlerProps) => {
+export const useChatHandler = ({ agents, agentManager, globalApiKey, activeConversation, conversationMode, longTermMemory, onUpdateConversation, onAppendToMessageText, onFinalizeMessage, openActionModal, closeActionModal, logUsage, setLastTurnAgentIds, playSound }: ChatHandlerProps) => {
     const [loadingStage, setLoadingStage] = useState<LoadingStage>({ stage: 'idle' });
     const [manualSuggestions, setManualSuggestions] = useState<ManualSuggestion[]>([]);
+    const hasPlayedReceiveSound = useRef(false);
     
     const isChatLoading = loadingStage.stage !== 'idle';
 
     const handleSendMessage = async (text: string, attachment?: Attachment) => {
         if ((!text.trim() && !attachment) || isChatLoading || !activeConversation) return;
+
+        playSound('send');
+        hasPlayedReceiveSound.current = false;
 
         const usedAgentIds = new Set<string>();
         setLastTurnAgentIds(new Set()); // Clear previous turn's agents immediately
@@ -60,6 +64,15 @@ export const useChatHandler = ({ agents, agentManager, globalApiKey, activeConve
         const managerSettings = activeConversation.managerSettings;
         const userMessageTokens = TokenCounter.estimateTokens(userMessage);
         logUsage(userMessageTokens, undefined, 0); // User message isn't an API request
+        
+        const onStreamWithSound = (conversationId: string, messageId: string, chunk: string) => {
+            if (!hasPlayedReceiveSound.current) {
+                playSound('receive');
+                hasPlayedReceiveSound.current = true;
+            }
+            onAppendToMessageText(conversationId, messageId, chunk);
+        };
+
 
         try {
             if (discussionSettings?.enabled) {
@@ -124,7 +137,7 @@ export const useChatHandler = ({ agents, agentManager, globalApiKey, activeConve
                         currentMessages = [...currentMessages, placeholderMessage];
                         onUpdateConversation(conversationId, { messages: currentMessages });
 
-                        const { finalResult, summary, pipeline: agentPipeline } = await AgentService.generateResponse('Continue the discussion.', respondingAgent, currentMessages, undefined, discussionSettings.rules, longTermMemory, (chunk) => onAppendToMessageText(conversationId, aiMessageId, chunk), taskForNextSpeaker || undefined, globalApiKey);
+                        const { finalResult, summary, pipeline: agentPipeline } = await AgentService.generateResponse('Continue the discussion.', respondingAgent, currentMessages, undefined, discussionSettings.rules, longTermMemory, (chunk) => onStreamWithSound(conversationId, aiMessageId, chunk), taskForNextSpeaker || undefined, globalApiKey);
                         
                         const finalMessageData: Partial<Message> = { text: finalResult, summary, isStreaming: false, pipeline: [...moderationResponse.pipeline, ...agentPipeline], responseTimeMs: agentPipeline.find(s => s.stage.startsWith('Model Invocation'))?.durationMs };
                         onFinalizeMessage(conversationId, aiMessageId, finalMessageData);
@@ -189,7 +202,7 @@ export const useChatHandler = ({ agents, agentManager, globalApiKey, activeConve
                     currentMessages = [...currentMessages, placeholderMessage];
                     onUpdateConversation(conversationId, { messages: currentMessages });
 
-                    const { finalResult, summary, pipeline: agentPipeline } = await AgentService.generateResponse('Based on the plan, execute your task.', respondingAgent, currentMessages, undefined, undefined, longTermMemory, (chunk) => onAppendToMessageText(conversationId, aiMessageId, chunk), step.task, globalApiKey);
+                    const { finalResult, summary, pipeline: agentPipeline } = await AgentService.generateResponse('Based on the plan, execute your task.', respondingAgent, currentMessages, undefined, undefined, longTermMemory, (chunk) => onStreamWithSound(conversationId, aiMessageId, chunk), step.task, globalApiKey);
                     
                     const finalMessageData: Partial<Message> = { text: finalResult, summary, isStreaming: false, pipeline: agentPipeline, responseTimeMs: agentPipeline.find(s => s.stage.startsWith('Model Invocation'))?.durationMs };
                     
@@ -230,7 +243,7 @@ export const useChatHandler = ({ agents, agentManager, globalApiKey, activeConve
                         currentMessages = [...currentMessages, placeholderMessage];
                         onUpdateConversation(conversationId, { messages: currentMessages });
 
-                        const { finalResult, summary, pipeline: agentPipeline } = await AgentService.generateResponse(text, respondingAgent, currentMessages, attachment, activeConversation.systemInstructionOverride, longTermMemory, (chunk) => onAppendToMessageText(conversationId, aiMessageId, chunk), undefined, globalApiKey);
+                        const { finalResult, summary, pipeline: agentPipeline } = await AgentService.generateResponse(text, respondingAgent, currentMessages, attachment, activeConversation.systemInstructionOverride, longTermMemory, (chunk) => onStreamWithSound(conversationId, aiMessageId, chunk), undefined, globalApiKey);
                         
                         const finalMessageData: Partial<Message> = {
                             text: finalResult,
@@ -263,6 +276,7 @@ export const useChatHandler = ({ agents, agentManager, globalApiKey, activeConve
                 setManualSuggestions(managerResponse.result);
             }
         } catch (error) {
+            playSound('error');
             let errorMessageText: string;
             if (error instanceof AIError) {
                 errorMessageText = error.userFriendlyMessage;
@@ -288,6 +302,7 @@ export const useChatHandler = ({ agents, agentManager, globalApiKey, activeConve
         if (!activeConversation) return;
         const usedAgentIds = new Set<string>([agentId]);
         setLastTurnAgentIds(new Set());
+        hasPlayedReceiveSound.current = false;
 
         const conversationId = activeConversation.id;
 
@@ -295,6 +310,15 @@ export const useChatHandler = ({ agents, agentManager, globalApiKey, activeConve
         
         const systemInstructionOverride = activeConversation.systemInstructionOverride;
         let currentMessages = activeConversation.messages;
+
+        const onStreamWithSound = (conversationId: string, messageId: string, chunk: string) => {
+            if (!hasPlayedReceiveSound.current) {
+                playSound('receive');
+                hasPlayedReceiveSound.current = true;
+            }
+            onAppendToMessageText(conversationId, messageId, chunk);
+        };
+
 
         try {
             const userMessage = [...currentMessages].reverse().find(m => m.sender === 'user');
@@ -308,7 +332,7 @@ export const useChatHandler = ({ agents, agentManager, globalApiKey, activeConve
                 currentMessages = [...currentMessages, placeholderMessage];
                 onUpdateConversation(conversationId, { messages: currentMessages});
 
-                const { finalResult, summary, pipeline } = await AgentService.generateResponse(userMessage.text, respondingAgent, activeConversation.messages, userMessage.attachment, systemInstructionOverride, longTermMemory, (chunk) => onAppendToMessageText(conversationId, aiMessageId, chunk), undefined, globalApiKey);
+                const { finalResult, summary, pipeline } = await AgentService.generateResponse(userMessage.text, respondingAgent, activeConversation.messages, userMessage.attachment, systemInstructionOverride, longTermMemory, (chunk) => onStreamWithSound(conversationId, aiMessageId, chunk), undefined, globalApiKey);
                 
                 const finalMessageData: Partial<Message> = {
                     text: finalResult,
@@ -325,6 +349,7 @@ export const useChatHandler = ({ agents, agentManager, globalApiKey, activeConve
                 logUsage(TokenCounter.estimateTokens(finalMessage as Message), agentId, 1);
             }
         } catch (error) {
+            playSound('error');
             let errorMessageText: string;
             if (error instanceof AIError) {
                 errorMessageText = error.userFriendlyMessage;
@@ -357,6 +382,7 @@ export const useChatHandler = ({ agents, agentManager, globalApiKey, activeConve
             logUsage(0, 'manager', 1);
             openActionModal({ title: 'Summary', content: summary });
         } catch (error) {
+            playSound('error');
             const errorMessage = (error instanceof Error) ? getApiErrorMessage(error) : 'Could not generate summary.';
             openActionModal({ title: 'Error', content: errorMessage });
         }
@@ -380,6 +406,7 @@ export const useChatHandler = ({ agents, agentManager, globalApiKey, activeConve
                 ]
             });
         } catch (error) {
+            playSound('error');
              const errorMessage = (error instanceof Error) ? getApiErrorMessage(error) : 'Could not rewrite prompt.';
              openActionModal({ title: 'Error', content: errorMessage });
         }
@@ -406,6 +433,8 @@ export const useChatHandler = ({ agents, agentManager, globalApiKey, activeConve
 
             setLoadingStage({ stage: 'generating', agentId: agent.id });
             
+            playSound('receive');
+
             // For regeneration, we don't want to stream the response, just get the final result
             const { finalResult, pipeline } = await AgentService.generateResponse(userMessage.text, agent, activeConversation.messages.slice(0, aiMessageIndex), userMessage.attachment, systemInstructionOverride, longTermMemory, () => {}, undefined, globalApiKey);
             
@@ -430,6 +459,7 @@ export const useChatHandler = ({ agents, agentManager, globalApiKey, activeConve
             logUsage(aiMessageTokens, agent.id, 1);
             
         } catch (error) {
+            playSound('error');
             console.error("Error regenerating response:", error);
             const errorMessage = (error instanceof Error) ? getApiErrorMessage(error) : 'An unexpected error occurred during regeneration.';
             if(activeConversation) {

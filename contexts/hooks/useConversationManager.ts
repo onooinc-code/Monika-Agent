@@ -1,14 +1,13 @@
 import { useState, useEffect } from 'react';
 import { useLocalStorage } from '../../hooks/useLocalStorage.ts';
-import { Conversation, AgentManager, Message } from '../../types/index.ts';
+import { Conversation, AgentManager, Message, Agent } from '../../types/index.ts';
 import * as TitleService from '../../services/analysis/titleService.ts';
 import { isConversationArray } from '../../types/utils.ts';
 
 export const useConversationManager = () => {
     const [conversations, setConversations] = useLocalStorage<Conversation[]>('conversations', []);
     const [activeConversationId, setActiveConversationId] = useLocalStorage<string | null>('active-conversation-id', null);
-    const [isGeneratingTitle, setIsGeneratingTitle] = useState(false);
-
+    
     const activeConversation = conversations.find(c => c.id === activeConversationId) || null;
 
     useEffect(() => {
@@ -64,12 +63,13 @@ export const useConversationManager = () => {
         handleUpdateConversation(conversationId, { title });
     };
 
-    const handleGenerateTitle = async (conversationId: string, agentManager: AgentManager, globalApiKey: string) => {
+    const handleGenerateTitle = async (conversationId: string, agentManager: AgentManager, globalApiKey: string, onComplete: (id: string, updates: Partial<Conversation>) => void) => {
         const conversation = conversations.find(c => c.id === conversationId);
-        if (!conversation || conversation.messages.length === 0) return;
+        if (!conversation || conversation.messages.length === 0) {
+             onComplete(conversationId, { isGeneratingTitle: false });
+             return;
+        }
 
-        setIsGeneratingTitle(true);
-        handleUpdateConversation(conversationId, { isGeneratingTitle: true });
         try {
             const newTitle = await TitleService.generateConversationTitle(conversation.messages, agentManager, globalApiKey);
             handleUpdateConversationTitle(conversationId, newTitle);
@@ -77,8 +77,7 @@ export const useConversationManager = () => {
             const errorMessage = (error instanceof Error) ? error.message : 'Failed to generate title due to an unexpected error.';
             alert(`Title Generation Failed: ${errorMessage}`);
         } finally {
-            setIsGeneratingTitle(false);
-            handleUpdateConversation(conversationId, { isGeneratingTitle: false });
+            onComplete(conversationId, { isGeneratingTitle: false });
         }
     };
 
@@ -240,7 +239,6 @@ export const useConversationManager = () => {
         conversations,
         activeConversationId,
         activeConversation,
-        isGeneratingTitle,
         handleNewConversation,
         handleDeleteConversation,
         handleSelectConversation,

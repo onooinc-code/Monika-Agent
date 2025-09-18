@@ -26,6 +26,7 @@ export const ConversationSettingsModal: React.FC = () => {
         isLoading,
         handleExtractAndUpdateMemory,
         globalApiKey,
+        playSound,
     } = useAppContext();
 
     const [systemOverride, setSystemOverride] = useState('');
@@ -55,6 +56,7 @@ export const ConversationSettingsModal: React.FC = () => {
             discussionSettings: discussionSettings,
             managerSettings: managerSettings,
         });
+        playSound('save');
         setIsConversationSettingsOpen(false);
     };
     

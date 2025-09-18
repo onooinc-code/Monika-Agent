@@ -1,4 +1,3 @@
-
 import React from 'react';
 
 export interface BubbleSettings {
@@ -15,3 +14,5 @@ export interface ContextMenuItem {
     isDestructive?: boolean;
     isSeparator?: boolean;
 }
+
+export type SoundEvent = 'open' | 'close' | 'save' | 'send' | 'receive' | 'error';

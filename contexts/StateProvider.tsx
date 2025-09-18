@@ -1,5 +1,5 @@
 import React, { createContext, useContext, useRef, useCallback, useState } from 'react';
-import { Agent, AgentManager, ConversationMode, Attachment, ManualSuggestion, HistoryView, Conversation, PipelineStep, UsageMetrics, Message, LongTermMemoryData, BubbleSettings, ContextMenuItem } from '../types/index.ts';
+import { Agent, AgentManager, ConversationMode, Attachment, ManualSuggestion, HistoryView, Conversation, PipelineStep, UsageMetrics, Message, LongTermMemoryData, BubbleSettings, ContextMenuItem, SoundEvent } from '../types/index.ts';
 import { useLocalStorage } from '../hooks/useLocalStorage.ts';
 import { useConversationManager } from './hooks/useConversationManager.ts';
 import { useChatHandler, LoadingStage } from './hooks/useChatHandler.ts';
@@ -8,6 +8,7 @@ import { useModalManager } from './hooks/useModalManager.ts';
 import { useUsageTracker } from './hooks/useUsageTracker.ts';
 import { useMemoryManager } from './hooks/useMemoryManager.ts';
 import { useUIPrefsManager } from './hooks/useUIPrefsManager.ts';
+import { useSoundManager } from './hooks/useSoundManager.ts';
 import * as MemoryService from '../services/analysis/memoryService.ts';
 import { ActionModalState, ContextMenuState } from './hooks/useModalManager.ts';
 import * as AgentConstants from '../constants/agentConstants.ts';
@@ -33,8 +34,14 @@ interface AppState {
     setIsHistoryOpen: (isOpen: boolean) => void;
     manualSuggestions: ManualSuggestion[];
     historyView: HistoryView | null;
+    
+    // Preferences
     sendOnEnter: boolean;
     setSendOnEnter: React.Dispatch<React.SetStateAction<boolean>>;
+    isSoundEnabled: boolean;
+    setIsSoundEnabled: React.Dispatch<React.SetStateAction<boolean>>;
+    playSound: (event: SoundEvent) => void;
+
     messagesEndRef: React.RefObject<HTMLDivElement>;
     
     handleSendMessage: (text: string, attachment?: Attachment) => Promise<void>;
@@ -130,9 +137,11 @@ interface AppState {
     isBookmarksPanelOpen: boolean;
     setIsBookmarksPanelOpen: (isOpen: boolean) => void;
 
-    // Agent Status
+    // Agent Management
     handleToggleAgentEnabled: (agentId: string) => void;
     lastTurnAgentIds: Set<string>;
+    handleUpdateSingleAgent: (agentId: string, updates: Partial<Agent>) => void;
+    handleUpdateAgentManager: (updates: Partial<AgentManager>) => void;
     
     // Context Menu
     contextMenuState: ContextMenuState;
@@ -158,6 +167,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     const [agentManager, setAgentManager] = useLocalStorage<AgentManager>('agent-manager', AgentConstants.DEFAULT_AGENT_MANAGER);
     const [conversationMode, setConversationMode] = useLocalStorage<ConversationMode>('conversation-mode', 'Dynamic');
     const [sendOnEnter, setSendOnEnter] = useLocalStorage<boolean>('send-on-enter', true);
+    const [isSoundEnabled, setIsSoundEnabled] = useLocalStorage<boolean>('is-sound-enabled', true);
     const [globalApiKey, setGlobalApiKey] = useLocalStorage<string>('global-api-key', '');
     const [agentBubbleSettings, setAgentBubbleSettings] = useLocalStorage<BubbleSettings>('agent-bubble-settings', { alignment: 'left', scale: 1, textDirection: 'ltr', fontSize: 1 });
     const [userBubbleSettings, setUserBubbleSettings] = useLocalStorage<BubbleSettings>('user-bubble-settings', { alignment: 'right', scale: 1, textDirection: 'ltr', fontSize: 1 });
@@ -168,6 +178,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     const [lastTurnAgentIds, setLastTurnAgentIds] = useState<Set<string>>(new Set());
 
     // 3. Custom Hooks for logic domains
+    const { playSound } = useSoundManager({ isSoundEnabled });
     const modalManager = useModalManager();
     const conversationManager = useConversationManager();
     const historyHandler = useHistoryHandler();
@@ -191,25 +202,24 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
         closeActionModal: modalManager.closeActionModal,
         logUsage: usageTracker.logUsage,
         setLastTurnAgentIds: setLastTurnAgentIds,
+        playSound,
     });
     
     // 4. Combined loading state for UI components
-    const isLoading = chatHandler.isChatLoading || historyHandler.isGeneratingHistory || isExtractingMemory || conversationManager.isGeneratingTitle;
+    const [isGeneratingTitle, setIsGeneratingTitle] = useState(false);
+    const isLoading = chatHandler.isChatLoading || historyHandler.isGeneratingHistory || isExtractingMemory || isGeneratingTitle;
 
     // 5. Callback functions that bridge hooks or components
     const getAgent = useCallback((id: string) => {
         return agents.find(a => a.id === id);
     }, [agents]);
 
-    const handleShowHistory = async () => {
-        if (conversationManager.activeConversation) {
-            modalManager.setIsHistoryOpen(true);
-            await historyHandler.handleShowHistory(conversationManager.activeConversation, agentManager, globalApiKey);
-        }
-    };
-
     const handleGenerateTitle = async (conversationId: string) => {
-        await conversationManager.handleGenerateTitle(conversationId, agentManager, globalApiKey);
+        setIsGeneratingTitle(true);
+        await conversationManager.handleGenerateTitle(conversationId, agentManager, globalApiKey, (id, updates) => {
+            conversationManager.handleUpdateConversation(id, updates);
+            setIsGeneratingTitle(false);
+        });
     }
 
     const handleReplaceAgents = (newAgents: Agent[]) => {
@@ -229,8 +239,10 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
                 globalApiKey
             );
             memoryManager.setLongTermMemory(newFacts);
+            playSound('save');
             alert('Memory updated successfully!');
         } catch (error) {
+            playSound('error');
             const message = error instanceof Error ? error.message : 'Failed to update memory from conversation.';
             console.error('Failed to update memory', error);
             alert(message);
@@ -247,7 +259,44 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
         ));
     };
     
-    // 6. Assemble the context value, ensuring the AppState interface is matched
+    const handleUpdateSingleAgent = (agentId: string, updates: Partial<Agent>) => {
+        setAgents(prev => prev.map(agent => agent.id === agentId ? { ...agent, ...updates } : agent));
+    };
+
+    const handleUpdateAgentManager = (updates: Partial<AgentManager>) => {
+        setAgentManager(prev => ({ ...prev, ...updates }));
+    };
+
+    // 6. Wrapped modal setters with sound effects
+    const createSoundifiedSetter = (setter: (isOpen: boolean) => void) => (isOpen: boolean) => {
+        playSound(isOpen ? 'open' : 'close');
+        setter(isOpen);
+    };
+    
+    const setIsSettingsOpen = createSoundifiedSetter(modalManager.setIsSettingsOpen);
+    const setIsHistoryOpen = createSoundifiedSetter(modalManager.setIsHistoryOpen);
+    const setIsConversationSettingsOpen = createSoundifiedSetter(modalManager.setIsConversationSettingsOpen);
+    const setIsAgentStatsOpen = createSoundifiedSetter(modalManager.setIsAgentStatsOpen);
+    const setIsTeamGeneratorOpen = createSoundifiedSetter(modalManager.setIsTeamGeneratorOpen);
+    const setIsApiUsageOpen = createSoundifiedSetter(modalManager.setIsApiUsageOpen);
+    const setIsArchiveOpen = createSoundifiedSetter(modalManager.setIsArchiveOpen);
+    const setIsBookmarksPanelOpen = createSoundifiedSetter(modalManager.setIsBookmarksPanelOpen);
+    const openAgentSettingsModal = (agent: Agent | AgentManager) => {
+        playSound('open');
+        modalManager.openAgentSettingsModal(agent);
+    };
+    const closeAgentSettingsModal = () => {
+        playSound('close');
+        modalManager.closeAgentSettingsModal();
+    };
+    const handleShowHistory = async () => {
+        if (conversationManager.activeConversation) {
+            setIsHistoryOpen(true);
+            await historyHandler.handleShowHistory(conversationManager.activeConversation, agentManager, globalApiKey);
+        }
+    };
+    
+    // 7. Assemble the context value, ensuring the AppState interface is matched
     const value: AppState = {
         // Core state
         agents,
@@ -257,17 +306,22 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
         setAgentManager,
         conversationMode,
         setConversationMode,
-        sendOnEnter,
-        setSendOnEnter,
         messagesEndRef,
         getAgent,
         globalApiKey,
         setGlobalApiKey,
         
+        // Preferences
+        sendOnEnter,
+        setSendOnEnter,
+        isSoundEnabled,
+        setIsSoundEnabled,
+        playSound,
+        
         // From useConversationManager
-        conversations: conversationManager.conversations,
+        conversations: conversationManager.conversations.map(c => ({...c, isGeneratingTitle: c.id === conversationManager.activeConversationId && isGeneratingTitle})),
         activeConversationId: conversationManager.activeConversationId,
-        activeConversation: conversationManager.activeConversation,
+        activeConversation: conversationManager.activeConversation ? { ...conversationManager.activeConversation, isGeneratingTitle } : null,
         handleNewConversation: conversationManager.handleNewConversation,
         handleDeleteConversation: conversationManager.handleDeleteConversation,
         handleSelectConversation: conversationManager.handleSelectConversation,
@@ -288,27 +342,27 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
         historyView: historyHandler.historyView,
         handleShowHistory,
 
-        // From useModalManager
+        // From useModalManager (with sound)
         isSettingsOpen: modalManager.isSettingsOpen,
-        setIsSettingsOpen: modalManager.setIsSettingsOpen,
+        setIsSettingsOpen,
         isHistoryOpen: modalManager.isHistoryOpen,
-        setIsHistoryOpen: modalManager.setIsHistoryOpen,
+        setIsHistoryOpen,
         isConversationSettingsOpen: modalManager.isConversationSettingsOpen,
-        setIsConversationSettingsOpen: modalManager.setIsConversationSettingsOpen,
+        setIsConversationSettingsOpen,
         isHtmlPreviewOpen: modalManager.isHtmlPreviewOpen,
         htmlPreviewContent: modalManager.htmlPreviewContent,
         handleShowHtmlPreview: modalManager.handleShowHtmlPreview,
         handleCloseHtmlPreview: modalManager.handleCloseHtmlPreview,
         isAgentStatsOpen: modalManager.isAgentStatsOpen,
-        setIsAgentStatsOpen: modalManager.setIsAgentStatsOpen,
+        setIsAgentStatsOpen,
         isTeamGeneratorOpen: modalManager.isTeamGeneratorOpen,
-        setIsTeamGeneratorOpen: modalManager.setIsTeamGeneratorOpen,
+        setIsTeamGeneratorOpen,
         isApiUsageOpen: modalManager.isApiUsageOpen,
-        setIsApiUsageOpen: modalManager.setIsApiUsageOpen,
+        setIsApiUsageOpen,
         isArchiveOpen: modalManager.isArchiveOpen,
-        setIsArchiveOpen: modalManager.setIsArchiveOpen,
+        setIsArchiveOpen,
         isBookmarksPanelOpen: modalManager.isBookmarksPanelOpen,
-        setIsBookmarksPanelOpen: modalManager.setIsBookmarksPanelOpen,
+        setIsBookmarksPanelOpen,
 
         // Message actions from useConversationManager
         handleToggleMessageBookmark: conversationManager.handleToggleMessageBookmark,
@@ -354,9 +408,11 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
         userBubbleSettings,
         setUserBubbleSettings,
 
-        // Agent Status
+        // Agent Management
         handleToggleAgentEnabled,
         lastTurnAgentIds,
+        handleUpdateSingleAgent,
+        handleUpdateAgentManager,
 
         // Context Menu
         contextMenuState: modalManager.contextMenuState,
@@ -366,8 +422,8 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
         // Agent Settings Modal
         isAgentSettingsModalOpen: modalManager.isAgentSettingsModalOpen,
         selectedAgentForModal: modalManager.selectedAgentForModal,
-        openAgentSettingsModal: modalManager.openAgentSettingsModal,
-        closeAgentSettingsModal: modalManager.closeAgentSettingsModal,
+        openAgentSettingsModal,
+        closeAgentSettingsModal,
 
         // UI Preferences
         isPermanentlyVisible: uiPrefsManager.isPermanentlyVisible,

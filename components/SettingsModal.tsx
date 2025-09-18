@@ -18,6 +18,8 @@ export const SettingsModal: React.FC = () => {
         setAgentManager,
         sendOnEnter,
         setSendOnEnter,
+        isSoundEnabled,
+        setIsSoundEnabled,
         handleExportConversations,
         handleImportConversations,
         longTermMemory,
@@ -25,6 +27,7 @@ export const SettingsModal: React.FC = () => {
         clearMemory,
         globalApiKey,
         setGlobalApiKey,
+        playSound,
     } = useAppContext();
 
     const [localAgents, setLocalAgents] = useState(agents);
@@ -59,6 +62,7 @@ export const SettingsModal: React.FC = () => {
         setGlobalApiKey(localGlobalApiKey);
         setAgents(localAgents);
         setAgentManager(localManager);
+        playSound('save');
         setIsSettingsOpen(false);
     };
 
@@ -77,8 +81,10 @@ export const SettingsModal: React.FC = () => {
         try {
             const parsedMemory: LongTermMemoryData = JSON.parse(localMemory);
             setLongTermMemory(parsedMemory);
+            playSound('save');
             alert('Memory saved successfully!');
         } catch (e) {
+            playSound('error');
             alert('Invalid JSON format. Please correct it and try again.');
         }
     };
@@ -112,12 +118,20 @@ export const SettingsModal: React.FC = () => {
                     {/* Preferences */}
                     <div className="glass-pane p-4 rounded-lg">
                         <h3 className="text-lg font-semibold text-indigo-400 mb-4">Preferences</h3>
-                        <ToggleSwitch
-                            label="Send message on Enter"
-                            description="ON: Press Enter to send, Shift+Enter for new line. OFF: Press Ctrl+Enter to send."
-                            enabled={sendOnEnter}
-                            onChange={setSendOnEnter}
-                        />
+                        <div className="space-y-4">
+                            <ToggleSwitch
+                                label="Send message on Enter"
+                                description="ON: Press Enter to send, Shift+Enter for new line. OFF: Press Ctrl+Enter to send."
+                                enabled={sendOnEnter}
+                                onChange={setSendOnEnter}
+                            />
+                            <ToggleSwitch
+                                label="Enable Sound Effects"
+                                description="Play subtle sounds for actions like sending messages and opening modals."
+                                enabled={isSoundEnabled}
+                                onChange={setIsSoundEnabled}
+                            />
+                        </div>
                     </div>
 
                     {/* Data Management */}
