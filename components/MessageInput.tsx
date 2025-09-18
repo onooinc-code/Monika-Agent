@@ -75,43 +75,45 @@ export const MessageInput: React.FC = () => {
       )}
       <div className="w-full flex flex-col">
         <div className="message-input-wrapper">
-            <div className="message-input-inner flex flex-col">
-                <div className="relative flex">
-                    <textarea
-                        value={text}
-                        onChange={(e) => setText(e.target.value)}
-                        onKeyDown={handleKeyPress}
-                        placeholder="Imagine Something...✦˚"
-                        className="message-input-textarea min-h-[30px] max-h-24 p-1.5"
-                        disabled={isLoading}
-                    />
-                </div>
-                <div className="flex justify-between items-end p-1.5">
-                    <div className="flex items-center gap-2">
-                        <input
-                            type="file"
-                            ref={fileInputRef}
-                            onChange={handleFileChange}
-                            accept="image/*"
-                            className="hidden"
-                            id="file-input-v2"
-                        />
-                        <ActionToolbar onAttachClick={() => fileInputRef.current?.click()} />
-                    </div>
-                    <button
-                        onClick={handleSend}
-                        className="message-input-submit-btn active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed"
-                        disabled={(!text.trim() && !attachment) || isLoading}
-                        aria-label="Send message"
-                    >
-                        <i>
-                            <SendIconV2 />
-                        </i>
-                    </button>
-                </div>
+          <div className="message-input-inner flex flex-col">
+            <div className="relative flex">
+              <textarea
+                value={text}
+                onChange={(e) => setText(e.target.value)}
+                onKeyDown={handleKeyPress}
+                placeholder="Imagine Something...✦˚"
+                className="message-input-textarea min-h-[30px] max-h-24 p-1.5"
+                disabled={isLoading}
+              />
             </div>
+            <div className="flex justify-between items-end p-1.5">
+              <div className="flex items-center gap-2">
+                <input
+                  type="file"
+                  ref={fileInputRef}
+                  onChange={handleFileChange}
+                  accept="image/*"
+                  className="hidden"
+                  id="file-input-v2"
+                  data-testid="file-input-v2"
+                />
+                <ActionToolbar
+                  onAttachClick={() => fileInputRef.current?.click()}
+                />
+              </div>
+              <button
+                onClick={handleSend}
+                className="message-input-submit-btn active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed"
+                disabled={(!text.trim() && !attachment) || isLoading}
+                aria-label="Send message"
+              >
+                <i>
+                  <SendIconV2 />
+                </i>
+              </button>
+            </div>
+          </div>
         </div>
-
       </div>
     </footer>
   );
