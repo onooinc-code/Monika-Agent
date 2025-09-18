@@ -34,7 +34,7 @@ export const StatusBar: React.FC = () => {
     };
 
     return (
-        <footer className="glass-pane px-4 py-2 flex items-center justify-between text-xs text-white z-10">
+        <footer className="glass-pane rounded-2xl m-1 px-4 py-2 flex items-center justify-between text-xs text-white z-10">
             {/* Conversation Stats */}
             <div className="flex items-center gap-4">
                 <span className="font-semibold text-gray-300">Conversation:</span>
