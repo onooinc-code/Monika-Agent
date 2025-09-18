@@ -3,14 +3,15 @@
 // It also handles aliasing (e.g., mapping HistoryIconV2 to HistoryIcon)
 // to avoid refactoring every component that uses an older icon name.
 
+// Import new glass icons
+import { SettingsGlassIcon } from './icons/SettingsGlassIcon.tsx';
+import { TeamGenGlassIcon } from './icons/TeamGenGlassIcon.tsx';
+import { ApiUsageGlassIcon } from './icons/ApiUsageGlassIcon.tsx';
+
 export { MenuIcon } from './icons/MenuIcon.tsx';
 export { EditIcon } from './icons/EditIcon.tsx';
 export { CheckIcon } from './icons/CheckIcon.tsx';
 export { SparklesIcon } from './icons/SparklesIcon.tsx';
-export { SettingsIconV2 as SettingsIcon } from './icons/SettingsIconV2.tsx';
-export { UsersIconV2 as UsersIcon } from './icons/UsersIconV2.tsx';
-export { CloudIcon } from './icons/CloudIcon.tsx';
-export { PowerIcon } from './icons/PowerIcon.tsx';
 export { HistoryIconV2 as HistoryIcon } from './icons/HistoryIconV2.tsx';
 export { BookmarkIcon } from './icons/BookmarkIcon.tsx';
 export { BookmarkFilledIcon } from './icons/BookmarkFilledIcon.tsx';
@@ -44,3 +45,10 @@ export { EyeOffIcon } from './icons/EyeOffIcon.tsx';
 export { LockOpenIcon } from './icons/LockOpenIcon.tsx';
 export { LockClosedIcon } from './icons/LockClosedIcon.tsx';
 export { XCircleIcon } from './icons/XCircleIcon.tsx';
+export { PowerIcon } from './icons/PowerIcon.tsx';
+
+
+// Aliases for new glass icons to replace old ones without refactoring components
+export { SettingsGlassIcon as SettingsIcon };
+export { TeamGenGlassIcon as UsersIcon };
+export { ApiUsageGlassIcon as CloudIcon };
