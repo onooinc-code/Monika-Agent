@@ -3,21 +3,24 @@ import { Agent, AgentManager } from '../types/index.ts';
 import { useAppContext } from '../contexts/StateProvider.tsx';
 import { MenuIcon, PowerIcon, InformationCircleIcon, CpuIcon } from './Icons.tsx';
 import { safeRender } from '../services/utils/safeRender.ts';
-import { StyledHeaderButton } from './StyledHeaderButton.tsx';
 
-// --- SHARED COMPONENTS ---
-
-const HeaderButton: React.FC<{onClick: () => void, disabled?: boolean, title: string, 'aria-label': string, children: React.ReactNode}> = ({ onClick, disabled, title, 'aria-label': ariaLabel, children }) => (
-    <button 
-        onClick={onClick} 
-        disabled={disabled} 
-        className="relative p-2 rounded-lg hover:bg-white/10 transition-colors disabled:opacity-50 disabled:cursor-not-allowed hover-glow-indigo" 
+// --- NEW COMPONENT ---
+const GlassIconButton: React.FC<{
+    onClick: () => void;
+    title: string;
+    'aria-label': string;
+    iconUrl: string;
+}> = ({ onClick, title, 'aria-label': ariaLabel, iconUrl }) => (
+    <button
+        onClick={onClick}
         title={title}
         aria-label={ariaLabel}
+        className="w-12 h-12 glass-pane p-2 rounded-xl transition-all duration-300 transform hover:scale-110 hover-glow-indigo focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-[var(--color-primary-header)] focus:ring-cyan-500"
     >
-        {children}
+        <img src={iconUrl} alt={title} className="w-full h-full object-contain" />
     </button>
 );
+
 
 const getTodayDateString = (): string => {
     const today = new Date();
@@ -136,29 +139,50 @@ export const Header: React.FC<{ isSidebarOpen: boolean, toggleSidebar: () => voi
                 </div>
             </div>
 
-            <div className="flex-shrink-0 md:w-[25%] flex items-end justify-end">
-                <div className="hidden md:flex items-center gap-4 text-xs">
-                    <StyledHeaderButton
-                        onClick={() => setIsTeamGeneratorOpen(true)}
-                        title="Generate Team"
-                        aria-label="Open Team Generator"
-                        label="Team Gen"
-                        iconUrl="./components/icons/png/team-generator.png"
-                    />
-                     <StyledHeaderButton
-                        onClick={() => setIsApiUsageOpen(true)}
-                        title="API Usage"
-                        aria-label="Open API Usage"
-                        label="API Usage"
-                        iconUrl="./components/icons/png/api-usage.png"
-                    />
-                    <StyledHeaderButton
-                        onClick={() => setIsSettingsOpen(true)}
-                        title="Settings"
-                        aria-label="Open Settings"
-                        label="Settings"
-                        iconUrl="./components/icons/png/settings.png"
-                    />
+            <div className="flex-shrink-0 md:w-auto flex items-center justify-end">
+                <div className="hidden md:flex flex-row items-stretch gap-3">
+                    {/* Column 1 */}
+                    <div className="flex flex-col items-stretch gap-3">
+                        <GlassIconButton
+                            onClick={() => setIsTeamGeneratorOpen(true)}
+                            title="Generate Team"
+                            aria-label="Open Team Generator"
+                            iconUrl="./assets/generate-team.png"
+                        />
+                        <GlassIconButton
+                            onClick={() => setIsApiUsageOpen(true)}
+                            title="API Usage"
+                            aria-label="Open API Usage"
+                            iconUrl="./assets/api-usage.png"
+                        />
+                        <GlassIconButton
+                            onClick={() => setIsSettingsOpen(true)}
+                            title="Settings"
+                            aria-label="Open Settings"
+                            iconUrl="./assets/setting.png"
+                        />
+                    </div>
+                    {/* Column 2 */}
+                    <div className="flex flex-col items-stretch gap-3">
+                        <GlassIconButton
+                            onClick={() => setIsTeamGeneratorOpen(true)}
+                            title="Generate Team"
+                            aria-label="Open Team Generator"
+                            iconUrl="./assets/generate-team.png"
+                        />
+                        <GlassIconButton
+                            onClick={() => setIsApiUsageOpen(true)}
+                            title="API Usage"
+                            aria-label="Open API Usage"
+                            iconUrl="./assets/api-usage.png"
+                        />
+                        <GlassIconButton
+                            onClick={() => setIsSettingsOpen(true)}
+                            title="Settings"
+                            aria-label="Open Settings"
+                            iconUrl="./assets/setting.png"
+                        />
+                    </div>
                 </div>
                 {/* Placeholder for mobile to balance flexbox */}
                 <div className="w-6 h-6 md:hidden"></div>
