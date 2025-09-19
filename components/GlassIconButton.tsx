@@ -5,6 +5,7 @@ interface GlassIconButtonProps {
     title: string;
     ariaLabel: string;
     gradient: 'indigo' | 'cyan' | 'purple';
+    iconUrl?: string;
 }
 
 const FALLBACK_ICONS = {
@@ -49,7 +50,9 @@ export const GlassIconButton: React.FC<GlassIconButtonProps> = ({ onClick, title
             aria-label={ariaLabel}
             className="w-10 h-10 transition-transform transform hover:scale-110 focus:outline-none"
         >
-            <svg viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg">
+            className="relative w-10 h-10 transition-transform transform hover:scale-110 focus:outline-none"
+        >
+            <svg viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg" className="absolute inset-0">
                 <defs>
                     <linearGradient id={selectedGradient.id} x1="0%" y1="0%" x2="0%" y2="100%">
                         <stop offset="0%" stopColor={selectedGradient.stop1} />
@@ -62,10 +65,18 @@ export const GlassIconButton: React.FC<GlassIconButtonProps> = ({ onClick, title
                 <g filter={`url(#shadow-glass-btn-${gradient})`}>
                     <rect x="4" y="4" width="56" height="56" rx="16" fill={`url(#${selectedGradient.id})`} />
                     <path d="M4 20C18 14 46 14 60 20L60 16C60 9.37 54.63 4 48 4L16 4C9.37 4 4 9.37 4 16L4 20Z" fill="white" fillOpacity="0.3" />
-                    
-                    {FALLBACK_ICONS[gradient]}
                 </g>
             </svg>
+            {iconUrl ? (
+                <img src={iconUrl} alt={title} className="absolute inset-0 w-full h-full object-contain p-2" />
+            ) : (
+                <svg viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg" className="absolute inset-0">
+                    <g filter={`url(#shadow-glass-btn-${gradient})`}>
+                        {FALLBACK_ICONS[gradient]}
+                    </g>
+                </svg>
+            )}
         </button>
     );
+};
 };
