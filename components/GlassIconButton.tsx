@@ -33,7 +33,7 @@ const FALLBACK_ICONS = {
 };
 
 
-export const GlassIconButton: React.FC<GlassIconButtonProps> = ({ onClick, title, ariaLabel, gradient }) => {
+export const GlassIconButton: React.FC<GlassIconButtonProps> = ({ onClick, title, ariaLabel, gradient, iconUrl }) => {
     
     const gradients = {
         indigo: { id: 'grad-glass-indigo-btn', stop1: '#818cf8', stop2: '#4f46e5' },
@@ -48,8 +48,6 @@ export const GlassIconButton: React.FC<GlassIconButtonProps> = ({ onClick, title
             onClick={onClick}
             title={title}
             aria-label={ariaLabel}
-            className="w-10 h-10 transition-transform transform hover:scale-110 focus:outline-none"
-        >
             className="relative w-10 h-10 transition-transform transform hover:scale-110 focus:outline-none"
         >
             <svg viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg" className="absolute inset-0">
@@ -78,5 +76,4 @@ export const GlassIconButton: React.FC<GlassIconButtonProps> = ({ onClick, title
             )}
         </button>
     );
-};
 };
