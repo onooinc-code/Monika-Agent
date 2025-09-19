@@ -1,24 +1,19 @@
-import React from 'react';
-import styled from 'styled-components';
+import React from "react";
+import styled from "styled-components";
 
 interface AgentLastTurnStatusProps {
   wasUsed: boolean;
 }
 
-const AgentLastTurnStatus: React.FC<AgentLastTurnStatusProps> = ({ wasUsed }) => {
+const AgentLastTurnStatus: React.FC<AgentLastTurnStatusProps> = ({
+  wasUsed,
+}) => {
   return (
     <StyledWrapper>
-      <div className="toggle-cont">
-        <input className="toggle-input" id="toggle" name="toggle" type="checkbox" checked={wasUsed} readOnly />
-        <label className="toggle-label" htmlFor="toggle">
-          <div className="cont-label-play">
-            <span className="label-play" />
-          </div>
-        </label>
-      </div>
+     
     </StyledWrapper>
   );
-}
+};
 
 const StyledWrapper = styled.div`
   .toggle-cont {

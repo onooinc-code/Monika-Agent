@@ -1,0 +1,121 @@
+      /* Animations */
+      @keyframes fadeInUp {
+        from { opacity: 0; transform: translateY(10px); }
+        to { opacity: 1; transform: translateY(0); }
+      }
+      
+      .animate-fade-in-up {
+        animation: fadeInUp 0.5s ease-out forwards;
+      }
+
+      @keyframes highlight-flash {
+        0% { background-color: rgba(129, 140, 248, 0); }
+        50% { background-color: rgba(129, 140, 248, 0.3); }
+        100% { background-color: rgba(129, 140, 248, 0); }
+      }
+      .highlight-flash {
+        animation: highlight-flash 1.5s ease-out;
+        border-radius: 0.75rem; /* To match bubble's rounded corners */
+      }
+      
+      @keyframes blink {
+        50% { opacity: 0; }
+      }
+      .streaming-cursor {
+        display: inline-block;
+        width: 8px;
+        height: 1.2em;
+        background-color: var(--color-neon-cyan);
+        animation: blink 1s step-end infinite;
+        vertical-align: text-bottom;
+        margin-left: 2px;
+      }
+
+      @keyframes animated-gradient-text {
+        0% { background-position: 0% 50%; }
+        50% { background-position: 100% 50%; }
+        100% { background-position: 0% 50%; }
+      }
+
+      @keyframes animated-gradient-bg {
+        0% { background-position: 0% 50%; }
+        50% { background-position: 100% 50%; }
+        100% { background-position: 0% 50%; }
+      }
+      
+      @keyframes flashing-dot {
+        0%, 100% { opacity: 1; transform: scale(1); }
+        50% { opacity: 0.3; transform: scale(0.8); }
+      }
+      .flashing-dot {
+        animation: flashing-dot 1.5s ease-in-out infinite;
+      }
+      
+      @keyframes rotBGimg {
+        from { transform: rotate(0deg); }
+        to { transform: rotate(360deg); }
+      }
+      
+      @keyframes anime1 { to { background-color: rgb(77, 124, 255); } }
+      @keyframes anime2 { to { fill: rgba(77, 124, 255, 0.642); } }
+
+      @keyframes pulse-slow {
+    50% {
+        box-shadow: 0 0 20px 5px rgba(0, 255, 255, 0.7);
+    }
+}
+
+@keyframes flicker {
+    0%, 100% {
+        opacity: 1;
+    }
+    50% {
+        opacity: 0.5;
+    }
+}
+
+/* Sidebar Animation */
+.sidebar-transition {
+    transition: transform 0.3s ease-in-out;
+}
+.sidebar-closed {
+    transform: translateX(-100%);
+}
+.sidebar-open {
+    transform: translateX(0);
+}
+
+@keyframes neon-flash {
+    0%, 100% {
+        box-shadow: 0 0 5px #00ffff, 0 0 10px #00ffff, 0 0 15px #00ffff, 0 0 20px #00ffff;
+    }
+    50% {
+        box-shadow: 0 0 2px #00ffff, 0 0 5px #00ffff, 0 0 10px #00ffff;
+    }
+}
+
+@keyframes neon-flash-slow {
+    0%, 100% {
+        box-shadow: 0 0 5px #00ffff, 0 0 10px #00ffff, 0 0 15px #00ffff, 0 0 20px #00ffff;
+    }
+    50% {
+        box-shadow: 0 0 2px #00ffff, 0 0 5px #00ffff, 0 0 10px #00ffff;
+    }
+}
+
+@keyframes neon-flash-medium {
+    0%, 100% {
+        box-shadow: 0 0 8px #00ffff, 0 0 15px #00ffff, 0 0 20px #00ffff, 0 0 25px #00ffff;
+    }
+    50% {
+        box-shadow: 0 0 4px #00ffff, 0 0 8px #00ffff, 0 0 12px #00ffff;
+    }
+}
+
+.neon-flash-slow {
+    animation: neon-flash-slow 2s ease-in-out infinite;
+}
+
+.neon-flash-medium {
+    animation: neon-flash-medium 1s ease-in-out infinite;
+}

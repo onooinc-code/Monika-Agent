@@ -1,8 +1,7 @@
-import React from 'react';
-import styled from 'styled-components';
-import { AgentManager } from '../types/index.ts';
-import { useAppContext } from '../contexts/StateProvider.tsx';
-import { InformationCircleIcon, CpuIcon } from './Icons.tsx';
+import React from "react";
+import { AgentManager } from "../types/index.ts";
+import { useAppContext } from "../contexts/StateProvider.tsx";
+import { InformationCircleIcon, CpuIcon } from "./Icons.tsx";
 
 interface ManagerCardV2Props {
   manager: AgentManager;
@@ -18,122 +17,91 @@ const ManagerCardV2: React.FC<ManagerCardV2Props> = ({ manager }) => {
   };
 
   return (
-    <StyledWrapper>
-      <div className="card">
-        <div className="card-header">
-          <span className="manager-agent-label">Agent Manager</span>
-          <button
-            onClick={() => openAgentSettingsModal(manager)}
-            className="view-details-button"
-            title="View details for Agent Manager"
-          >
-            <InformationCircleIcon className="w-5 h-5" />
-          </button>
-        </div>
-        <div className="card-content">
-          <div className="flex flex-col items-center justify-center">
-            <CpuIcon className="w-8 h-8 text-yellow-400" />
-            <p className="text-sm font-bold text-white">Decisions</p>
-            <p className="text-xs text-yellow-400">{formatStat(stats.totalMessages)}</p>
+    <div className="flex-1 min-w-[150px] glass-pane rounded-lg flex flex-col transition-all duration-300 transform hover:-translate-y-1 hover:shadow-lg hover:shadow-yellow-500/20">
+      <div className="relative group h-full">
+        <div className="absolute -inset-1 rounded-xl blur opacity-25 group-hover:opacity-50 transition duration-500 bg-gradient-to-r from-yellow-400 to-amber-500" />
+
+        <div className="relative bg-white dark:bg-gray-900 rounded-xl p-1 shadow-xl h-full flex flex-col">
+          <div className="relative overflow-hidden rounded-lg p-1 bg-gradient-to-br from-gray-50 to-gray-100 dark:from-gray-800 dark:to-gray-900 flex items-center justify-center">
+            <span className="block text-xl font-bold text-yellow-400">
+              <p className="text-xs font-bold bg-clip-text text-transparent bg-gradient-to-r from-yellow-400 to-amber-500">
+                Agent Manager
+              </p>
+            </span>
+            <div className="flex   space-x-2 px-2 py-3 rounded-full"></div>
+
+            
+
+            <div
+              className="absolute bottom-0 left-0 w-full h-0.5 rounded-full"
+              style={{
+                background: `linear-gradient(to right, #F59E0B, #D97706)`,
+              }}
+            />
+          </div>
+
+          <div className="flex items-center justify-between mb-2">
+            <div className="space-y-0.5"></div>
+          </div>
+          <div className="grid grid-cols-2 gap-1  mb-2 flex-1">
+            <div className="relative overflow-hidden rounded-lg p-1 bg-gradient-to-br from-gray-50 to-gray-100 dark:from-gray-800 dark:to-gray-900 flex items-center justify-center">
+              <span className="block text-xl font-bold text-amber-500">
+                <button
+                  onClick={() => openAgentSettingsModal(manager)}
+                  className="w-6 h-6 flex items-center justify-center text-white rounded-lg transform hover:scale-105 transition-transform bg-gradient-to-r from-yellow-400 to-amber-500"
+                  title="Configure Agent Manager"
+                >
+                  <InformationCircleIcon className="w-5 h-5" />
+                </button>
+              </span>
+              <div
+                className="absolute bottom-0 left-0 w-full h-0.5 rounded-full"
+                style={{
+                  background: `linear-gradient(to right, #F59E0B, #D97706)`,
+                }}
+              />
+            </div>
+
+            <div className="relative overflow-hidden rounded-lg p-1 bg-gradient-to-br from-gray-50 to-gray-100 dark:from-gray-800 dark:to-gray-900">
+              <div className="relative z-10">
+                <span
+                  className="block text-xl font-bold flex items-center justify-center text-yellow-400"
+                  title="Total decisions made"
+                >
+                  {formatStat(stats.totalMessages)}
+                </span>
+              </div>
+
+              <div
+                className="absolute bottom-0 left-0 w-full h-0.5 rounded-full"
+                style={{
+                  background: `linear-gradient(to right, #F59E0B, #D97706)`,
+                }}
+              />
+            </div>
+          </div>
+
+          {/* Placeholder for alignment with agent cards - can be filled with manager-specific stats later if needed */}
+          <div className="relative overflow-hidden rounded-lg p-1 bg-gradient-to-br from-gray-50 to-gray-100 dark:from-gray-800 dark:to-gray-900 flex items-center justify-center">
+            <span className="block text-xl font-bold text-yellow-400">
+              <div
+                className="absolute bottom-0 left-0 w-full h-0.5 rounded-full"
+                style={{
+                  background: `linear-gradient(to right, #F59E0B, #D97706)`,
+                }}
+              />
+              <div
+                className="absolute bottom-0 left-0 w-full h-0.5 rounded-full"
+                style={{
+                  background: `linear-gradient(to right, #F59E0B, #D97706)`,
+                }}
+              />
+            </span>
           </div>
         </div>
       </div>
-    </StyledWrapper>
+    </div>
   );
-}
-
-const StyledWrapper = styled.div`
-  .card {
-    position: relative;
-    width: 150px; /* Adjusted to fit header */
-    height: 70px; /* Adjusted to fit header */
-    background: linear-gradient(-45deg, #161616 0%, #000000 100%);
-    color: #81818144;
-    display: flex;
-    flex-direction: column;
-    justify-content: space-between; /* Adjusted */
-    align-items: flex-start; /* Adjusted */
-    padding: 5px; /* Reduced padding */
-    gap: 5px; /* Reduced gap */
-    border-radius: 8px;
-    cursor: pointer;
-    flex-shrink: 0; /* Prevent shrinking */
-  }
-
-  .card::before {
-    content: "";
-    position: absolute;
-    inset: 0;
-    left: 0;
-    margin: auto;
-    width: 150px; /* Adjusted */
-    height: 74px; /* Adjusted */
-    border-radius: 10px;
-    background: linear-gradient(-45deg, #ffc107 0%, #ffeb3b 100%); /* Yellow gradient */
-    z-index: -10;
-    pointer-events: none;
-    transition: all 0.8s cubic-bezier(0.175, 0.95, 0.9, 1.275);
-    box-shadow: 0px 10px 15px hsla(0, 0%, 0%, 0.521); /* Adjusted shadow */
-  }
-
-  .card::after {
-    content: "";
-    z-index: -1;
-    position: absolute;
-    inset: 0;
-    width: 130px; /* Adjusted */
-    height: 65px; /* Adjusted */
-    background: linear-gradient(-45deg, #ffc107 0%, #ffeb3b 100%); /* Yellow gradient */
-    transform: translate3d(0, 0, 0) scale(0.45);
-  }
-
-  .card-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    width: 100%;
-  }
-
-  .manager-agent-label {
-    font-size: 12px;
-    font-weight: bold;
-    color: #fff;
-  }
-
-  .view-details-button {
-    width: 28px;
-    height: 28px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    background: rgba(255, 255, 255, 0.1);
-    border-radius: 50%;
-    color: #fff;
-    cursor: pointer;
-    transition: background 0.3s ease;
-  }
-
-  .view-details-button:hover {
-    background: rgba(255, 255, 255, 0.2);
-  }
-
-  .card-content {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    flex-grow: 1;
-    width: 100%;
-  }
-
-  .card:hover::after {
-    transition: all 0.2s cubic-bezier(0.175, 0.285, 0.82, 1.275);
-  }
-
-  .card:hover::before {
-    transform: scaleX(1.02) scaleY(1.02);
-    box-shadow: 0px 0px 15px 0px hsla(45, 100%, 50%, 0.356); /* Yellow glow */
-  }
-`;
+};
 
 export default ManagerCardV2;

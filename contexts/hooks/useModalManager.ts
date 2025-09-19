@@ -50,6 +50,8 @@ export const useModalManager = () => {
         y: 0,
         menuItems: []
     });
+    const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+    const [isSidebarPinned, setIsSidebarPinned] = useState(false);
 
     const handleShowHtmlPreview = (html: string) => {
         setHtmlPreviewContent(html);
@@ -133,5 +135,7 @@ export const useModalManager = () => {
         openAgentSettingsModal,
         closeAgentSettingsModal,
         contextMenuState, openContextMenu, closeContextMenu,
+        isSidebarOpen, setIsSidebarOpen,
+        isSidebarPinned, setIsSidebarPinned,
     };
 };

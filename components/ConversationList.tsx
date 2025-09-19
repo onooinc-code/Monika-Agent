@@ -1,24 +1,38 @@
-
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useEffect, useRef } from 'react';
 import { ConversationItem } from './ConversationItem.tsx';
 import { useAppContext } from '../contexts/StateProvider.tsx';
 import { PlusIcon, SearchIcon } from './Icons.tsx';
 import { safeRender } from '../services/utils/safeRender.ts';
 
-interface ConversationListProps {
-    isOpen: boolean;
-}
-
-export const ConversationList: React.FC<ConversationListProps> = ({ isOpen }) => {
+export const ConversationList: React.FC = () => {
     const { 
         conversations, 
         activeConversationId,
         handleNewConversation,
         handleDeleteConversation,
-        handleSelectConversation
+        handleSelectConversation,
+        isSidebarOpen,
+        isSidebarPinned,
+        setIsSidebarOpen,
     } = useAppContext();
 
     const [searchQuery, setSearchQuery] = useState('');
+    const [isHovering, setIsHovering] = useState(false);
+    const timeoutRef = useRef<NodeJS.Timeout | null>(null);
+
+    useEffect(() => {
+        if (isSidebarOpen && !isHovering && !isSidebarPinned) {
+            timeoutRef.current = setTimeout(() => {
+                setIsSidebarOpen(false);
+            }, 10000);
+        }
+
+        return () => {
+            if (timeoutRef.current) {
+                clearTimeout(timeoutRef.current);
+            }
+        };
+    }, [isSidebarOpen, isHovering, isSidebarPinned, setIsSidebarOpen]);
 
     const filteredConversations = useMemo(() => {
         if (!searchQuery.trim()) {
@@ -36,12 +50,12 @@ export const ConversationList: React.FC<ConversationListProps> = ({ isOpen }) =>
         });
     }, [conversations, searchQuery]);
 
-    if (!isOpen) {
-        return null;
-    }
-
     return (
-        <aside className="glass-pane w-72 p-4 flex flex-col">
+        <aside 
+            className={`glass-pane w-72 p-4 flex flex-col absolute top-0 left-0 h-full z-40 sidebar-transition ${isSidebarOpen ? 'sidebar-open' : 'sidebar-closed'}`}
+            onMouseEnter={() => setIsHovering(true)}
+            onMouseLeave={() => setIsHovering(false)}
+        >
             <div className="flex justify-between items-center mb-4 flex-shrink-0">
                 <h2 className="text-lg font-semibold text-white">Chats</h2>
                 <button 

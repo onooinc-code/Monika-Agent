@@ -46,6 +46,7 @@ export { LockOpenIcon } from './icons/LockOpenIcon.tsx';
 export { LockClosedIcon } from './icons/LockClosedIcon.tsx';
 export { XCircleIcon } from './icons/XCircleIcon.tsx';
 export { PowerIcon } from './icons/PowerIcon.tsx';
+export { PinIcon } from './icons/PinIcon.tsx';
 
 
 // Aliases for icons used throughout the app

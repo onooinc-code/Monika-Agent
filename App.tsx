@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect } from 'react';
 import { Header } from './components/Header.tsx';
 import { MessageList } from './components/MessageList.tsx';
 import { ManualSuggestions } from './components/ManualSuggestions.tsx';
@@ -24,6 +24,7 @@ import { ConversationSubHeader } from './components/ConversationSubHeader.tsx';
 import { ContextMenuItem } from './types/index.ts';
 import { PlusIcon, SettingsIcon, AlignLeftIcon } from './components/Icons.tsx';
 import { AgentSettingsModal } from './components/AgentSettingsModal.tsx';
+import { SidebarToggler } from './components/SidebarToggler.tsx';
 
 export default function App() {
   const { 
@@ -43,9 +44,8 @@ export default function App() {
     closeContextMenu,
     handleNewConversation,
     setIsArchiveOpen,
+    isSidebarOpen,
   } = useAppContext();
-
-  const [isSidebarOpen, setIsSidebarOpen] = useState(true);
 
   // Scroll to bottom of messages on new message
   useEffect(() => {
@@ -130,12 +130,10 @@ export default function App() {
 
   return (
     <div className="flex h-screen bg-[#0a0a0f] text-gray-200" style={{fontFamily: "'Inter', sans-serif"}}>
-        <ConversationList isOpen={isSidebarOpen} />
-        <div className="flex flex-1 flex-col min-w-0">
-             <Header 
-                isSidebarOpen={isSidebarOpen} 
-                toggleSidebar={() => setIsSidebarOpen(!isSidebarOpen)}
-            />
+        <SidebarToggler />
+        <ConversationList />
+        <div className={`flex flex-1 flex-col min-w-0 transition-all duration-300 ease-in-out ${isSidebarOpen ? 'ml-72' : 'ml-0'}`}>
+             <Header />
             <div className="flex flex-1 min-h-0">
                 <main
                     className="flex flex-col flex-1 bg-[#0a0a0f] min-h-0"

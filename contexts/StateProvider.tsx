@@ -157,6 +157,10 @@ interface AppState {
     // UI Preferences
     isPermanentlyVisible: (id: string) => boolean;
     togglePermanentVisibility: (id: string) => void;
+    isSidebarOpen: boolean;
+    setIsSidebarOpen: (isOpen: boolean) => void;
+    isSidebarPinned: boolean;
+    setIsSidebarPinned: (isPinned: boolean) => void;
 }
 
 const AppContext = createContext<AppState | undefined>(undefined);
@@ -281,6 +285,9 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     const setIsApiUsageOpen = createSoundifiedSetter(modalManager.setIsApiUsageOpen);
     const setIsArchiveOpen = createSoundifiedSetter(modalManager.setIsArchiveOpen);
     const setIsBookmarksPanelOpen = createSoundifiedSetter(modalManager.setIsBookmarksPanelOpen);
+    const setIsSidebarOpen = createSoundifiedSetter(modalManager.setIsSidebarOpen);
+    const setIsSidebarPinned = createSoundifiedSetter(modalManager.setIsSidebarPinned);
+
     const openAgentSettingsModal = (agent: Agent | AgentManager) => {
         playSound('open');
         modalManager.openAgentSettingsModal(agent);
@@ -363,6 +370,10 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
         setIsArchiveOpen,
         isBookmarksPanelOpen: modalManager.isBookmarksPanelOpen,
         setIsBookmarksPanelOpen,
+        isSidebarOpen: modalManager.isSidebarOpen,
+        setIsSidebarOpen,
+        isSidebarPinned: modalManager.isSidebarPinned,
+        setIsSidebarPinned,
 
         // Message actions from useConversationManager
         handleToggleMessageBookmark: conversationManager.handleToggleMessageBookmark,

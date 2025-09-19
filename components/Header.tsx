@@ -31,10 +31,7 @@ const agentGradients = [
 ];
 
 // Main Header component is now the Dashboard Header
-export const Header: React.FC<{
-  isSidebarOpen: boolean;
-  toggleSidebar: () => void;
-}> = ({ toggleSidebar }) => {
+export const Header: React.FC = () => {
   const {
     agents,
     agentManager,
@@ -50,14 +47,6 @@ export const Header: React.FC<{
       }}
     >
       <div className="flex-shrink-0 md:w-[25%] flex items-center gap-2">
-        <button
-          onClick={toggleSidebar}
-          className="p-2 rounded-full hover:bg-white/10 transition-colors"
-          aria-label="Toggle Sidebar"
-          title="Toggle conversation list"
-        >
-          <MenuIcon className="w-6 h-6" />
-        </button>
       </div>
 
       <div className="flex-1 md:w-[50%] flex flex-col">
@@ -92,4 +81,4 @@ export const Header: React.FC<{
       </div>
     </header>
   );
-};
+}
