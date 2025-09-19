@@ -1,0 +1,20 @@
+      /* Modal Styles */
+      .modal-overlay {
+        opacity: 0;
+        transition: opacity 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        pointer-events: none;
+        background-color: rgba(0, 0, 0, 0.7);
+      }
+      .modal-overlay.open {
+        opacity: 1;
+        pointer-events: auto;
+      }
+      .modal-content {
+        opacity: 0;
+        transform: translateY(20px) scale(0.98);
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      }
+      .modal-overlay.open .modal-content {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+      }

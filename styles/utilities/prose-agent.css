@@ -18,19 +18,3 @@
         --tw-prose-invert-headings: #f1f5f9;
         --tw-prose-invert-links: #a5b4fc;
       }
-      .prose-user {
-        --tw-prose-body: #e0e7ff;
-        --tw-prose-headings: #ffffff;
-        --tw-prose-lead: #c7d2fe;
-        --tw-prose-links: #a5b4fc;
-        --tw-prose-bold: #ffffff;
-        --tw-prose-counters: #a5b4fc;
-        --tw-prose-bullets: #a5b4fc;
-        --tw-prose-hr: rgba(129, 140, 248, 0.3);
-        --tw-prose-quotes: #e0e7ff;
-        --tw-prose-quote-borders: #818cf8;
-        --tw-prose-captions: #94a3b8;
-        --tw-prose-code: #a5b4fc;
-        --tw-prose-pre-code: #c7d2fe;
-        --tw-prose-pre-bg: rgba(0, 0, 0, 0.3);
-      }
