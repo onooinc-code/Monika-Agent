@@ -12,14 +12,14 @@ export const HeaderActions = () => {
                         onClick={() => setIsApiUsageOpen(true)}
                         title="API Usage"
                         ariaLabel="Open API Usage"
-                        iconUrl="./assets/api-usage.png"
+                        iconUrl="/assets/api-usage.png"
                         gradient="cyan"
                     />
                     <GlassIconButton
                         onClick={() => setIsSettingsOpen(true)}
                         title="Settings"
                         ariaLabel="Open Settings"
-                        iconUrl="./assets/setting.png"
+                        iconUrl="/assets/setting.png"
                         gradient="indigo"
                     />
                      <div className="col-span-2 flex justify-center">
@@ -27,7 +27,7 @@ export const HeaderActions = () => {
                             onClick={() => setIsTeamGeneratorOpen(true)}
                             title="Generate Team"
                             ariaLabel="Open Team Generator"
-                            iconUrl="./assets/generate-team.png"
+                            iconUrl="/assets/generate-team.png"
                             gradient="purple"
                         />
                      </div>

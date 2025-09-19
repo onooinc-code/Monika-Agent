@@ -1,5 +1,5 @@
 
-import { render, screen, fireEvent } from '../src/test-utils';
+import { render, screen, fireEvent, waitFor } from '../src/test-utils';
 import userEvent from '@testing-library/user-event';
 import { MessageInput } from './MessageInput';
 import { vi } from 'vitest';
@@ -44,7 +44,7 @@ describe('MessageInput', () => {
     Object.defineProperty(file, 'size', { value: 5 * 1024 * 1024 });
 
     const input = screen.getByTestId('file-input-v2');
-    await userEvent.upload(input, file);
+    fireEvent.change(input, { target: { files: [file] } });
 
     expect(screen.getByText('File size exceeds 4MB.')).toBeInTheDocument();
   });
@@ -54,7 +54,7 @@ describe('MessageInput', () => {
     const file = new File(['hello'], 'hello.txt', { type: 'text/plain' });
 
     const input = screen.getByTestId('file-input-v2');
-    await userEvent.upload(input, file);
+    fireEvent.change(input, { target: { files: [file] } });
 
     expect(screen.getByText('Only image files are supported.')).toBeInTheDocument();
   });
