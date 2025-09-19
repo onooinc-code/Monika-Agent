@@ -2,10 +2,6 @@ import React from 'react';
 import { useAppContext } from '../contexts/StateProvider';
 import { GlassIconButton } from './GlassIconButton';
 
-import apiUsageIcon from '../assets/api-usage.png';
-import settingIcon from '../assets/setting.png';
-import generateTeamIcon from '../assets/generate-team.png';
-
 export const HeaderActions = () => {
     const { setIsSettingsOpen, setIsTeamGeneratorOpen, setIsApiUsageOpen } = useAppContext();
     return (
@@ -16,14 +12,12 @@ export const HeaderActions = () => {
                         onClick={() => setIsApiUsageOpen(true)}
                         title="API Usage"
                         ariaLabel="Open API Usage"
-                        iconUrl={apiUsageIcon}
                         gradient="cyan"
                     />
                     <GlassIconButton
                         onClick={() => setIsSettingsOpen(true)}
                         title="Settings"
                         ariaLabel="Open Settings"
-                        iconUrl={settingIcon}
                         gradient="indigo"
                     />
                      <div className="col-span-2 flex justify-center">
@@ -31,7 +25,6 @@ export const HeaderActions = () => {
                             onClick={() => setIsTeamGeneratorOpen(true)}
                             title="Generate Team"
                             ariaLabel="Open Team Generator"
-                            iconUrl={generateTeamIcon}
                             gradient="purple"
                         />
                      </div>

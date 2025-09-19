@@ -5,7 +5,6 @@ interface GlassIconButtonProps {
     title: string;
     ariaLabel: string;
     gradient: 'indigo' | 'cyan' | 'purple';
-    iconUrl?: string;
 }
 
 const FALLBACK_ICONS = {
@@ -33,7 +32,7 @@ const FALLBACK_ICONS = {
 };
 
 
-export const GlassIconButton: React.FC<GlassIconButtonProps> = ({ onClick, title, ariaLabel, gradient, iconUrl }) => {
+export const GlassIconButton: React.FC<GlassIconButtonProps> = ({ onClick, title, ariaLabel, gradient }) => {
     
     const gradients = {
         indigo: { id: 'grad-glass-indigo-btn', stop1: '#818cf8', stop2: '#4f46e5' },
@@ -64,13 +63,7 @@ export const GlassIconButton: React.FC<GlassIconButtonProps> = ({ onClick, title
                     <rect x="4" y="4" width="56" height="56" rx="16" fill={`url(#${selectedGradient.id})`} />
                     <path d="M4 20C18 14 46 14 60 20L60 16C60 9.37 54.63 4 48 4L16 4C9.37 4 4 9.37 4 16L4 20Z" fill="white" fillOpacity="0.3" />
                     
-                    {iconUrl ? (
-                        <foreignObject x="12" y="12" width="40" height="40">
-                             <img src={iconUrl} alt={title} className="w-full h-full object-contain" />
-                        </foreignObject>
-                    ) : (
-                        FALLBACK_ICONS[gradient]
-                    )}
+                    {FALLBACK_ICONS[gradient]}
                 </g>
             </svg>
         </button>
