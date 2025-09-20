@@ -82,11 +82,11 @@ export const MessageInput: React.FC = () => {
                 onChange={(e) => setText(e.target.value)}
                 onKeyDown={handleKeyPress}
                 placeholder="Imagine Something...✦˚"
-                className="message-input-textarea min-h-[30px] max-h-24 p-1.5"
+                className="message-input-textarea min-h-[15px] max-h-12 p-1"
                 disabled={isLoading}
               />
             </div>
-            <div className="flex justify-between items-end p-1.5">
+            <div className="flex justify-between items-end p-1">
               <div className="flex items-center gap-2">
                 <input
                   type="file"

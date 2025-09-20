@@ -38,7 +38,7 @@ export const Header: React.FC = () => {
   } = useAppContext();
   return (
     <header
-      className="sticky top-0 p-2 flex justify-between items-center md:items-stretch gap-2 flex-shrink-0 z-30 border-b border-white/10 shadow-lg glass-pane rounded-xl p-3 px-4 flex justify-between items-center"
+      className="header-component sticky top-0 py-1 flex justify-between items-center gap-2 flex-shrink-0 z-30 border-b border-white/10 shadow-lg glass-pane rounded-xl px-4 flex justify-between items-center"
       style={{
         background: "rgba(33, 33, 33, 0.7)",
         backdropFilter: "blur(10px)",
@@ -50,7 +50,7 @@ export const Header: React.FC = () => {
       </div>
 
       <div className="flex-1 md:w-[50%] flex flex-col">
-        <div className="flex items-center justify-center md:h-[40%]">
+        <div className="flex items-center justify-center">
           <h1
             className="text-2xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-indigo-400 via-cyan-400 to-indigo-400"
             style={{

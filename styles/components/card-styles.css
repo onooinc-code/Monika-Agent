@@ -1,0 +1,44 @@
+/* Agent and Manager Card Styles - Neon Enhancements */
+
+.card-bottom-line,
+.agent-header-underline,
+.manager-header-underline,
+.stat-underline,
+.manager-stat-underline,
+.manager-placeholder-underline {
+  box-shadow: 
+    0 0 5px currentColor,
+    0 0 10px currentColor,
+    0 0 15px currentColor,
+    0 0 20px currentColor;
+  animation: neon-flash-slow 2s ease-in-out infinite;
+  opacity: 0.8;
+}
+
+.card-bottom-line:hover,
+.agent-header-underline:hover,
+.manager-header-underline:hover,
+.stat-underline:hover,
+.manager-stat-underline:hover,
+.manager-placeholder-underline:hover {
+  opacity: 1;
+  animation-duration: 1s;
+}
+
+.stats-grid,
+.manager-stats-grid {
+  position: relative;
+}
+
+.stats-grid::after,
+.manager-stats-grid::after {
+  content: '';
+  position: absolute;
+  bottom: -2px;
+  left: 0;
+  right: 0;
+  height: 1px;
+  background: linear-gradient(to right, #F59E0B, #D97706);
+  box-shadow: 0 0 5px #F59E0B;
+  opacity: 0.5;
+}
