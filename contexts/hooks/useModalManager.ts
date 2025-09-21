@@ -52,6 +52,7 @@ export const useModalManager = () => {
     });
     const [isSidebarOpen, setIsSidebarOpen] = useState(false);
     const [isSidebarPinned, setIsSidebarPinned] = useState(false);
+    const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
 
     const handleShowHtmlPreview = (html: string) => {
         setHtmlPreviewContent(html);

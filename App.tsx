@@ -25,6 +25,7 @@ import { ContextMenuItem } from './types/index.ts';
 import { PlusIcon, SettingsIcon, AlignLeftIcon } from './components/Icons.tsx';
 import { AgentSettingsModal } from './components/AgentSettingsModal.tsx';
 import { SidebarToggler } from './components/SidebarToggler.tsx';
+import { AuthModal } from './components/auth/AuthModal.tsx';
 
 export default function App() {
   const { 
@@ -45,6 +46,8 @@ export default function App() {
     handleNewConversation,
     setIsArchiveOpen,
     isSidebarOpen,
+    isAuthModalOpen,
+    setIsAuthModalOpen,
   } = useAppContext();
 
   // Scroll to bottom of messages on new message
