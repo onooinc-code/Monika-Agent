@@ -137,5 +137,6 @@ export const useModalManager = () => {
         contextMenuState, openContextMenu, closeContextMenu,
         isSidebarOpen, setIsSidebarOpen,
         isSidebarPinned, setIsSidebarPinned,
+        isAuthModalOpen, setIsAuthModalOpen,
     };
 };

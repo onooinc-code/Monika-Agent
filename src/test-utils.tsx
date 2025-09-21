@@ -2,9 +2,14 @@
 import React from 'react';
 import { render } from '@testing-library/react';
 import { AppProvider } from '../contexts/StateProvider';
+import { AuthProvider } from '../contexts/hooks/auth/useAuth.tsx';
 
 const AllTheProviders = ({ children }) => {
-  return <AppProvider>{children}</AppProvider>;
+  return (
+    <AuthProvider>
+      <AppProvider>{children}</AppProvider>
+    </AuthProvider>
+  );
 };
 
 const customRender = (ui, options) =>

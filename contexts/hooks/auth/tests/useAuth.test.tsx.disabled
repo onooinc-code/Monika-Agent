@@ -1,0 +1,73 @@
+import { renderHook, act } from '@testing-library/react';
+import { describe, it, expect, vi, beforeEach } from 'vitest';
+import { AuthProvider, useAuth } from '../useAuth.tsx';
+import { supabase } from '../../../../services/supabaseClient';
+import { ReactNode } from 'react';
+
+// Mock the supabase client
+vi.mock('../../../../services/supabaseClient', () => ({
+  supabase: {
+    auth: {
+      getSession: vi.fn(),
+      onAuthStateChange: vi.fn(),
+      signUp: vi.fn(),
+      signInWithPassword: vi.fn(),
+      signOut: vi.fn(),
+    },
+  },
+}));
+
+// Wrapper component that provides the AuthContext
+const wrapper = ({ children }: { children: ReactNode }) => (
+  <AuthProvider>{children}</AuthProvider>
+);
+
+describe('useAuth Hook', () => {
+  beforeEach(() => {
+    // Reset mocks before each test
+    vi.mocked(supabase.auth.getSession).mockResolvedValue({ data: { session: null }, error: null });
+    vi.mocked(supabase.auth.onAuthStateChange).mockReturnValue({ data: { subscription: { unsubscribe: vi.fn() } } } as any);
+    vi.mocked(supabase.auth.signUp).mockClear();
+    vi.mocked(supabase.auth.signInWithPassword).mockClear();
+    vi.mocked(supabase.auth.signOut).mockClear();
+  });
+
+  it('should start with no user and session', async () => {
+    const { result } = renderHook(() => useAuth(), { wrapper });
+    expect(result.current.user).toBeNull();
+    expect(result.current.session).toBeNull();
+    expect(result.current.loading).toBe(false);
+  });
+
+  it('should call supabase.auth.signUp', async () => {
+    const { result } = renderHook(() => useAuth(), { wrapper });
+    const credentials = { email: 'test@example.com', password: 'password123' };
+
+    await act(async () => {
+      await result.current.signUp(credentials);
+    });
+
+    expect(supabase.auth.signUp).toHaveBeenCalledWith(credentials);
+  });
+
+  it('should call supabase.auth.signInWithPassword', async () => {
+    const { result } = renderHook(() => useAuth(), { wrapper });
+    const credentials = { email: 'test@example.com', password: 'password123' };
+
+    await act(async () => {
+      await result.current.signInWithPassword(credentials);
+    });
+
+    expect(supabase.auth.signInWithPassword).toHaveBeenCalledWith(credentials);
+  });
+
+  it('should call supabase.auth.signOut', async () => {
+    const { result } = renderHook(() => useAuth(), { wrapper });
+
+    await act(async () => {
+      await result.current.signOut();
+    });
+
+    expect(supabase.auth.signOut).toHaveBeenCalled();
+  });
+});

@@ -176,6 +176,7 @@ export default function App() {
         <MessageArchiveModal />
         <ContextMenu />
         <AgentSettingsModal />
+        <AuthModal isOpen={isAuthModalOpen} onClose={() => setIsAuthModalOpen(false)} />
     </div>
   );
 }
