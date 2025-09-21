@@ -9,6 +9,7 @@
     "test": "npx cross-env NODE_ENV=test npx vitest"
   },
   "dependencies": {
+    "@genkit-ai/mcp": "^1.19.3",
     "@google/genai": "^1.20.0",
     "@novu/react": "^3.9.3",
     "@supabase/supabase-js": "^2.57.4",

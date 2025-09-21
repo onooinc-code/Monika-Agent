@@ -1,0 +1,37 @@
+{
+  "manifest_version": 3,
+  "name": "Monica-Ext",
+  "version": "1.0.0",
+  "description": "Browser extension with action management and status tracking",
+  "permissions": [
+    "activeTab",
+    "tabs",
+    "storage",
+    "webNavigation",
+    "scripting"
+  ],
+  "host_permissions": [
+    "http://*/*",
+    "https://*/*"
+  ],
+  "action": {
+    "default_popup": "popup.html",
+    "default_title": "Monica-Ext"
+  },
+  "background": {
+    "service_worker": "background.js"
+  },
+  "content_scripts": [
+    {
+      "matches": ["http://*/*", "https://*/*"],
+      "js": ["content.js"],
+      "run_at": "document_end"
+    }
+  ],
+  "web_accessible_resources": [
+    {
+      "resources": ["api-server.js"],
+      "matches": ["http://*/*", "https://*/*"]
+    }
+  ]
+}

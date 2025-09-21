@@ -1,0 +1,278 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Monica-Ext</title>
+    <style>
+        body {
+            width: 600px;
+            min-height: 400px;
+            margin: 0;
+            padding: 20px;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: #f5f5f5;
+        }
+
+        .container {
+            display: flex;
+            height: 100%;
+            gap: 20px;
+        }
+
+        .column {
+            flex: 1;
+            background: white;
+            border-radius: 8px;
+            padding: 16px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            overflow-y: auto;
+        }
+
+        .column-header {
+            font-weight: 600;
+            margin-bottom: 16px;
+            color: #333;
+            font-size: 14px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            text-align: center;
+            border-bottom: 2px solid #e0e0e0;
+            padding-bottom: 8px;
+        }
+
+        .action-row {
+            display: flex;
+            align-items: center;
+            padding: 12px;
+            margin-bottom: 12px;
+            border: 1px solid #e0e0e0;
+            border-radius: 8px;
+            background: #fafafa;
+            transition: all 0.2s ease;
+        }
+
+        .action-row:hover {
+            background: #f0f0f0;
+            border-color: #007bff;
+        }
+
+        .action-row.success {
+            background: #f8fff8;
+            border-color: #28a745;
+        }
+
+        .action-row.error {
+            background: #fff8f8;
+            border-color: #dc3545;
+        }
+
+        .action-row.pending {
+            background: #fffef8;
+            border-color: #ffc107;
+        }
+
+        .action-button {
+            background: #007bff;
+            color: white;
+            border: none;
+            border-radius: 6px;
+            padding: 10px 16px;
+            cursor: pointer;
+            font-size: 13px;
+            font-weight: 500;
+            transition: all 0.2s ease;
+            min-width: 80px;
+        }
+
+        .action-button:hover:not(:disabled) {
+            background: #0056b3;
+            transform: translateY(-1px);
+        }
+
+        .action-button:disabled {
+            background: #6c757d;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .action-button:active:not(:disabled) {
+            transform: translateY(0);
+        }
+
+        .action-status {
+            flex: 1;
+            font-size: 13px;
+            font-weight: 500;
+            text-align: center;
+            padding: 0 12px;
+            min-height: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .status-indicator {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 4px 8px;
+            border-radius: 12px;
+            font-size: 11px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .status-ready {
+            background: #e9ecef;
+            color: #495057;
+        }
+
+        .status-pending {
+            background: #fff3cd;
+            color: #856404;
+        }
+
+        .status-success {
+            background: #d4edda;
+            color: #155724;
+        }
+
+        .status-error {
+            background: #f8d7da;
+            color: #721c24;
+        }
+
+        .action-value {
+            font-size: 13px;
+            color: #333;
+            font-weight: 500;
+            font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace;
+            background: #f8f9fa;
+            padding: 8px 12px;
+            border-radius: 4px;
+            border: 1px solid #dee2e6;
+            min-width: 100px;
+            text-align: center;
+        }
+
+        .action-value:empty::before {
+            content: '-';
+            color: #6c757d;
+        }
+
+        /* Responsive design */
+        @media (max-width: 700px) {
+            body {
+                width: 100%;
+                min-width: 320px;
+            }
+
+            .container {
+                flex-direction: column;
+                gap: 12px;
+            }
+
+            .column {
+                min-height: 200px;
+            }
+
+            .action-row {
+                flex-direction: column;
+                gap: 8px;
+                align-items: stretch;
+            }
+
+            .action-button {
+                width: 100%;
+            }
+
+            .action-status {
+                text-align: center;
+                padding: 8px 0;
+            }
+
+            .action-value {
+                width: 100%;
+                min-width: auto;
+            }
+        }
+
+        @media (max-width: 480px) {
+            body {
+                padding: 12px;
+            }
+
+            .column {
+                padding: 12px;
+            }
+
+            .column-header {
+                font-size: 12px;
+            }
+        }
+
+        /* Loading spinner */
+        .spinner {
+            display: inline-block;
+            width: 12px;
+            height: 12px;
+            border: 2px solid #f3f3f3;
+            border-top: 2px solid #007bff;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        /* Scrollbar styling */
+        .column::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        .column::-webkit-scrollbar-track {
+            background: #f1f1f1;
+            border-radius: 3px;
+        }
+
+        .column::-webkit-scrollbar-thumb {
+            background: #c1c1c1;
+            border-radius: 3px;
+        }
+
+        .column::-webkit-scrollbar-thumb:hover {
+            background: #a8a8a8;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="column">
+            <div class="column-header">Action Button</div>
+            <div id="action-buttons">
+                <!-- Action buttons will be populated by JavaScript -->
+            </div>
+        </div>
+
+        <div class="column">
+            <div class="column-header">Action Status</div>
+            <div id="action-status">
+                <!-- Action status will be populated by JavaScript -->
+            </div>
+        </div>
+
+        <div class="column">
+            <div class="column-header">Action Value</div>
+            <div id="action-values">
+                <!-- Action values will be populated by JavaScript -->
+            </div>
+        </div>
+    </div>
+
+    <script src="popup.js"></script>
+</body>
+</html>

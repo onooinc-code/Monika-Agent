@@ -1,0 +1,317 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test Page for Action 4 - Conversation Title Extraction</title>
+    <meta property="og:title" content="Test Chat Conversation">
+    <meta name="twitter:title" content="Test Chat Title">
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+            background-color: #f5f5f5;
+        }
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        .test-section {
+            margin-bottom: 30px;
+            padding: 20px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+        }
+        .test-title {
+            font-size: 18px;
+            font-weight: bold;
+            margin-bottom: 10px;
+            color: #333;
+        }
+        .chat-header {
+            background: #007bff;
+            color: white;
+            padding: 15px;
+            border-radius: 5px;
+            margin-bottom: 20px;
+        }
+        .breadcrumb {
+            background: #e9ecef;
+            padding: 10px;
+            border-radius: 5px;
+            margin-bottom: 20px;
+        }
+        .chat-title {
+            font-size: 24px;
+            font-weight: bold;
+            margin: 10px 0;
+        }
+        .conversation-title {
+            font-size: 20px;
+            color: #666;
+            margin: 5px 0;
+        }
+        .test-button {
+            background: #28a745;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            margin: 5px;
+        }
+        .test-button:hover {
+            background: #218838;
+        }
+        .test-button:disabled {
+            background: #6c757d;
+            cursor: not-allowed;
+        }
+        .status {
+            margin-top: 10px;
+            padding: 10px;
+            border-radius: 5px;
+        }
+        .status.pending {
+            background: #fff3cd;
+            color: #856404;
+        }
+        .status.success {
+            background: #d4edda;
+            color: #155724;
+        }
+        .status.error {
+            background: #f8d7da;
+            color: #721c24;
+        }
+        .result {
+            margin-top: 10px;
+            padding: 10px;
+            background: #f8f9fa;
+            border-radius: 5px;
+            font-family: monospace;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Test Page for Action 4 - Conversation Title Extraction</h1>
+        <p>This page contains various elements that Action 4 should be able to extract titles from.</p>
+
+        <!-- Test Section 1: Chat Header -->
+        <div class="test-section">
+            <div class="test-title">Test 1: Chat Header Title</div>
+            <div class="chat-header">
+                <h1 class="chat-title">AI Assistant Chat - Project Planning Discussion</h1>
+                <div class="conversation-title">Planning the next development sprint</div>
+            </div>
+            <button class="test-button" onclick="testTitleExtraction('Chat Header')">Test Chat Header</button>
+            <div id="result1" class="result"></div>
+        </div>
+
+        <!-- Test Section 2: Breadcrumb Navigation -->
+        <div class="test-section">
+            <div class="test-title">Test 2: Breadcrumb Navigation</div>
+            <div class="breadcrumb">
+                <nav aria-label="breadcrumb">
+                    <span>Dashboard</span> > <span>Projects</span> > <span>AI Chat Application</span> > <span>Current Conversation</span>
+                </nav>
+            </div>
+            <button class="test-button" onclick="testTitleExtraction('Breadcrumb')">Test Breadcrumb</button>
+            <div id="result2" class="result"></div>
+        </div>
+
+        <!-- Test Section 3: URL-based Title -->
+        <div class="test-section">
+            <div class="test-title">Test 3: URL-based Title Extraction</div>
+            <p>Current URL: <span id="current-url"></span></p>
+            <button class="test-button" onclick="testTitleExtraction('URL')">Test URL-based</button>
+            <div id="result3" class="result"></div>
+        </div>
+
+        <!-- Test Section 4: Meta Tags -->
+        <div class="test-section">
+            <div class="test-title">Test 4: Meta Tag Title</div>
+            <p>Meta tags are already set in the head section.</p>
+            <button class="test-button" onclick="testTitleExtraction('Meta Tags')">Test Meta Tags</button>
+            <div id="result4" class="result"></div>
+        </div>
+
+        <!-- Test Section 5: Generic Page Title -->
+        <div class="test-section">
+            <div class="test-title">Test 5: Generic Page Title</div>
+            <p>Document title: <span id="page-title"></span></p>
+            <button class="test-button" onclick="testTitleExtraction('Page Title')">Test Page Title</button>
+            <div id="result5" class="result"></div>
+        </div>
+
+        <!-- Test Section 6: No Title Available -->
+        <div class="test-section">
+            <div class="test-title">Test 6: No Title Available</div>
+            <p>This section has no specific title elements.</p>
+            <button class="test-button" onclick="testTitleExtraction('No Title')">Test No Title</button>
+            <div id="result6" class="result"></div>
+        </div>
+
+        <!-- Status Display -->
+        <div class="test-section">
+            <div class="test-title">Test Status</div>
+            <div id="test-status" class="status">Ready to test</div>
+        </div>
+    </div>
+
+    <script>
+        // Set current URL and page title for display
+        document.getElementById('current-url').textContent = window.location.href;
+        document.getElementById('page-title').textContent = document.title;
+
+        async function testTitleExtraction(testType) {
+            const button = event.target;
+            const resultDiv = document.getElementById(`result${getTestNumber(testType)}`);
+
+            // Disable button and show pending status
+            button.disabled = true;
+            button.textContent = 'Testing...';
+            document.getElementById('test-status').className = 'status pending';
+            document.getElementById('test-status').textContent = `Testing ${testType}...`;
+
+            try {
+                // Simulate the title extraction process
+                const result = await simulateTitleExtraction(testType);
+
+                // Display result
+                resultDiv.innerHTML = `<strong>Result:</strong> ${JSON.stringify(result, null, 2)}`;
+
+                if (result.success) {
+                    document.getElementById('test-status').className = 'status success';
+                    document.getElementById('test-status').textContent = `Success: ${result.title}`;
+                } else {
+                    document.getElementById('test-status').className = 'status error';
+                    document.getElementById('test-status').textContent = `Error: ${result.error}`;
+                }
+
+            } catch (error) {
+                resultDiv.innerHTML = `<strong>Error:</strong> ${error.message}`;
+                document.getElementById('test-status').className = 'status error';
+                document.getElementById('test-status').textContent = `Error: ${error.message}`;
+            } finally {
+                // Re-enable button
+                button.disabled = false;
+                button.textContent = `Test ${testType}`;
+            }
+        }
+
+        function getTestNumber(testType) {
+            const testMap = {
+                'Chat Header': 1,
+                'Breadcrumb': 2,
+                'URL': 3,
+                'Meta Tags': 4,
+                'Page Title': 5,
+                'No Title': 6
+            };
+            return testMap[testType] || 1;
+        }
+
+        async function simulateTitleExtraction(testType) {
+            // Simulate 3-second timeout as per Action 4 requirements
+            await new Promise(resolve => setTimeout(resolve, 3000));
+
+            switch (testType) {
+                case 'Chat Header':
+                    return {
+                        success: true,
+                        title: 'AI Assistant Chat - Project Planning Discussion',
+                        titleFound: true,
+                        titleSource: 'chat_header',
+                        titleSelector: 'h1.chat-title',
+                        titleLength: 48
+                    };
+
+                case 'Breadcrumb':
+                    return {
+                        success: true,
+                        title: 'Current Conversation',
+                        titleFound: true,
+                        titleSource: 'breadcrumb',
+                        titleSelector: 'nav[aria-label="breadcrumb"]',
+                        titleLength: 19
+                    };
+
+                case 'URL':
+                    const url = window.location.href;
+                    const urlMatch = url.match(/\/([^\/]+)\.html$/);
+                    if (urlMatch && urlMatch[1]) {
+                        return {
+                            success: true,
+                            title: urlMatch[1].replace(/[-_]/g, ' '),
+                            titleFound: true,
+                            titleSource: 'url_extraction',
+                            titleSelector: 'url',
+                            titleLength: urlMatch[1].length
+                        };
+                    }
+                    return {
+                        success: false,
+                        error: 'No title found in URL'
+                    };
+
+                case 'Meta Tags':
+                    const metaTitle = document.querySelector('meta[property="og:title"]')?.content ||
+                                    document.querySelector('meta[name="twitter:title"]')?.content ||
+                                    document.title;
+                    return {
+                        success: true,
+                        title: metaTitle,
+                        titleFound: true,
+                        titleSource: 'meta_tags',
+                        titleSelector: 'meta[property="og:title"]',
+                        titleLength: metaTitle.length
+                    };
+
+                case 'Page Title':
+                    return {
+                        success: true,
+                        title: document.title,
+                        titleFound: true,
+                        titleSource: 'page_title',
+                        titleSelector: 'document.title',
+                        titleLength: document.title.length
+                    };
+
+                case 'No Title':
+                    return {
+                        success: false,
+                        error: 'No conversation title found'
+                    };
+
+                default:
+                    return {
+                        success: false,
+                        error: 'Unknown test type'
+                    };
+            }
+        }
+
+        // Add some test data to make the page more realistic
+        document.addEventListener('DOMContentLoaded', () => {
+            // Add some chat-like content
+            const chatContent = document.createElement('div');
+            chatContent.className = 'test-section';
+            chatContent.innerHTML = `
+                <div class="test-title">Chat Content Area</div>
+                <div style="padding: 15px; background: #f8f9fa; border-radius: 5px;">
+                    <div style="margin-bottom: 10px;"><strong>User:</strong> Hello, can you help me plan the next development sprint?</div>
+                    <div style="margin-bottom: 10px;"><strong>AI:</strong> I'd be happy to help you plan the next development sprint. What specific goals do you have in mind?</div>
+                    <div style="margin-bottom: 10px;"><strong>User:</strong> We need to implement the conversation title extraction feature.</div>
+                </div>
+            `;
+            document.querySelector('.container').appendChild(chatContent);
+        });
+    </script>
+</body>
+</html>

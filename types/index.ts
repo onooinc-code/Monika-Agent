@@ -10,3 +10,4 @@ export * from './memory.ts';
 export * from './plan.ts';
 export * from './utils.ts';
 export * from './ui.ts';
+export * from './aiStudio.ts';
