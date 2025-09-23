@@ -1,5 +1,5 @@
 import React, { createContext, useContext, useRef, useCallback, useState } from 'react';
-import { Agent, AgentManager, ConversationMode, Attachment, ManualSuggestion, HistoryView, Conversation, PipelineStep, UsageMetrics, Message, LongTermMemoryData, BubbleSettings, ContextMenuItem, SoundEvent } from '../types/index.ts';
+import { Agent, AgentManager, ConversationMode, Attachment, ManualSuggestion, HistoryView, Conversation, PipelineStep, UsageMetrics, Message, LongTermMemoryData, BubbleSettings, ContextMenuItem, SoundEvent, CustomComponent, HtmlComponent } from '../types/index.ts';
 import { useLocalStorage } from '../hooks/useLocalStorage.ts';
 import { useConversationManager } from './hooks/useConversationManager.ts';
 import { useChatHandler, LoadingStage } from './hooks/useChatHandler.ts';
@@ -161,6 +161,22 @@ interface AppState {
     // Components Gallery Modal
     isComponentsGalleryOpen: boolean;
     setIsComponentsGalleryOpen: (isOpen: boolean) => void;
+    isAddComponentModalOpen: boolean;
+    setIsAddComponentModalOpen: (isOpen: boolean) => void;
+    isAddHtmlComponentModalOpen: boolean;
+    setIsAddHtmlComponentModalOpen: (isOpen: boolean) => void;
+    customComponents: CustomComponent[];
+    setCustomComponents: React.Dispatch<React.SetStateAction<CustomComponent[]>>;
+    customHtmlComponents: HtmlComponent[];
+    setCustomHtmlComponents: React.Dispatch<React.SetStateAction<HtmlComponent[]>>;
+    handleUpdateHtmlComponent: (component: HtmlComponent) => void;
+    
+    // Edit HTML Component Modal
+    isEditHtmlComponentModalOpen: boolean;
+    editingHtmlComponent: HtmlComponent | null;
+    openEditHtmlComponentModal: (component: HtmlComponent) => void;
+    closeEditHtmlComponentModal: () => void;
+
 
     // UI Preferences
     isPermanentlyVisible: (id: string) => boolean;
@@ -179,6 +195,8 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     const [globalApiKey, setGlobalApiKey] = useLocalStorage<string>('global-api-key', '');
     const [agentBubbleSettings, setAgentBubbleSettings] = useLocalStorage<BubbleSettings>('agent-bubble-settings', { alignment: 'left', scale: 1, textDirection: 'ltr', fontSize: 1 });
     const [userBubbleSettings, setUserBubbleSettings] = useLocalStorage<BubbleSettings>('user-bubble-settings', { alignment: 'right', scale: 1, textDirection: 'ltr', fontSize: 1 });
+    const [customComponents, setCustomComponents] = useLocalStorage<CustomComponent[]>('custom-components', []);
+    const [customHtmlComponents, setCustomHtmlComponents] = useLocalStorage<HtmlComponent[]>('custom-html-components', []);
     
     // 2. Refs & Local State
     const messagesEndRef = useRef<HTMLDivElement>(null);
@@ -275,6 +293,12 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
         setAgentManager(prev => ({ ...prev, ...updates }));
     };
 
+    const handleUpdateHtmlComponent = (updatedComponent: HtmlComponent) => {
+        setCustomHtmlComponents(prev => 
+            prev.map(c => c.id === updatedComponent.id ? updatedComponent : c)
+        );
+    };
+
     // 6. Wrapped modal setters with sound effects
     const createSoundifiedSetter = (setter: (isOpen: boolean) => void) => (isOpen: boolean) => {
         playSound(isOpen ? 'open' : 'close');
@@ -291,6 +315,16 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     const setIsBookmarksPanelOpen = createSoundifiedSetter(modalManager.setIsBookmarksPanelOpen);
     const setIsDeveloperInfoOpen = createSoundifiedSetter(modalManager.setIsDeveloperInfoOpen);
     const setIsComponentsGalleryOpen = createSoundifiedSetter(modalManager.setIsComponentsGalleryOpen);
+    const setIsAddComponentModalOpen = createSoundifiedSetter(modalManager.setIsAddComponentModalOpen);
+    const setIsAddHtmlComponentModalOpen = createSoundifiedSetter(modalManager.setIsAddHtmlComponentModalOpen);
+    const openEditHtmlComponentModal = (component: HtmlComponent) => {
+        playSound('open');
+        modalManager.openEditHtmlComponentModal(component);
+    };
+    const closeEditHtmlComponentModal = () => {
+        playSound('close');
+        modalManager.closeEditHtmlComponentModal();
+    };
 
     const openAgentSettingsModal = (agent: Agent | AgentManager) => {
         playSound('open');
@@ -378,6 +412,10 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
         setIsDeveloperInfoOpen,
         isComponentsGalleryOpen: modalManager.isComponentsGalleryOpen,
         setIsComponentsGalleryOpen,
+        isAddComponentModalOpen: modalManager.isAddComponentModalOpen,
+        setIsAddComponentModalOpen,
+        isAddHtmlComponentModalOpen: modalManager.isAddHtmlComponentModalOpen,
+        setIsAddHtmlComponentModalOpen,
 
 
         // Message actions from useConversationManager
@@ -440,6 +478,19 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
         selectedAgentForModal: modalManager.selectedAgentForModal,
         openAgentSettingsModal,
         closeAgentSettingsModal,
+        
+        // Custom Components
+        customComponents,
+        setCustomComponents,
+        customHtmlComponents,
+        setCustomHtmlComponents,
+        handleUpdateHtmlComponent,
+
+        // Edit HTML Component Modal
+        isEditHtmlComponentModalOpen: modalManager.isEditHtmlComponentModalOpen,
+        editingHtmlComponent: modalManager.editingHtmlComponent,
+        openEditHtmlComponentModal,
+        closeEditHtmlComponentModal,
 
         // UI Preferences
         isPermanentlyVisible: uiPrefsManager.isPermanentlyVisible,

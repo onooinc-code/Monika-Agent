@@ -1,0 +1,495 @@
+
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>خارطة طريق معرض المكونات المتقدم</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        :root {
+            --font-sans: 'Inter', sans-serif;
+            --color-bg: #0a0a0f;
+            --color-pane: rgba(23, 26, 43, 0.7);
+            --color-border: rgba(129, 140, 248, 0.2);
+            --color-neon-indigo: rgba(129, 140, 248, 1);
+            --color-neon-cyan: rgba(34, 211, 238, 1);
+        }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+        @keyframes popIn { 0% { opacity: 0; transform: scale(0.8); } 100% { opacity: 1; transform: scale(1); } }
+
+        body {
+            font-family: 'Cairo', var(--font-sans);
+            background-color: var(--color-bg);
+            color: #e5e7eb;
+            font-size: 17px;
+            line-height: 1.8;
+        }
+        .glass-pane {
+            background-color: var(--color-pane);
+            backdrop-filter: blur(16px) saturate(180%);
+            -webkit-backdrop-filter: blur(16px) saturate(180%);
+            border: 1px solid var(--color-border);
+        }
+        details.category > summary {
+            cursor: pointer;
+            padding: 1rem 1.5rem;
+            border-radius: 0.75rem;
+            background-color: rgba(129, 140, 248, 0.1);
+            transition: all 0.2s ease;
+            font-weight: 600;
+            font-size: 1.25rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            list-style: none; /* Hide default marker */
+        }
+        details.category > summary::-webkit-details-marker { display: none; } /* Hide default marker for Chrome */
+        details.category > summary:hover {
+            background-color: rgba(129, 140, 248, 0.2);
+            box-shadow: 0 0 15px rgba(129, 140, 248, 0.2);
+        }
+        details.category[open] > summary {
+            border-bottom-left-radius: 0;
+            border-bottom-right-radius: 0;
+            background-color: rgba(129, 140, 248, 0.25);
+        }
+        .summary-arrow { transition: transform 0.3s ease; }
+        details.category[open] .summary-arrow { transform: rotate(180deg); }
+        .feedback-popup {
+            position: fixed;
+            bottom: 2rem;
+            left: 50%;
+            transform: translateX(-50%);
+            padding: 0.75rem 1.5rem;
+            border-radius: 0.5rem;
+            background-color: #22c55e;
+            color: white;
+            font-weight: 600;
+            z-index: 100;
+            opacity: 0;
+            animation: popIn 0.3s ease-out forwards;
+        }
+        .feature-item {
+            border-right: 4px solid var(--color-border);
+            transition: all 0.3s ease;
+        }
+        .feature-item.status-done {
+            border-right-color: #22c55e; /* green-500 */
+            background-color: rgba(34, 197, 94, 0.05);
+        }
+        .feature-item.status-done .feature-text {
+            text-decoration: line-through;
+            color: #6b7280; /* gray-500 */
+        }
+        .feature-item.status-blocked {
+            border-right-color: #f97316; /* orange-500 */
+            background-color: rgba(249, 115, 22, 0.05);
+        }
+        .feature-item.status-blocked .feature-text {
+             color: #9ca3af; /* gray-400 */
+        }
+        
+        details.prompts-details > summary {
+            font-size: 0.875rem;
+            font-weight: 500;
+            padding: 0.5rem 0.75rem;
+            background-color: rgba(0,0,0,0.15);
+        }
+         details.prompts-details > summary:hover {
+            background-color: rgba(0,0,0,0.3);
+        }
+        details.prompts-details[open] > summary {
+            background-color: rgba(0,0,0,0.3);
+        }
+    </style>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body class="p-4 sm:p-6 lg:p-8">
+
+    <main class="max-w-screen-xl mx-auto space-y-8">
+        <header class="glass-pane rounded-xl p-8 text-center">
+            <h1 class="text-4xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-indigo-400 via-cyan-400 to-indigo-400">خارطة طريق ميزات معرض المكونات المتقدم</h1>
+            <p class="mt-2 text-lg text-gray-300">أداة تفاعلية لتتبع وإدارة وتوليد الأوامر البرمجية لميزات المعرض.</p>
+        </header>
+
+        <div class="space-y-4" id="features-container">
+            <!-- Categories will be injected by JS -->
+        </div>
+    </main>
+
+    <div id="sticky-footer" class="sticky bottom-4 z-50 transition-transform duration-300">
+        <div class="max-w-screen-lg mx-auto glass-pane rounded-xl p-3 flex items-center justify-between gap-4">
+            <div>
+                <span class="font-bold text-gray-200">المحدد:</span>
+                <span id="selection-count" class="font-mono font-bold text-cyan-400">0</span>
+            </div>
+            <div class="flex items-center gap-2">
+                <button id="clear-selection-btn" class="px-4 py-2 rounded-lg font-semibold bg-slate-600/50 hover:bg-slate-500/50 text-gray-200 transition-colors">مسح التحديد</button>
+                <button id="copy-selected-btn" class="px-4 py-2 rounded-lg font-semibold bg-indigo-600 hover:bg-indigo-700 text-white transition-colors">نسخ المحدد</button>
+            </div>
+        </div>
+    </div>
+    
+    <div id="feedback-container"></div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const featuresData = [
+                {
+                    category: 'التصميم العام والواجهة الذكية',
+                    features: [
+                        { id: 1, text: "تصميم بملء الشاشة: المعرض يفتح في نافذة بملء الشاشة لتقديم تجربة غامرة وخالية من المشتتات، مما يسمح بالتركيز الكامل على المكونات." },
+                        { id: 2, text: "شريط جانبي للبحث والتصفية: يمكنك البحث عن أي مكون بالاسم أو الوصف، وتصفية المكونات حسب الفئة (أزرار، نوافذ، مدخلات، إلخ)." },
+                        { id: 3, text: "لوحة المعاينة التفاعلية: هنا يتم عرض المكون المختار بشكل حي. يمكنك تغيير حجم نافذة العرض لمحاكاة شاشات مختلفة (سطح مكتب، جهاز لوحي، جوال)." },
+                    ]
+                },
+                {
+                    category: 'أدوات المطور: تبويب الخصائص (Props)',
+                    features: [
+                        { id: 4, text: "محرر حي: قم بتغيير خصائص المكون (مثل النصوص، الألوان، الحالة) وشاهد التغييرات تحدث فورًا في لوحة المعاينة." },
+                        { id: 5, text: "عرض الأنواع والافتراضيات: شاهد نوع كل خاصية (نص، رقم، اختيار) وقيمتها الافتراضية." },
+                        { id: 6, text: "زر إعادة التعيين: زر لإعادة جميع الخصائص إلى حالتها الافتراضية." }
+                    ]
+                },
+                {
+                    category: 'أدوات المطور: تبويب الكود (Code)',
+                    features: [
+                        { id: 7, text: "عرض JSX و CSS: شاهد كود JSX اللازم لاستخدام المكون وأهم كلاسات CSS التي يعتمد عليها." },
+                        { id: 8, text: "نسخ بنقرة واحدة: أزرار لنسخ الكود بسهولة لاستخدامه في مشروعك." },
+                        { id: 9, text: "عرض مسار الملف: عرض المسار الكامل لملف المكون داخل المشروع." }
+                    ]
+                },
+                {
+                    category: 'أدوات المطور: تبويب التخصيص (Theming)',
+                    features: [
+                        { id: 10, text: "متحكمات حية: قم بتغيير متغيرات CSS الرئيسية للتطبيق (مثل لون الخلفية، لون اللوحة الزجاجية، لون التوهج) باستخدام منتقي الألوان وشاهد كيف يؤثر ذلك على المكون." },
+                        { id: 11, text: "التحكم في الخطوط: غير حجم الخط الأساسي ونوع الخط لرؤية تأثير ذلك على قابلية القراءة." }
+                    ]
+                },
+                {
+                    category: 'أدوات المطور: تبويب الوصولية (Accessibility)',
+                    features: [
+                        { id: 12, text: "فحص آلي (محاكاة): زر يقوم بمحاكاة فحص الوصولية ويعرض تقريرًا فوريًا عن التباين اللوني، وسمات ARIA، وقابلية الاستخدام عبر لوحة المفاتيح." },
+                        { id: 13, text: "عرض سمات ARIA: قائمة بالسمات الهامة للوصولية التي يستخدمها المكون." }
+                    ]
+                },
+                {
+                    category: 'ميزات إضافية ذكية',
+                    features: [
+                        { id: 14, text: "وضع الأشعة السينية (X-ray Mode): زر يضيف حدودًا ملونة حول المكون وأجزائه الداخلية لفهم هيكله وتخطيطه." },
+                        { id: 15, text: "قياس الأداء (محاكاة): عرض وقت العرض (Render Time) التقديري للمكون." },
+                        { id: 16, text: "إضافة للمفضلة: يمكنك تمييز المكونات التي تستخدمها بكثرة للوصول إليها بسرعة." }
+                    ]
+                }
+            ];
+
+            const container = document.getElementById('features-container');
+            const selectionCountEl = document.getElementById('selection-count');
+            const copySelectedBtn = document.getElementById('copy-selected-btn');
+            const clearSelectionBtn = document.getElementById('clear-selection-btn');
+            const feedbackContainer = document.getElementById('feedback-container');
+
+            const saveStatuses = () => {
+                const statuses = {};
+                featuresData.forEach(cat => {
+                    cat.features.forEach(feat => {
+                        statuses[feat.id] = feat.status || 'todo';
+                    });
+                });
+                localStorage.setItem('monicaGalleryFeatureStatuses', JSON.stringify(statuses));
+            };
+
+            const loadStatuses = () => {
+                const savedStatuses = JSON.parse(localStorage.getItem('monicaGalleryFeatureStatuses') || '{}');
+                featuresData.forEach(cat => {
+                    cat.features.forEach(feat => {
+                        feat.status = savedStatuses[feat.id] || 'todo';
+                    });
+                });
+            };
+
+            const generatePrompt = (type, featureText) => {
+                const context = `You are a world-class senior frontend engineer with deep expertise in the Gemini API and UI/UX design. You are working on the "Monica" project, an advanced AI assistant built with React, TypeScript, and Tailwind CSS. The project has a clean three-layer architecture:
+1.  **UI Layer (/components):** Renders UI and captures user input.
+2.  **State & Orchestration Layer (/contexts):** Manages all application state and business logic using React Context and custom hooks.
+3.  **Service Layer (/services):** Handles all external API interactions with the Gemini API.
+
+You must adhere to all project coding standards and architectural principles.`;
+
+                const featureContext = `The specific feature to focus on is: "${featureText}"`;
+
+                const tasks = {
+                    plan: `**Your Task:**
+Generate a detailed, step-by-step implementation plan for this feature.
+- Identify all new or modified files.
+- Specify new functions, components, and state changes.
+- Do NOT write any code. Your output should be the plan only.`,
+
+                    logic: `**Your Task:**
+Define the complete logic, workflow, and code structure required to implement this feature.
+- Describe the data flow.
+- Detail the function signatures and component props.
+- Specify which files to create or modify.
+- Do NOT write the full implementation code, only the structure and definitions.`,
+
+                    execute: `**Your Task:**
+Implement the feature based on a pre-defined plan and code structure. Your goal is to write the complete, production-ready code for all required files. Assume the plan and structure have been approved.`,
+
+                    docs: `**Your Task:**
+Generate comprehensive documentation for this feature. The documentation should be clear, concise, and cover the following sections:
+1.  **Business Requirements:** What the feature does and why it's needed.
+2.  **Technical Logic & Workflow:** A detailed explanation of the implementation.
+3.  **Code Structure:** An overview of the files and components involved.
+4.  **API Interactions:** Details on any calls to the Gemini API.`,
+
+                    unit_test: `**Your Task:**
+Write complete unit tests for all new or modified components and logic for this feature.
+- Use Vitest as the testing framework.
+- Use React Testing Library for component tests.
+- Ensure high test coverage for all functions and edge cases.`,
+
+                    run_unit_test: `**Your Task:**
+Provide clear, step-by-step instructions on how to set up and run the unit tests you previously designed for this feature.
+- Include any necessary setup commands.
+- Provide the exact command to run the tests.
+- Explain how to interpret the test results.`,
+
+                    external_design: `**[CONTEXT FOR EXTERNAL AI]**
+You are an expert AI system designer. You will be given a feature requirement for a web application named "Monica".
+**Application Tech Stack:** React, TypeScript, Tailwind CSS
+**Application Architecture:** A clean three-layer system (UI components, State/Orchestration via React Context, and stateless API services).
+
+**[YOUR TASK]**
+Design and plan the implementation for the following feature. Your output should be a detailed plan that another AI developer can follow. The plan must specify:
+1.  New components to be created.
+2.  Changes to the global state management.
+3.  New API service functions needed.
+
+**Feature to Design:**
+"${featureText}"`,
+
+                    external_review: `**[CONTEXT FOR EXTERNAL AI]**
+You are an expert code reviewer specializing in React and TypeScript applications. You will be given code for a feature implemented in a project named "Monica".
+**Application Tech Stack:** React, TypeScript, Tailwind CSS
+**Application Architecture:** A clean three-layer system (UI components, State/Orchestration via React Context, and stateless API services).
+
+**[YOUR TASK]**
+I am going to provide you with the code that implements the following feature. Please perform a thorough code review. Focus on:
+- Logic correctness and efficiency.
+- Adherence to React best practices and hooks rules.
+- Type safety and code readability.
+- Potential bugs or edge cases.
+
+**Feature to Review:**
+"${featureText}"
+
+Please acknowledge that you are ready, and I will provide the code.`
+                };
+
+                return `${context}\n\n${featureContext}\n\n${tasks[type]}`;
+            };
+
+            const renderFeatures = () => {
+                container.innerHTML = '';
+                featuresData.forEach(category => {
+                    const details = document.createElement('details');
+                    details.className = 'category';
+                    details.open = true;
+
+                    const summary = document.createElement('summary');
+                    summary.innerHTML = `${category.category} <span class="summary-arrow">&#9662;</span>`;
+                    
+                    const contentDiv = document.createElement('div');
+                    contentDiv.className = 'glass-pane p-4 border-t-0 rounded-b-xl space-y-3';
+                    
+                    category.features.forEach(feature => {
+                        const itemDiv = document.createElement('div');
+                        itemDiv.className = `feature-item p-3 rounded-lg flex flex-col gap-2 status-${feature.status}`;
+                        
+                        const mainRow = document.createElement('div');
+                        mainRow.className = 'flex items-center gap-4';
+
+                        const checkbox = document.createElement('input');
+                        checkbox.type = 'checkbox';
+                        checkbox.className = 'mt-1 h-5 w-5 rounded border-gray-500 bg-transparent text-indigo-500 focus:ring-indigo-600 shrink-0';
+                        checkbox.dataset.id = feature.id;
+
+                        const textSpan = document.createElement('span');
+                        textSpan.className = 'feature-text flex-grow text-gray-300';
+                        textSpan.textContent = feature.text;
+                        
+                        const actionsDiv = document.createElement('div');
+                        actionsDiv.className = 'flex items-center gap-1.5 shrink-0';
+                        
+                        const statusButtons = [
+                            { status: 'done', title: 'مكتمل', icon: '✔' },
+                            { status: 'blocked', title: 'مشكلة (تجاهل)', icon: '✖' },
+                            { status: 'todo', title: 'قيد الانتظار', icon: '…' }
+                        ];
+
+                        statusButtons.forEach(btn => {
+                            const button = document.createElement('button');
+                            button.textContent = btn.icon;
+                            button.title = btn.title;
+                            button.dataset.action = 'setStatus';
+                            button.dataset.id = feature.id;
+                            button.dataset.status = btn.status;
+                            
+                            let baseClass = 'h-8 w-8 rounded-full font-bold flex items-center justify-center transition-all duration-200';
+                            let activeClass = '';
+                            if (feature.status === btn.status) {
+                                if (btn.status === 'done') activeClass = 'bg-green-500 text-white scale-110';
+                                else if (btn.status === 'blocked') activeClass = 'bg-orange-500 text-white scale-110';
+                                else activeClass = 'bg-gray-500 text-white scale-110';
+                            } else {
+                                activeClass = 'bg-gray-700/50 text-gray-400 hover:bg-gray-600/50';
+                            }
+                            button.className = `${baseClass} ${activeClass}`;
+                            actionsDiv.appendChild(button);
+                        });
+                        
+                        const copyBtn = document.createElement('button');
+                        copyBtn.innerHTML = 'نسخ';
+                        copyBtn.className = 'px-3 py-1.5 rounded-lg font-semibold bg-slate-600/50 hover:bg-slate-500/50 text-gray-200 transition-colors text-sm';
+                        copyBtn.dataset.action = 'copy';
+                        copyBtn.dataset.id = feature.id;
+                        
+                        mainRow.appendChild(checkbox);
+                        mainRow.appendChild(textSpan);
+                        actionsDiv.appendChild(copyBtn);
+                        mainRow.appendChild(actionsDiv);
+
+                        const promptsDetails = document.createElement('details');
+                        promptsDetails.className = 'prompts-details';
+                        
+                        const promptsSummary = document.createElement('summary');
+                        promptsSummary.textContent = 'مولدات الأوامر المتقدمة';
+                        
+                        const promptsGrid = document.createElement('div');
+                        promptsGrid.className = 'grid grid-cols-2 md:grid-cols-4 gap-2 p-2 mt-2 bg-black/20 rounded-lg';
+                        
+                        const promptButtons = [
+                            { type: 'plan', text: 'بناء خطة' },
+                            { type: 'logic', text: 'تحديد الهيكلية' },
+                            { type: 'execute', text: 'تنفيذ الكود' },
+                            { type: 'docs', text: 'توثيق الميزة' },
+                            { type: 'unit_test', text: 'بناء اختبارات' },
+                            { type: 'run_unit_test', text: 'تشغيل الاختبارات' },
+                            { type: 'external_design', text: 'طلب تصميم خارجي' },
+                            { type: 'external_review', text: 'طلب مراجعة خارجية' }
+                        ];
+
+                        promptButtons.forEach(pBtn => {
+                            const button = document.createElement('button');
+                            button.textContent = pBtn.text;
+                            button.className = 'px-3 py-1.5 rounded-md font-semibold bg-slate-700/70 hover:bg-slate-600/70 text-gray-300 transition-colors text-xs';
+                            button.dataset.action = 'copyPrompt';
+                            button.dataset.promptType = pBtn.type;
+                            button.dataset.id = feature.id;
+                            promptsGrid.appendChild(button);
+                        });
+
+                        promptsDetails.appendChild(promptsSummary);
+                        promptsDetails.appendChild(promptsGrid);
+
+                        itemDiv.appendChild(mainRow);
+                        itemDiv.appendChild(promptsDetails);
+                        contentDiv.appendChild(itemDiv);
+                    });
+                    
+                    details.appendChild(summary);
+                    details.appendChild(contentDiv);
+                    container.appendChild(details);
+                });
+            };
+
+            const showFeedback = (message) => {
+                const popup = document.createElement('div');
+                popup.textContent = message;
+                popup.className = 'feedback-popup';
+                feedbackContainer.appendChild(popup);
+                setTimeout(() => {
+                    popup.style.opacity = '0';
+                    popup.style.transition = 'opacity 0.5s ease';
+                    setTimeout(() => popup.remove(), 500);
+                }, 1500);
+            };
+
+            const copyToClipboard = (text, btn) => {
+                navigator.clipboard.writeText(text).then(() => {
+                    const originalText = btn.textContent;
+                    if (originalText !== 'تم النسخ!') {
+                        btn.textContent = 'تم النسخ!';
+                        btn.classList.add('!bg-green-500', '!text-white');
+                        setTimeout(() => {
+                            btn.textContent = originalText;
+                            btn.classList.remove('!bg-green-500', '!text-white');
+                        }, 1500);
+                    }
+                    showFeedback('تم نسخ النص بنجاح!');
+                });
+            };
+
+            const updateSelectionCount = () => {
+                const count = document.querySelectorAll('input[type="checkbox"]:checked').length;
+                selectionCountEl.textContent = count;
+                copySelectedBtn.disabled = count === 0;
+                clearSelectionBtn.disabled = count === 0;
+            };
+
+            container.addEventListener('click', (e) => {
+                const target = e.target.closest('button, input');
+                if (!target) return;
+                
+                if (target.matches('input[type="checkbox"]')) {
+                    updateSelectionCount();
+                }
+
+                const action = target.dataset.action;
+                if (!action) return;
+
+                const id = target.dataset.id;
+                const feature = featuresData.flatMap(c => c.features).find(f => f.id == id);
+
+                if (action === 'setStatus') {
+                    feature.status = target.dataset.status;
+                    saveStatuses();
+                    renderFeatures();
+                    updateSelectionCount();
+                } else if (action === 'copy') {
+                    copyToClipboard(feature.text, target);
+                } else if (action === 'copyPrompt') {
+                    const promptType = target.dataset.promptType;
+                    const promptText = generatePrompt(promptType, feature.text);
+                    copyToClipboard(promptText, target);
+                }
+            });
+
+            copySelectedBtn.addEventListener('click', (e) => {
+                const selected = Array.from(document.querySelectorAll('input[type="checkbox"]:checked'));
+                if (selected.length === 0) return;
+                
+                const textToCopy = selected.map(checkbox => {
+                    const id = checkbox.dataset.id;
+                    return featuresData.flatMap(c => c.features).find(f => f.id == id).text;
+                }).join('\n- ');
+                
+                copyToClipboard("- " + textToCopy, e.target);
+            });
+
+            clearSelectionBtn.addEventListener('click', () => {
+                document.querySelectorAll('input[type="checkbox"]:checked').forEach(checkbox => checkbox.checked = false);
+                updateSelectionCount();
+            });
+
+            // Initial Load
+            loadStatuses();
+            renderFeatures();
+            updateSelectionCount();
+        });
+    </script>
+</body>
+</html>

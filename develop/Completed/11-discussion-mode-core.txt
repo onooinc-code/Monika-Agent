@@ -1,0 +1,26 @@
+Feature: Moderated Chat Mode
+ID: 11
+
+Description:
+Implement a "Moderated Chat" mode where a dynamic, multi-turn conversation can occur between multiple AI agents, moderated by the AI Agent Manager. This allows for more complex problem-solving where agents can build on, critique, or collaborate on each other's ideas.
+
+Core Functionalities:
+1.  **Mode Activation:**
+    -   Add a toggle or setting within the "Per-Conversation Settings" modal to enable "Moderated Chat".
+    -   When enabled, the normal `Dynamic` and `Continuous` modes are superseded by this new logic.
+
+2.  **Moderation Loop:**
+    -   After a user sends a message, the AI Agent Manager is invoked first.
+    -   The Manager analyzes the conversation state and decides which agent should speak next to advance the discussion.
+    -   The chosen agent generates a response.
+    -   The loop repeats: The Manager analyzes the new state (including the latest agent's response) and decides the next action (another agent speaks, or the conversation pauses for user input).
+
+3.  **Manager's Role:**
+    -   The Manager's primary role is to guide the conversation according to a set of rules or a goal.
+    -   It can critique an agent's response if it's off-topic or unhelpful.
+    -   It decides when the conversation has reached a logical conclusion or requires further input from the user, at which point it will pause the loop.
+
+4.  **UI/UX:**
+    -   Clearly indicate in the UI when "Moderated Chat" mode is active.
+    -   Messages from the Manager (like critiques or decisions) should be visually distinct from regular agent messages.
+    -   The `LiveStatusIndicator` should reflect the current state (e.g., "Manager is moderating...", "Agent X is responding...").

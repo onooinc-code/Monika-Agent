@@ -20,6 +20,13 @@ const HeaderButton: React.FC<{onClick: () => void, disabled?: boolean, title: st
     </button>
 );
 
+const MobileMenuItem: React.FC<{onClick: () => void, children: React.ReactNode, className?: string, disabled?: boolean}> = ({ onClick, children, className, disabled }) => (
+    <button onClick={onClick} disabled={disabled} className={`MobileMenuItem w-full flex items-center gap-3 text-left px-3 py-2 text-sm rounded-md transition-colors text-gray-200 hover:bg-white/10 hover:text-white disabled:opacity-50 disabled:cursor-not-allowed ${className}`}>
+        {children}
+    </button>
+);
+
+
 export const ConversationSubHeader: React.FC<{ conversation: Conversation | null }> = ({ conversation }) => {
     const {
         conversationMode, 
@@ -89,12 +96,6 @@ export const ConversationSubHeader: React.FC<{ conversation: Conversation | null
     };
 
     const bookmarkedCount = activeConversation?.messages.filter(m => m.isBookmarked).length || 0;
-
-    const MobileMenuItem: React.FC<{onClick: () => void, children: React.ReactNode, className?: string, disabled?: boolean}> = ({ onClick, children, className, disabled }) => (
-        <button onClick={onClick} disabled={disabled} className={`MobileMenuItem w-full flex items-center gap-3 text-left px-3 py-2 text-sm rounded-md transition-colors text-gray-200 hover:bg-white/10 hover:text-white disabled:opacity-50 disabled:cursor-not-allowed ${className}`}>
-            {children}
-        </button>
-    );
 
     return (
         <header className="ConversationSubHeader glass-pane rounded-2xl mx-2 md:mx-4 my-2 p-3 flex justify-between items-center flex-shrink-0 z-10 neon-glow-cyan shadow-lg shadow-cyan-500/10">

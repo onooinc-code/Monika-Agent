@@ -1,0 +1,26 @@
+Feature: Automatic Team Generation Wizard
+ID: 14
+
+Description:
+Create a powerful, multi-step wizard that uses AI to generate a complete, brand-new team of specialized agents from a high-level user goal. This automates the most difficult part of setting up the application and showcases the power of AI-driven configuration.
+
+Core Functionalities:
+1.  **Team Generation Modal:**
+    -   Create a new modal, accessible from the main UI, for the Team Generator.
+
+2.  **Phase 1: Goal Definition:**
+    -   The user provides two simple inputs: a "Topic" (e.g., "Quantum Computing") and a "Goal" (e.g., "Create an educational YouTube series for beginners").
+
+3.  **Phase 2: AI-Powered Prompt Generation (Optional Step):**
+    -   The wizard uses AI to turn the simple Topic and Goal into a detailed prompt suitable for generating agent profiles. The user can view and edit this generated prompt.
+
+4.  **Phase 3: AI-Powered Component Generation:**
+    -   The detailed prompt is sent to the Gemini API to generate the core components of a 3-agent team (Name, Job Title, Role, Goals, etc.).
+    -   The UI displays these generated agent "concepts" for user review.
+
+5.  **Phase 4: AI-Powered Finalization:**
+    -   The generated concepts are sent back to the Gemini API one last time to generate the final, detailed fields like the `systemInstruction` and appropriate UI colors for each agent.
+
+6.  **Phase 5: Approval:**
+    -   The final, fully-configured team of agents is displayed to the user.
+    -   An "Approve & Use Team" button allows the user to replace their current set of agents with the newly generated ones, saving them to `localStorage`.

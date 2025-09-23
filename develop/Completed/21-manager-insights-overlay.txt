@@ -1,0 +1,18 @@
+Feature: Manager Insights Overlay
+ID: 21
+
+Description:
+Provide users with the option to see the AI Manager's reasoning and decisions directly in the chat interface. This adds a layer of transparency, helping users understand why certain agents are chosen or why a specific plan is being executed.
+
+Core Functionalities:
+1.  **"Show Manager Insights" Setting:**
+    -   Add a new toggle switch to the "Per-Conversation Settings" modal labeled "Show Manager Insights". This setting should be `false` by default.
+
+2.  **Update Manager Services:**
+    -   Modify the prompts in `managerService.ts` for functions like `generateDynamicPlan` and `moderateTurn`.
+    -   Instruct the AI to include an additional field in its JSON response, such as `rationale`, which contains a brief, user-friendly explanation of its decision-making process.
+
+3.  **Conditional Rendering in UI:**
+    -   In `useChatHandler`, after receiving a response from the manager, check if the "Show Manager Insights" setting is enabled for the current conversation.
+    -   If it is enabled and a `rationale` is present in the response, create a new, specially-styled system message bubble to display this insight to the user before the plan or agent response is shown.
+    -   This insight message bubble should be visually distinct (e.g., using a different color or icon) to differentiate it from regular agent messages.

@@ -1,0 +1,20 @@
+Feature: Dynamic Conversation Flow (Planning)
+ID: 19
+
+Description:
+Implement a "Dynamic" conversation mode where the AI Agent Manager doesn't just pick the next speaker, but formulates a multi-step plan to address the user's request. This is the most advanced mode, enabling the agent team to tackle complex tasks that require sequential actions from different specialists.
+
+Core Functionalities:
+1.  **Plan Generation:**
+    -   When the user sends a message in "Dynamic" mode, the `useChatHandler` will call a new `managerService.generateDynamicPlan` function.
+    -   This service will prompt the Gemini API with the user's request, conversation history, and agent profiles, asking it to return a structured JSON array representing a step-by-step plan.
+    -   Each step in the plan should specify the `agentId` to be used and the `task` for that agent.
+
+2.  **Plan Display:**
+    -   Once the plan is generated, it should be displayed to the user in a new, specialized `PlanDisplay` component within a system message bubble. This informs the user of the AI's intended actions.
+
+3.  **Plan Execution Loop:**
+    -   The `useChatHandler` will then iterate through the steps of the plan.
+    -   For each step, it will invoke the specified agent via `agentService.generateResponse`, passing the task from the plan as a targeted instruction.
+    -   The handler will wait for each step to complete before proceeding to the next, adding each agent's response to the chat.
+    -   The `LiveStatusIndicator` should be updated to show the current step being executed (e.g., "Executing Step 1 of 3: Creative Writer is drafting the intro...").

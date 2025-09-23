@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { PipelineStep, Message, ContextMenuItem, Agent, AgentManager } from '../../types/index.ts';
+import { PipelineStep, Message, ContextMenuItem, Agent, AgentManager, HtmlComponent } from '../../types/index.ts';
 
 export interface ActionModalButton {
     label: string;
@@ -46,6 +46,11 @@ export const useModalManager = () => {
     const [selectedAgentForModal, setSelectedAgentForModal] = useState<Agent | AgentManager | null>(null);
     const [isDeveloperInfoOpen, setIsDeveloperInfoOpen] = useState(false);
     const [isComponentsGalleryOpen, setIsComponentsGalleryOpen] = useState(false);
+    const [isAddComponentModalOpen, setIsAddComponentModalOpen] = useState(false);
+    const [isAddHtmlComponentModalOpen, setIsAddHtmlComponentModalOpen] = useState(false);
+    const [isEditHtmlComponentModalOpen, setIsEditHtmlComponentModalOpen] = useState(false);
+    const [editingHtmlComponent, setEditingHtmlComponent] = useState<HtmlComponent | null>(null);
+
     const [contextMenuState, setContextMenuState] = useState<ContextMenuState>({
         isOpen: false,
         x: 0,
@@ -114,6 +119,16 @@ export const useModalManager = () => {
         setContextMenuState(prev => ({ ...prev, isOpen: false }));
     };
 
+    const openEditHtmlComponentModal = (component: HtmlComponent) => {
+        setEditingHtmlComponent(component);
+        setIsEditHtmlComponentModalOpen(true);
+    };
+
+    const closeEditHtmlComponentModal = () => {
+        setIsEditHtmlComponentModalOpen(false);
+        setEditingHtmlComponent(null);
+    };
+
     return {
         isSettingsOpen, setIsSettingsOpen,
         isHistoryOpen, setIsHistoryOpen,
@@ -136,6 +151,12 @@ export const useModalManager = () => {
         closeAgentSettingsModal,
         isDeveloperInfoOpen, setIsDeveloperInfoOpen,
         isComponentsGalleryOpen, setIsComponentsGalleryOpen,
+        isAddComponentModalOpen, setIsAddComponentModalOpen,
+        isAddHtmlComponentModalOpen, setIsAddHtmlComponentModalOpen,
+        isEditHtmlComponentModalOpen,
+        editingHtmlComponent,
+        openEditHtmlComponentModal,
+        closeEditHtmlComponentModal,
         contextMenuState, openContextMenu, closeContextMenu,
     };
 };

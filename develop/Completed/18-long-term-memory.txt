@@ -1,0 +1,24 @@
+Feature: Long-Term Memory
+ID: 18
+
+Description:
+Implement a persistent, long-term memory system that allows the AI agents to retain key information across different conversations and sessions. This moves the AI from a purely conversational agent to a knowledgeable assistant that remembers user preferences and important facts.
+
+Core Functionalities:
+1.  **Memory Storage:**
+    -   The long-term memory will be stored as a single JSON object in `localStorage` under a key like `long-term-memory`.
+    -   This allows the data to persist between browser sessions.
+
+2.  **Memory Injection:**
+    -   In `agentService.ts`, before making an API call, the contents of the long-term memory object should be serialized into a string and prepended to the agent's system prompt.
+    -   This ensures the agent has access to its memory as core context for every response it generates.
+
+3.  **Memory Management UI:**
+    -   In the main `SettingsModal`, add a dedicated section for "Long-Term Memory".
+    -   This section should include a textarea that displays the current memory JSON object, allowing users to view and manually edit it.
+    -   Include "Save Memory" and "Clear Memory" buttons for manual control.
+
+4.  **AI-Powered Memory Extraction:**
+    -   In the "Per-Conversation Settings" modal, add a button like "Update Memory from this Chat".
+    -   When clicked, a new service function will be called. This function will take the recent conversation history and the current memory object, and prompt the Gemini API to extract key new facts and return an updated JSON memory object.
+    -   This allows users to easily populate the memory from important conversations.

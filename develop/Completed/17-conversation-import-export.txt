@@ -1,0 +1,21 @@
+Feature: Conversation Import/Export
+ID: 17
+
+Description:
+Provide users with the ability to export all of their conversations to a local file for backup and to import conversations from a file to restore them. This is a critical data management feature for a client-side application.
+
+Core Functionalities:
+1.  **Export Functionality:**
+    -   Add an "Export All Conversations" button to the main `SettingsModal`.
+    -   When clicked, this button should serialize the entire `conversations` array from `localStorage` into a JSON string.
+    -   The application should then trigger a browser download of this JSON data as a file (e.g., `monica-backup-YYYY-MM-DD.json`).
+
+2.  **Import Functionality:**
+    -   Add an "Import Conversations" button to the `SettingsModal`.
+    -   This button should open a file picker dialog, allowing the user to select a JSON file.
+    -   The application will read the selected file, parse the JSON, and validate its structure to ensure it's a valid conversation array.
+    -   The imported conversations should be merged with the existing conversations. To avoid duplicates, the import logic should check the `id` of each conversation and only add those that do not already exist.
+
+3.  **Error Handling:**
+    -   The import process must handle potential errors, such as a user selecting a non-JSON file or a file with a malformed structure.
+    -   Informative alerts should be shown to the user in case of success or failure.

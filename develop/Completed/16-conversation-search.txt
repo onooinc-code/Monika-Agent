@@ -1,0 +1,18 @@
+Feature: Conversation Search
+ID: 16
+
+Description:
+Implement a search functionality in the conversation list sidebar that allows users to quickly find conversations based on their title or the content of their messages.
+
+Core Functionalities:
+1.  **Search Input UI:**
+    -   Add a search input field at the top of the `ConversationList` component.
+    -   The input should be styled consistently with the application's aesthetic.
+
+2.  **Client-Side Filtering Logic:**
+    -   As the user types into the search field, the list of conversations should be filtered in real-time.
+    -   The filtering logic should be case-insensitive.
+    -   The search should match the query against both the `title` of the conversation and the `text` of every message within each conversation.
+
+3.  **No Results State:**
+    -   If the search query yields no results, the UI should display a helpful message (e.g., "No matching conversations found.").

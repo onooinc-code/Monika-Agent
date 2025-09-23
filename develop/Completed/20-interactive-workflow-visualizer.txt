@@ -1,0 +1,18 @@
+Feature: Interactive Workflow Visualizer
+ID: 20
+
+Description:
+Enhance the "Cognitive Workflow Inspector" with interactive elements, turning it from a static data display into a more engaging and user-friendly debugging tool.
+
+Core Functionalities:
+1.  **Collapsible Steps:**
+    -   Instead of showing all pipeline steps expanded by default, render them as a collapsible accordion or list.
+    -   Each step should show its title (e.g., "Model Invocation") and duration.
+    -   The user can click on a step to expand it and view the detailed input and output data.
+
+2.  **Timeline View:**
+    -   Display the pipeline steps vertically along a timeline.
+    -   Each step should be represented by a dot or a node on the line, giving a clear visual flow of the process from top to bottom.
+
+3.  **Auto-Expand First Step:**
+    -   When the modal is opened, the first step of the pipeline should be expanded by default to immediately provide some context to the user.

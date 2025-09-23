@@ -1,0 +1,27 @@
+Feature: Status Bar & Usage Metrics
+ID: 10
+
+Description:
+Implement a persistent status bar at the bottom of the application that provides at-a-glance metrics about the current conversation and overall API usage. This feature enhances user awareness and helps them track their consumption.
+
+Core Functionalities:
+1.  **Persistent Status Bar:**
+    -   Design a clean, unobtrusive status bar that is always visible at the bottom of the screen.
+    -   It should not interfere with the main chat or input areas.
+
+2.  **Conversation-Specific Metrics:**
+    -   Display the total number of messages in the currently active conversation.
+    -   Display an estimated token count for the current conversation. This helps users understand the "size" of a chat.
+
+3.  **Global Usage Metrics:**
+    -   Track and display the total estimated tokens used across all conversations for the current day.
+    -   Track and display the total estimated API requests made for the current day.
+    -   Display the all-time total estimated tokens and requests.
+
+4.  **Agent-Specific Stats:**
+    -   Include a button or link in the status bar that opens a modal with a detailed breakdown of usage metrics per agent.
+    -   This modal should show total messages sent and tokens used by each agent, helping users identify which agents are most active or costly.
+
+5.  **Client-Side Tracking:**
+    -   All usage metrics will be estimated and tracked on the client-side and stored in `localStorage`.
+    -   This avoids the need for a backend but provides a good-enough approximation for user awareness.

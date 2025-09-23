@@ -1,0 +1,25 @@
+Feature: Advanced Agent Configuration
+ID: 13
+
+Description:
+Expand the agent configuration options in the main settings modal to allow for more granular control over each agent's behavior and capabilities. This transforms them from simple profiles into highly specialized, tool-enabled entities.
+
+Core Functionalities:
+1.  **Tool Integration:**
+    -   Add a "Tools" field to the agent configuration.
+    -   Users can list available tools (e.g., `calculator`, `search`, `executeShellCommand`) that a specific agent is allowed to use.
+    -   The backend service for agent responses must be updated to support the Gemini API's function calling capabilities, passing the declared tools and handling tool execution.
+
+2.  **Knowledge Base:**
+    -   Add a "Knowledge" textarea to each agent's configuration.
+    -   This allows users to provide specific, supplementary text-based knowledge that will be prepended to the agent's system prompt.
+    -   This is useful for giving an agent context about a specific project, person, or domain without altering its core instruction.
+
+3.  **Enable/Disable Toggle:**
+    -   Add a toggle switch for each agent to enable or disable them.
+    -   Disabled agents should not appear in the main UI and should not be considered by the AI Agent Manager for responses. This allows users to focus on a subset of their configured agents for a given task.
+    
+4.  **Per-Agent API Keys:**
+    -   Allow users to assign a specific Gemini API key to each agent.
+    -   If an agent has its own key, it will be used for its API calls.
+    -   If not, the agent will fall back to using the global API key. This allows for better rate limit management and cost tracking.

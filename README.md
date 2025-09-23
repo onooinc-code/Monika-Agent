@@ -31,7 +31,7 @@ Monica is packed with features that make it a powerful and flexible platform for
 | **Robust UI/UX**              | Comprehensive **global and per-conversation settings**.                                                        | ✅ Implemented |
 |                               | Real-time **status indicators** and client-side **usage metrics**.                                             | ✅ Implemented |
 |                               | **Conversation Search** and **Import/Export** for data management.                                             | ✅ Implemented |
-|                               | **Developer Tools** to inspect and browse the application's UI components and structure.                       | ✅ Implemented |
+|                               | **Developer Tools** providing a browsable gallery of the application's UI components.                          | ✅ Implemented |
 
 ---
 

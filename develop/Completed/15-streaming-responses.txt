@@ -1,0 +1,19 @@
+Feature: Streaming AI Responses
+ID: 15
+
+Description:
+Update the application to stream responses from the Gemini API directly into the message bubble, character by character or word by word. This significantly improves the user's perception of speed, as they can start reading the response as it's being generated instead of waiting for the full reply.
+
+Core Functionalities:
+1.  **Update Service Layer:**
+    -   Modify the `agentService.ts` to use the `generateContentStream` method of the Gemini API client instead of `generateContent`.
+    -   The service function should accept a callback function (e.g., `onStreamChunk`) that will be called for each piece of text received from the stream.
+
+2.  **Update State Management:**
+    -   The `useChatHandler` hook needs to be updated. When it initiates an AI response, it should first add a placeholder message to the conversation state.
+    -   It will pass a callback function to the service layer. This callback will append the streamed text chunks to the placeholder message in the state.
+    -   A new state property, `isStreaming`, should be added to the `Message` type to indicate when a message is still being generated.
+
+3.  **Update UI Layer:**
+    -   The `MessageBubble` component should display a blinking cursor or similar indicator at the end of the text if the `isStreaming` flag is true.
+    -   The component should re-render efficiently as new text chunks are added to the message.

@@ -1,0 +1,19 @@
+Feature: AI-Generated Discussion Rules
+ID: 12
+
+Description:
+Enhance the "Moderated Chat" mode by allowing the AI Agent Manager to dynamically generate the rules and turn-taking order for the discussion based on the agents' profiles and the current conversation topic.
+
+Core Functionalities:
+1.  **Rule Generation Trigger:**
+    -   In the "Per-Conversation Settings" modal, next to the "Moderated Chat" toggle, add a "Generate Rules with AI" button.
+
+2.  **AI Service for Rule Generation:**
+    -   Create a new service function that takes the list of active agents and the recent conversation history as input.
+    -   This service will prompt the Gemini API to analyze the agents' roles (e.g., "Creative Writer," "Technical Analyst") and the topic.
+    -   The AI should return a concise system prompt that defines the rules for the discussion (e.g., "The Technical Analyst will provide the data, then the Creative Writer will craft a narrative around it.").
+
+3.  **Applying the Rules:**
+    -   The generated rules will be populated into a textarea in the settings modal.
+    -   The user can review, edit, or accept these rules.
+    -   When the moderated chat runs, these rules are passed to the AI Agent Manager as part of its system prompt to guide its moderation decisions.

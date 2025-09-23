@@ -11,6 +11,7 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/dompurify/3.1.6/purify.min.js"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.10.0/styles/atom-one-dark.min.css">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.10.0/highlight.min.js"></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Roboto+Mono:wght@400;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
@@ -463,12 +464,14 @@
         grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
         gap: 1rem;
         align-content: start;
+        grid-auto-rows: min-content; /* Allow rows to grow with content */
       }
       .gallery-component-card {
         background-color: rgba(0,0,0,0.2);
         border: 1px solid var(--color-border);
         border-radius: 0.75rem;
-        overflow: hidden;
+        display: flex; /* Use flexbox for layout */
+        flex-direction: column; /* Stack preview and footer */
         transition: all 0.2s ease-in-out;
       }
       .gallery-component-card:hover {
@@ -487,8 +490,9 @@
         padding: 2rem;
         display: flex;
         justify-content: center;
-        align-items: center;
-        min-height: 150px;
+        align-items: start; /* Align to top to prevent cutoff */
+        min-height: 200px;
+        flex-grow: 1; /* Allow preview to take available space */
       }
 
     </style>

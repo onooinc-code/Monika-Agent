@@ -26,6 +26,9 @@ import { PlusIcon, SettingsIcon, AlignLeftIcon } from './components/Icons.tsx';
 import { AgentSettingsModal } from './components/AgentSettingsModal.tsx';
 import { DeveloperInfoModal } from './components/DeveloperInfoModal.tsx';
 import { ComponentsGalleryModal } from './components/ComponentsGalleryModal.tsx';
+import { AddComponentModal } from './components/AddComponentModal.tsx';
+import { AddHtmlComponentModal } from './components/AddHtmlComponentModal.tsx';
+import { EditHtmlComponentModal } from './components/EditHtmlComponentModal.tsx';
 
 export default function App() {
   const { 
@@ -45,6 +48,16 @@ export default function App() {
     closeContextMenu,
     handleNewConversation,
     setIsArchiveOpen,
+    isAddComponentModalOpen,
+    setIsAddComponentModalOpen,
+    isAddHtmlComponentModalOpen,
+    setIsAddHtmlComponentModalOpen,
+    setCustomComponents,
+    setCustomHtmlComponents,
+    isEditHtmlComponentModalOpen,
+    closeEditHtmlComponentModal,
+    editingHtmlComponent,
+    handleUpdateHtmlComponent,
   } = useAppContext();
 
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
@@ -92,6 +105,9 @@ export default function App() {
         if (isSettingsOpen) setIsSettingsOpen(false);
         if (isHistoryOpen) setIsHistoryOpen(false);
         if (isConversationSettingsOpen) setIsConversationSettingsOpen(false);
+        if (isAddComponentModalOpen) setIsAddComponentModalOpen(false);
+        if (isAddHtmlComponentModalOpen) setIsAddHtmlComponentModalOpen(false);
+        if (isEditHtmlComponentModalOpen) closeEditHtmlComponentModal();
         closeContextMenu();
       }
 
@@ -142,7 +158,7 @@ export default function App() {
       window.removeEventListener('keydown', handleKeyDown);
       window.removeEventListener('click', handleClick);
     };
-  }, [isSettingsOpen, isHistoryOpen, isConversationSettingsOpen, setIsSettingsOpen, setIsHistoryOpen, setIsConversationSettingsOpen, setConversationMode, handleShowHistory, activeConversation, closeContextMenu, handleNewConversation]);
+  }, [isSettingsOpen, isHistoryOpen, isConversationSettingsOpen, isAddComponentModalOpen, isAddHtmlComponentModalOpen, isEditHtmlComponentModalOpen, setIsSettingsOpen, setIsHistoryOpen, setIsConversationSettingsOpen, setIsAddComponentModalOpen, setIsAddHtmlComponentModalOpen, closeEditHtmlComponentModal, setConversationMode, handleShowHistory, activeConversation, closeContextMenu, handleNewConversation]);
 
   const handleGlobalContextMenu = (e: React.MouseEvent) => {
     e.preventDefault();
@@ -224,6 +240,24 @@ export default function App() {
         <AgentSettingsModal />
         <DeveloperInfoModal />
         <ComponentsGalleryModal />
+        <AddComponentModal
+            isOpen={isAddComponentModalOpen}
+            onClose={() => setIsAddComponentModalOpen(false)}
+            onAddComponent={(newComp) => setCustomComponents(prev => [...prev, newComp])}
+        />
+        <AddHtmlComponentModal
+            isOpen={isAddHtmlComponentModalOpen}
+            onClose={() => setIsAddHtmlComponentModalOpen(false)}
+            onAddComponent={(newComp) => setCustomHtmlComponents(prev => [...prev, newComp])}
+        />
+        {editingHtmlComponent && (
+          <EditHtmlComponentModal
+              isOpen={isEditHtmlComponentModalOpen}
+              onClose={closeEditHtmlComponentModal}
+              componentToEdit={editingHtmlComponent}
+              onUpdateComponent={handleUpdateHtmlComponent}
+          />
+        )}
     </div>
   );
 }

@@ -10,3 +10,11 @@ export * from './memory.ts';
 export * from './plan.ts';
 export * from './utils.ts';
 export * from './ui.ts';
+export * from './htmlComponent.ts';
+
+// Added for the dynamic component gallery feature
+export interface CustomComponent {
+    name: string;
+    category: string;
+    code: string;
+}
