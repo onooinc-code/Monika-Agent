@@ -1,6 +1,5 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { useAppContext } from '../contexts/StateProvider.tsx';
-import { GlassIconButton } from './GlassIconButton.tsx';
 
 interface HeaderActionsProps {
     toggleSidebar: () => void;
@@ -8,9 +7,37 @@ interface HeaderActionsProps {
 }
 
 export const HeaderActions: React.FC<HeaderActionsProps> = ({ toggleSidebar, sidebarAnimationState }) => {
-    const { setIsSettingsOpen, setIsComponentsGalleryOpen } = useAppContext();
+    const { setIsSettingsOpen, setIsComponentsGalleryOpen, setIsConversionTypeModalOpen } = useAppContext();
+    const [selectedValue, setSelectedValue] = useState<string | null>(null);
 
-    const animationClass = {
+    // This effect will "uncheck" the radio button after a short delay,
+    // allowing the animation to play but preventing it from staying in a selected state.
+    useEffect(() => {
+        if (selectedValue) {
+            const timer = setTimeout(() => setSelectedValue(null), 500);
+            return () => clearTimeout(timer);
+        }
+    }, [selectedValue]);
+
+    const handleAction = (value: string) => {
+        setSelectedValue(value);
+        switch (value) {
+            case 'settings':
+                setIsSettingsOpen(true);
+                break;
+            case 'sidebar':
+                toggleSidebar();
+                break;
+            case 'gallery':
+                setIsComponentsGalleryOpen(true);
+                break;
+            case 'conversation-type':
+                setIsConversionTypeModalOpen(true);
+                break;
+        }
+    };
+    
+    const sidebarBlinkClass = {
         slow: 'animate-neon-blink-slow',
         fast: 'animate-neon-blink-fast',
         idle: '',
@@ -18,31 +45,56 @@ export const HeaderActions: React.FC<HeaderActionsProps> = ({ toggleSidebar, sid
 
     return (
         <div className="HeaderActions header-action-card">
-            <div className="grid grid-cols-2 grid-rows-2 gap-3 p-3 z-10 w-full h-full">
-                <GlassIconButton
-                    onClick={() => setIsSettingsOpen(true)}
-                    title="Settings"
-                    aria-label="Open Settings"
-                    gradient="indigo"
-                    className="SettingsActionButton"
-                />
-                 <div className={`ToggleSidebarActionButton rounded-[16px] ${animationClass} w-full h-full`}>
-                    <GlassIconButton
-                        onClick={toggleSidebar}
-                        title="Toggle Sidebar"
-                        aria-label="Toggle Sidebar"
-                        gradient="menu"
-                        className="MenuButton"
+            <div className="radio-input p-3 z-10">
+                <div className="center"></div>
+                
+                {/* Settings */}
+                <label className="label spring" title="Settings">
+                    <input 
+                        type="radio" 
+                        value="settings" 
+                        name="header-actions" 
+                        checked={selectedValue === 'settings'}
+                        onChange={() => handleAction('settings')}
                     />
-                </div>
-                <GlassIconButton
-                    onClick={() => setIsComponentsGalleryOpen(true)}
-                    title="Components Gallery"
-                    aria-label="Open Components Gallery"
-                    gradient="dev"
-                    className="ComponentsGalleryActionButton"
-                />
-                <div/>
+                    <span className="text spring">Settings</span>
+                </label>
+                
+                {/* Toggle Sidebar */}
+                <label className={`label summer rounded-[22px] ${sidebarBlinkClass}`} title="Toggle Sidebar">
+                    <input 
+                        type="radio" 
+                        value="sidebar" 
+                        name="header-actions" 
+                        checked={selectedValue === 'sidebar'}
+                        onChange={() => handleAction('sidebar')}
+                    />
+                    <span className="text summer">Menu</span>
+                </label>
+                
+                {/* Components Gallery */}
+                <label className="label autumn" title="Components Gallery">
+                    <input 
+                        type="radio" 
+                        value="gallery" 
+                        name="header-actions" 
+                        checked={selectedValue === 'gallery'}
+                        onChange={() => handleAction('gallery')}
+                    />
+                    <span className="text autumn">Gallery</span>
+                </label>
+                
+                {/* Conversation Type */}
+                <label className="label winter" title="Conversation Type">
+                    <input 
+                        type="radio" 
+                        value="conversation-type" 
+                        name="header-actions" 
+                        checked={selectedValue === 'conversation-type'}
+                        onChange={() => handleAction('conversation-type')}
+                    />
+                    <span className="text winter">Mode</span>
+                </label>
             </div>
         </div>
     );

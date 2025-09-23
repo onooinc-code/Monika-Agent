@@ -1,6 +1,8 @@
 
-import { useState } from 'react';
 
+import React, { useState } from 'react';
+
+// FIX: Added import for React to resolve namespace errors for React.Dispatch and React.SetStateAction.
 export function useLocalStorage<T>(key: string, initialValue: T): [T, React.Dispatch<React.SetStateAction<T>>] {
   const [storedValue, setStoredValue] = useState<T>(() => {
     try {

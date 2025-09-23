@@ -1,17 +1,19 @@
+
 import React, { useEffect, useRef, useState } from 'react';
-import { Message, Agent, Conversation } from '../types/index.ts';
+// FIX: Added BubbleSettings to import list
+import { Message, Agent, Conversation, BubbleSettings } from '../types/index.ts';
 import { MANAGER_COLOR } from '../constants/agentConstants.ts';
 import { useAppContext } from '../contexts/StateProvider.tsx';
 import { Avatar } from './Avatar.tsx';
 import { 
     CopyIcon, BookmarkIcon, EditIcon, TrashIcon, RegenerateIcon, SummarizeIcon, RewriteIcon, 
-    CodeIcon, WorkflowIcon, BookmarkFilledIcon
+    CodeIcon, WorkflowIcon, AlignLeftIcon, AlignRightIcon, ZoomInIcon, ZoomOutIcon, 
+    TextLtrIcon, TextRtlIcon, TokenIcon, BookmarkFilledIcon
 } from './Icons.tsx';
 
 import { PlanDisplay } from './PlanDisplay.tsx';
+import * as TokenCounter from '../services/utils/tokenCounter.ts';
 import { safeRender } from '../services/utils/safeRender.ts';
-import { ContextMenuItem } from '../types/ui.ts';
-import { CopyClearWrapper } from './CopyClearWrapper.tsx';
 
 declare const marked: any;
 declare const DOMPurify: any;
@@ -23,32 +25,142 @@ interface MessageBubbleProps {
     featureFlags?: Conversation['featureFlags'];
 }
 
+const LONG_MESSAGE_LINES = 20;
+const LONG_MESSAGE_CHARS = 1000;
+
+const ActionButton: React.FC<{onClick: () => void, title: string, 'aria-label': string, children: React.ReactNode, className?: string, disabled?: boolean}> = ({ onClick, title, 'aria-label': ariaLabel, children, className, disabled }) => (
+    <button onClick={onClick} title={title} aria-label={ariaLabel} className={`p-1.5 rounded-full transition-colors disabled:opacity-50 disabled:cursor-not-allowed ${className}`} disabled={disabled}>
+        {children}
+    </button>
+);
+
+// FIX: Added props interface for MessageToolbar
+interface MessageToolbarProps {
+    message: Message;
+    isUser: boolean;
+    isContinuous: boolean;
+    settings: BubbleSettings;
+    handleAlignment: (align: 'left' | 'right') => void;
+    handleTextDirection: (dir: 'ltr' | 'rtl') => void;
+    handleFontSize: (direction: 'up' | 'down') => void;
+    handleCopy: () => void;
+}
+
+
+const MessageToolbar: React.FC<MessageToolbarProps> = ({ message, isUser, isContinuous, settings, handleAlignment, handleTextDirection, handleFontSize, handleCopy }) => {
+    // FIX: Removed handleAlignment, handleTextDirection, handleFontSize, handleCopy, and settings from useAppContext as they are now props.
+    const {
+        handleToggleMessageBookmark, handleDeleteMessage, handleSummarizeMessage, handleRegenerateResponse,
+        handleRewritePrompt, handleToggleMessageEdit, openPromptInspectorModal, openInspectorModal,
+    } = useAppContext();
+
+    const handleLocalAlignment = (align: 'left' | 'right') => {
+        handleAlignment(align);
+    };
+    const handleLocalTextDirection = (dir: 'ltr' | 'rtl') => {
+        handleTextDirection(dir);
+    };
+    const handleLocalFontSize = (direction: 'up' | 'down') => {
+        handleFontSize(direction);
+    };
+
+    const tokenCount = TokenCounter.estimateTokens(message);
+    const buttonClass = isUser ? "hover:bg-indigo-500" : "hover:bg-gray-700 hover:text-white";
+
+    if (isContinuous) {
+        return (
+            <div className="flex items-center gap-1 glass-pane p-1 rounded-full shadow-lg">
+                {!isUser && (
+                    <ActionButton onClick={() => handleRegenerateResponse(message.id)} title="Regenerate" aria-label="Regenerate response" className={buttonClass}><RegenerateIcon className="w-4 h-4" /></ActionButton>
+                )}
+                {isUser && (
+                    <ActionButton onClick={() => handleToggleMessageEdit(message.id)} title="Edit" aria-label="Edit message" className={buttonClass}><EditIcon className="w-4 h-4" /></ActionButton>
+                )}
+                <ActionButton onClick={() => handleToggleMessageBookmark(message.id)} title="Bookmark" aria-label="Bookmark message" className={buttonClass}>
+                    {message.isBookmarked ? <BookmarkFilledIcon className="w-4 h-4 text-indigo-400" /> : <BookmarkIcon className="w-4 h-4" />}
+                </ActionButton>
+                <ActionButton onClick={handleCopy} title="Copy" aria-label="Copy message" className={buttonClass}><CopyIcon className="w-4 h-4" /></ActionButton>
+                <ActionButton onClick={() => handleDeleteMessage(message.id)} title="Delete" aria-label="Delete message" className="text-red-400 hover:bg-red-500/50 hover:text-white"><TrashIcon className="w-4 h-4" /></ActionButton>
+            </div>
+        )
+    }
+
+    // Default Toolbar for 'Multi' mode
+    return (
+        <>
+            <div className={`flex items-center gap-1 ${isUser ? 'text-white' : 'text-white'}`}>
+                {!isUser && (
+                    <>
+                        <ActionButton onClick={() => handleSummarizeMessage(message.id)} title="Summarize message" aria-label="Summarize message" className={buttonClass}><SummarizeIcon className="w-5 h-5" /></ActionButton>
+                        <ActionButton onClick={() => handleRegenerateResponse(message.id)} title="Regenerate response" aria-label="Regenerate response" className={buttonClass}><RegenerateIcon className="w-5 h-5" /></ActionButton>
+                    </>
+                )}
+                {isUser && (
+                    <>
+                        <ActionButton onClick={() => handleRewritePrompt(message.id)} title="Rewrite prompt with AI" aria-label="Rewrite prompt" className={buttonClass}><RewriteIcon className="w-5 h-5" /></ActionButton>
+                        <ActionButton onClick={() => handleToggleMessageEdit(message.id)} title="Edit message" aria-label="Edit message" className={buttonClass}><EditIcon className="w-5 h-5" /></ActionButton>
+                    </>
+                )}
+                {message.pipeline && message.pipeline.length > 0 && !isUser && (
+                    <ActionButton onClick={() => openPromptInspectorModal(message)} title="View full prompt & response" aria-label="Inspect prompt" className={buttonClass}><CodeIcon className="w-5 h-5" /></ActionButton>
+                )}
+                {message.pipeline && message.pipeline.length > 0 && !isUser && (
+                    <ActionButton onClick={() => openInspectorModal(message.pipeline!)} title="View Workflow" aria-label="View AI Workflow" className={buttonClass}><WorkflowIcon className="w-5 h-5" /></ActionButton>
+                )}
+            </div>
+            <div className="flex-grow"></div>
+            <div className={`flex items-center gap-2 ${isUser ? 'text-white' : 'text-white'}`}>
+                {tokenCount > 0 && (
+                    <span className="font-mono text-xs flex items-center gap-1 opacity-80" title={`Estimated Tokens: ${tokenCount}`}><TokenIcon className="w-3.5 h-3.5" />{tokenCount}</span>
+                )}
+                {message.responseTimeMs && <span className="font-mono text-xs opacity-80" title="Response Time">{message.responseTimeMs}ms</span>}
+                {(tokenCount > 0 || message.responseTimeMs) && <div className="w-px h-4 bg-white/10 mx-1"></div>}
+                <ActionButton onClick={() => handleLocalAlignment('left')} title="Align Left" aria-label="Align message left" className={buttonClass}><AlignLeftIcon className="w-5 h-5"/></ActionButton>
+                <ActionButton onClick={() => handleLocalAlignment('right')} title="Align Right" aria-label="Align message right" className={buttonClass}><AlignRightIcon className="w-5 h-5"/></ActionButton>
+                <ActionButton onClick={() => handleLocalTextDirection('ltr')} title="Text LTR" aria-label="Set text direction to left-to-right" className={buttonClass}><TextLtrIcon className="w-5 h-5"/></ActionButton>
+                <ActionButton onClick={() => handleLocalTextDirection('rtl')} title="Text RTL" aria-label="Set text direction to right-to-left" className={buttonClass}><TextRtlIcon className="w-5 h-5"/></ActionButton>
+                <ActionButton onClick={() => handleLocalFontSize('down')} title="Decrease Font Size" aria-label="Decrease font size" disabled={settings.fontSize <= 0.75} className={buttonClass}><ZoomOutIcon className="w-5 h-5"/></ActionButton>
+                <ActionButton onClick={() => handleLocalFontSize('up')} title="Increase Font Size" aria-label="Increase font size" disabled={settings.fontSize >= 1.5} className={buttonClass}><ZoomInIcon className="w-5 h-5"/></ActionButton>
+                <ActionButton onClick={handleCopy} title="Copy message text" aria-label="Copy message" className={buttonClass}><CopyIcon className="w-5 h-5" /></ActionButton>
+                <ActionButton onClick={() => handleToggleMessageBookmark(message.id)} title="Bookmark message" aria-label="Bookmark message" className={buttonClass}>
+                    {message.isBookmarked ? <BookmarkFilledIcon className="w-5 h-5 text-indigo-400" /> : <BookmarkIcon className="w-5 h-5" />}
+                </ActionButton>
+                <ActionButton onClick={() => handleDeleteMessage(message.id)} title="Delete message" aria-label="Delete message" className="text-red-400 hover:bg-red-500/50 hover:text-white"><TrashIcon className="w-5 h-5" /></ActionButton>
+            </div>
+        </>
+    );
+};
+
+
 export const MessageBubble: React.FC<MessageBubbleProps> = ({ message, agent, featureFlags }) => {
+    // FIX: Added necessary functions and state setters from context.
     const { 
         handleShowHtmlPreview, 
         handleUpdateMessageText, 
         handleToggleMessageEdit,
         handleChangeAlternativeResponse,
+        userBubbleSettings,
+        agentBubbleSettings,
+        conversionType,
+        setAgentBubbleSettings,
+        setUserBubbleSettings,
         handleToggleMessageBookmark,
         handleDeleteMessage,
         handleSummarizeMessage,
-        handleRewritePrompt,
         handleRegenerateResponse,
-        openInspectorModal,
+        handleRewritePrompt,
         openPromptInspectorModal,
-        openContextMenu,
+        openInspectorModal,
     } = useAppContext();
     
     const contentRef = useRef<HTMLDivElement>(null);
     const [editText, setEditText] = useState(() => safeRender(message.text));
     const editTextAreaRef = useRef<HTMLTextAreaElement>(null);
-    
-    const activeAlternativeIndex = message.activeAlternativeIndex ?? -1;
-    const currentMessage = activeAlternativeIndex > -1 && message.alternatives?.[activeAlternativeIndex]
-        ? { ...message, ...message.alternatives[activeAlternativeIndex] }
-        : message;
 
-    const [isExpanded, setIsExpanded] = useState(false);
+    const activeAlternativeIndex = message.activeAlternativeIndex ?? -1;
+    const currentMessageText = activeAlternativeIndex > -1 && message.alternatives?.[activeAlternativeIndex]
+        ? message.alternatives[activeAlternativeIndex].text
+        : message.text;
 
     useEffect(() => {
         if (message.isEditing) {
@@ -64,6 +176,25 @@ export const MessageBubble: React.FC<MessageBubbleProps> = ({ message, agent, fe
     }, [message.isEditing, message.text]);
 
     const isUser = message.sender === 'user';
+    // FIX: Added local state and handlers for bubble settings.
+    const settings = isUser ? userBubbleSettings : agentBubbleSettings;
+    const setSettings = isUser ? setUserBubbleSettings : setAgentBubbleSettings;
+
+    const handleAlignment = (align: 'left' | 'right') => {
+        setSettings(prev => ({ ...prev, alignment: align }));
+    };
+    const handleTextDirection = (dir: 'ltr' | 'rtl') => {
+        setSettings(prev => ({ ...prev, textDirection: dir }));
+    };
+    const handleFontSize = (direction: 'up' | 'down') => {
+        setSettings(prev => ({ ...prev, fontSize: Math.max(0.75, Math.min(1.5, prev.fontSize + (direction === 'up' ? 0.1 : -0.1))) }));
+    };
+    const handleCopy = () => navigator.clipboard.writeText(safeRender(currentMessageText));
+
+
+    const isPotentiallyLong = !isUser && (safeRender(currentMessageText).split('\n').length > LONG_MESSAGE_LINES || safeRender(currentMessageText).length > LONG_MESSAGE_CHARS);
+    const isLongMessageEnabled = !message.isStreaming && isPotentiallyLong && featureFlags?.autoSummarization;
+    const [isExpanded, setIsExpanded] = useState(!isLongMessageEnabled);
     
     let _senderName = 'You';
     let _senderJob = 'User';
@@ -104,13 +235,19 @@ export const MessageBubble: React.FC<MessageBubbleProps> = ({ message, agent, fe
         }
     };
     
-    const handleCopy = () => navigator.clipboard.writeText(safeRender(currentMessage.text));
-    
-    const hasSummary = !!currentMessage.summary && currentMessage.summary !== currentMessage.text;
-
     const getMessageContent = () => {
-        const textToRender = safeRender(isExpanded ? currentMessage.text : (currentMessage.summary || currentMessage.text));
-        return DOMPurify.sanitize(marked.parse(textToRender));
+        const textToRender = safeRender(currentMessageText);
+        if (isExpanded) {
+            return DOMPurify.sanitize(marked.parse(textToRender));
+        }
+        const lines = textToRender.split('\n');
+        let truncatedText = textToRender;
+        if (lines.length > LONG_MESSAGE_LINES) {
+            truncatedText = lines.slice(0, LONG_MESSAGE_LINES).join('\n') + '\n...';
+        } else if (truncatedText.length > LONG_MESSAGE_CHARS) {
+            truncatedText = truncatedText.substring(0, LONG_MESSAGE_CHARS) + '...';
+        }
+        return DOMPurify.sanitize(marked.parse(truncatedText));
     };
 
     useEffect(() => {
@@ -121,7 +258,7 @@ export const MessageBubble: React.FC<MessageBubbleProps> = ({ message, agent, fe
             contentRef.current.querySelectorAll('pre').forEach((preElement) => {
                 if (preElement.querySelector('.code-toolbar')) return;
                 const code = preElement.querySelector('code');
-                const lang = Array.from(code?.classList || []).find(cls => cls.startsWith('language-'))?.replace('language-', '') || '';
+                const lang = (Array.from(code?.classList || []) as string[]).find(cls => cls.startsWith('language-'))?.replace('language-', '') || '';
                 const toolbar = document.createElement('div');
                 toolbar.className = 'code-toolbar glass-pane rounded-t-md px-3 py-1 flex justify-between items-center text-xs';
                 const langSpan = document.createElement('span');
@@ -146,68 +283,31 @@ export const MessageBubble: React.FC<MessageBubbleProps> = ({ message, agent, fe
                 preElement.parentNode?.insertBefore(toolbar, preElement);
             });
         }
-    }, [currentMessage, handleShowHtmlPreview, isExpanded]);
-    
-    const handleContextMenu = (e: React.MouseEvent) => {
-        e.preventDefault();
-        e.stopPropagation();
-        const commonActions: ContextMenuItem[] = [
-            { label: 'Copy Text', icon: <CopyIcon className="w-5 h-5"/>, action: handleCopy },
-            { label: message.isBookmarked ? 'Unbookmark' : 'Bookmark', icon: message.isBookmarked ? <BookmarkFilledIcon className="w-5 h-5 text-indigo-400"/> : <BookmarkIcon className="w-5 h-5"/>, action: () => handleToggleMessageBookmark(message.id) },
-        ];
-        
-        let specificActions: ContextMenuItem[] = [];
-        if(isUser) {
-            specificActions = [
-                { label: 'Edit', icon: <EditIcon className="w-5 h-5"/>, action: () => handleToggleMessageEdit(message.id) },
-                { label: 'Rewrite with AI', icon: <RewriteIcon className="w-5 h-5"/>, action: () => handleRewritePrompt(message.id) },
-            ];
-        } else {
-            specificActions = [
-                { label: 'Summarize', icon: <SummarizeIcon className="w-5 h-5"/>, action: () => handleSummarizeMessage(message.id) },
-                { label: 'Regenerate', icon: <RegenerateIcon className="w-5 h-5"/>, action: () => handleRegenerateResponse(message.id) },
-            ];
-            if (message.pipeline && message.pipeline.length > 0) {
-                 specificActions.push({ label: 'Inspect Workflow', icon: <WorkflowIcon className="w-5 h-5"/>, action: () => openInspectorModal(message.pipeline!) });
-                 specificActions.push({ label: 'Inspect Prompt', icon: <CodeIcon className="w-5 h-5"/>, action: () => openPromptInspectorModal(message) });
-            }
-        }
-        
-        const finalActions: ContextMenuItem[] = [
-            ...specificActions,
-            ...commonActions,
-            { isSeparator: true },
-            { label: 'Delete Message', icon: <TrashIcon className="w-5 h-5"/>, action: () => handleDeleteMessage(message.id), isDestructive: true },
-        ];
-        
-        openContextMenu(e.clientX, e.clientY, finalActions);
-    };
+    }, [currentMessageText, handleShowHtmlPreview, isExpanded]);
 
     const formattedTime = new Date(message.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
 
     if (message.isEditing) {
         return (
-            <div className="MessageBubbleEditing flex w-full px-4 md:px-8 mb-6 animate-fade-in-up">
-                 <div className="MessageAvatar"><Avatar name={senderName} color={agentColorIndicator} /></div>
+            <div className="flex w-full px-4 md:px-8 mb-6 animate-fade-in-up">
+                 <Avatar name={senderName} color={agentColorIndicator} />
                 <div className="flex flex-col w-full ml-4">
                     <div className="rounded-lg p-4 bg-gray-700">
-                        <CopyClearWrapper value={editText} onClear={() => setEditText('')}>
-                            <textarea
-                                ref={editTextAreaRef}
-                                value={editText}
-                                onChange={(e) => {
-                                    setEditText(e.target.value);
-                                    e.target.style.height = 'auto';
-                                    e.target.style.height = `${e.target.scrollHeight}px`;
-                                }}
-                                onKeyDown={handleEditKeyDown}
-                                className="MessageEditInput w-full bg-gray-600 text-white rounded-md p-2 focus:outline-none focus:ring-2 focus:ring-indigo-500 resize-none"
-                                rows={1}
-                            />
-                        </CopyClearWrapper>
-                        <div className="MessageEditActions mt-2 flex justify-end gap-2">
-                            <button onClick={handleCancelEdit} className="MessageEditCancelButton px-3 py-1 text-sm bg-gray-500 hover:bg-gray-600 rounded">Cancel</button>
-                            <button onClick={handleSaveEdit} className="MessageEditSaveButton px-3 py-1 text-sm bg-indigo-600 hover:bg-indigo-700 rounded">Save & Submit</button>
+                        <textarea
+                            ref={editTextAreaRef}
+                            value={editText}
+                            onChange={(e) => {
+                                setEditText(e.target.value);
+                                e.target.style.height = 'auto';
+                                e.target.style.height = `${e.target.scrollHeight}px`;
+                            }}
+                            onKeyDown={handleEditKeyDown}
+                            className="w-full bg-gray-600 text-white rounded-md p-2 focus:outline-none focus:ring-2 focus:ring-indigo-500 resize-none"
+                            rows={1}
+                        />
+                        <div className="mt-2 flex justify-end gap-2">
+                            <button onClick={handleCancelEdit} className="px-3 py-1 text-sm bg-gray-500 hover:bg-gray-600 rounded">Cancel</button>
+                            <button onClick={handleSaveEdit} className="px-3 py-1 text-sm bg-indigo-600 hover:bg-indigo-700 rounded">Save & Submit</button>
                         </div>
                     </div>
                 </div>
@@ -218,69 +318,105 @@ export const MessageBubble: React.FC<MessageBubbleProps> = ({ message, agent, fe
     const hasAlternatives = message.alternatives && message.alternatives.length > 0;
     const currentResponseIndex = (message.activeAlternativeIndex ?? -1);
     const totalResponses = 1 + (message.alternatives?.length ?? 0);
-
     const isInsight = message.messageType === 'insight';
+    const isContinuousConversation = conversionType === 'Continuous';
+    const alignmentClass = { left: 'justify-start', right: 'justify-end' }[settings.alignment];
 
-    return (
-        <div id={message.id} className="MessageBubble w-full px-4 md:px-8 mb-6 animate-fade-in-up" onContextMenu={handleContextMenu}>
-            <div className={`flex items-start w-full ${isUser ? 'justify-end' : 'justify-start'}`}>
-                <div className={`flex items-start w-auto max-w-3xl ${isUser ? 'flex-row-reverse' : 'flex-row'}`}>
-                    <div className="MessageAvatar"><Avatar name={senderName} color={agentColorIndicator} /></div>
-                    <div 
-                        className={`MessageContentContainer group flex flex-col w-full rounded-xl shadow-md overflow-hidden border ${isUser ? 'border-indigo-700' : 'border-slate-700'} ${isInsight ? '!border-yellow-500/50' : ''} ${isUser ? 'ml-0 mr-4' : 'ml-4'} transition-transform duration-300`}
-                    >
-                        {/* Header */}
-                        <div className={`MessageBubbleHeader flex items-center justify-between p-3 bg-primary-header ${isInsight ? '!bg-yellow-900/50' : ''} ${isUser ? 'flex-row-reverse' : ''}`} style={{backgroundColor: isInsight ? '' : 'var(--color-primary-header)'}}>
-                             <div className={`flex items-center ${isUser ? 'flex-row-reverse' : ''}`}>
-                                <div className={`w-3 h-3 rounded-sm ${agentColorIndicator}`}></div>
-                                <div className={`mx-3 text-sm font-semibold ${isUser ? 'text-right' : 'text-left'}`}>
-                                    <p className="SenderName text-white">{senderName}</p>
-                                    <p className="SenderJob text-white text-xs">{senderJob}</p>
-                                </div>
-                            </div>
-                             <div className="flex items-center text-xs text-gray-500">
-                                {hasAlternatives && (
-                                    <div className="AlternativeResponseNavigator flex items-center gap-2 mr-2 text-white">
-                                        <button onClick={() => handleChangeAlternativeResponse(message.id, 'prev')} disabled={currentResponseIndex <= -1} className="disabled:opacity-50">&lt;</button>
-                                        <span>{currentResponseIndex + 2} / {totalResponses}</span>
-                                        <button onClick={() => handleChangeAlternativeResponse(message.id, 'next')} disabled={currentResponseIndex >= totalResponses - 2} className="disabled:opacity-50">&gt;</button>
-                                    </div>
-                                )}
-                                <span className="MessageTimestamp">{formattedTime}</span>
-                            </div>
+    // CONTINUOUS CONVERSATION MODE RENDER
+    if (isContinuousConversation) {
+        return (
+            <div id={message.id} className={`w-full px-4 md:px-8 mb-3 animate-fade-in-up flex group relative ${alignmentClass}`}>
+                <div className={`flex items-start w-auto max-w-3xl ${isUser ? 'flex-row-reverse' : 'flex-row'}`} style={{ transform: `scale(${settings.scale})`}}>
+                    <div className="w-10 flex-shrink-0">
+                        <Avatar name={senderName} color={agentColorIndicator} />
+                    </div>
+                    <div className={`flex flex-col w-full ${isUser ? 'ml-0 mr-3' : 'ml-3'}`}>
+                        <div className={`flex items-baseline gap-2 ${isUser ? 'flex-row-reverse' : ''}`}>
+                            <p className={`text-sm font-semibold ${isUser ? 'text-indigo-300' : 'text-cyan-300'}`}>{senderName}</p>
+                            <span className="text-xs text-gray-500 opacity-0 group-hover:opacity-100 transition-opacity">{formattedTime}</span>
                         </div>
-
-                        {/* Content */}
                         <div
-                            className={`MessageBubbleBody p-4 ${isUser ? 'content-bg-user prose-user' : 'content-bg-agent prose-agent'}`}
-                        >
-                            {message.plan ? (
-                                <div className="PlanDisplayContainer"><PlanDisplay plan={message.plan} /></div>
-                            ) : (
-                                <>
-                                    <div
-                                        ref={contentRef}
-                                        className="MessageText prose max-w-none prose-p:my-2 prose-headings:my-3"
-                                        dangerouslySetInnerHTML={{ __html: getMessageContent() }}
-                                    />
-                                    {message.isStreaming && <span className="streaming-cursor"></span>}
-                                </>
-                            )}
-                            
-                            {hasSummary && !isUser && (
-                                 <button
-                                    onClick={() => setIsExpanded(!isExpanded)}
-                                    className="ExpandMessageButton text-indigo-400 hover:text-indigo-200 text-sm font-semibold mt-2 focus:outline-none bg-black bg-opacity-20 px-2 py-1 rounded"
-                                >
-                                    {isExpanded ? 'Show Summary' : 'Show Full Text'}
-                                </button>
-                            )}
-                             {message.attachment && (
-                                <div className="mt-2">
-                                    <img src={`data:${message.attachment.mimeType};base64,${message.attachment.base64}`} alt="Attachment" className="MessageAttachment max-w-xs rounded-lg border-2 border-gray-200" />
+                            className={`prose max-w-none prose-p:my-1 prose-headings:mt-2 prose-headings:mb-1 mt-1 ${isUser ? 'prose-user text-gray-200' : 'prose-agent bg-slate-800/30 p-3 rounded-lg'}`}
+                            dir={settings.textDirection}
+                            style={{ fontSize: `${settings.fontSize}rem` }}
+                            ref={contentRef}
+                            dangerouslySetInnerHTML={{ __html: getMessageContent() }}
+                        />
+                         {message.isStreaming && <span className="streaming-cursor"></span>}
+                         {message.attachment && (
+                            <div className="mt-2">
+                                <img src={`data:${message.attachment.mimeType};base64,${message.attachment.base64}`} alt="Attachment" className="max-w-xs rounded-lg border-2 border-gray-700" />
+                            </div>
+                        )}
+                    </div>
+                    <div className={`absolute -top-3 ${isUser ? 'left-12' : 'right-12'} z-10 opacity-0 group-hover:opacity-100 transition-opacity duration-300`}>
+                        {/* FIX: Passed props to MessageToolbar */}
+                        <MessageToolbar message={message} isUser={isUser} isContinuous={true} settings={settings} handleAlignment={handleAlignment} handleTextDirection={handleTextDirection} handleFontSize={handleFontSize} handleCopy={handleCopy} />
+                    </div>
+                </div>
+            </div>
+        );
+    }
+    
+    // DEFAULT (MULTI-CONVERSATION) MODE RENDER
+    return (
+        <div id={message.id} className={`w-full px-4 md:px-8 mb-6 animate-fade-in-up flex ${alignmentClass}`}>
+            <div className={`flex items-start w-auto max-w-full ${isUser ? 'flex-row-reverse' : 'flex-row'}`}>
+                <Avatar name={senderName} color={agentColorIndicator} />
+                <div 
+                    className={`group flex flex-col w-full max-w-3xl rounded-xl shadow-md overflow-hidden border ${isUser ? 'border-indigo-700' : 'border-slate-700'} ${isInsight ? '!border-yellow-500/50' : ''} ${isUser ? 'ml-0 mr-4' : 'ml-4'} transition-all duration-300`}
+                    style={{ transform: `scale(${settings.scale})`}}
+                >
+                    <div className={`flex items-center justify-between p-3 bg-primary-header ${isInsight ? '!bg-yellow-900/50' : ''} ${isUser ? 'flex-row-reverse' : ''}`} style={{backgroundColor: isInsight ? '' : 'var(--color-primary-header)'}}>
+                         <div className={`flex items-center ${isUser ? 'flex-row-reverse' : ''}`}>
+                            <div className={`w-3 h-3 rounded-sm ${agentColorIndicator}`}></div>
+                            <div className={`mx-3 text-sm font-semibold ${isUser ? 'text-right' : 'text-left'}`}>
+                                <p className="text-white">{senderName}</p>
+                                <p className="text-white text-xs">{senderJob}</p>
+                            </div>
+                        </div>
+                         <div className="flex items-center text-xs text-gray-500">
+                            {hasAlternatives && (
+                                <div className="flex items-center gap-2 mr-2 text-white">
+                                    <button onClick={() => handleChangeAlternativeResponse(message.id, 'prev')} disabled={currentResponseIndex <= -1} className="disabled:opacity-50">&lt;</button>
+                                    <span>{currentResponseIndex + 2} / {totalResponses}</span>
+                                    <button onClick={() => handleChangeAlternativeResponse(message.id, 'next')} disabled={currentResponseIndex >= totalResponses - 2} className="disabled:opacity-50">&gt;</button>
                                 </div>
                             )}
+                            <span>{formattedTime}</span>
                         </div>
+                    </div>
+                    <div
+                        className={`p-4 ${isUser ? 'content-bg-user prose-user' : 'content-bg-agent prose-agent'}`}
+                        dir={settings.textDirection}
+                        style={{ fontSize: `${settings.fontSize}rem` }}
+                    >
+                        {message.plan ? (
+                            <PlanDisplay plan={message.plan} />
+                        ) : (
+                            <>
+                                <div
+                                    ref={contentRef}
+                                    className="prose max-w-none prose-p:my-2 prose-headings:my-3"
+                                    dangerouslySetInnerHTML={{ __html: getMessageContent() }}
+                                />
+                                {message.isStreaming && <span className="streaming-cursor"></span>}
+                            </>
+                        )}
+                        {isLongMessageEnabled && (
+                             <button onClick={() => setIsExpanded(!isExpanded)} className="text-indigo-600 hover:text-indigo-800 text-sm font-semibold mt-2 focus:outline-none bg-black bg-opacity-5 px-2 py-1 rounded">
+                                {isExpanded ? 'Show Less' : 'Show More'}
+                            </button>
+                        )}
+                         {message.attachment && (
+                            <div className="mt-2">
+                                <img src={`data:${message.attachment.mimeType};base64,${message.attachment.base64}`} alt="Attachment" className="max-w-xs rounded-lg border-2 border-gray-200" />
+                            </div>
+                        )}
+                    </div>
+                    <div className={`flex items-center p-2 bg-primary-header/70 ${isUser ? 'flex-row-reverse' : ''} opacity-0 group-hover:opacity-100 transition-opacity duration-300`} style={{backgroundColor: 'var(--color-primary-header)'}}>
+                       {/* FIX: Passed props to MessageToolbar */}
+                       <MessageToolbar message={message} isUser={isUser} isContinuous={false} settings={settings} handleAlignment={handleAlignment} handleTextDirection={handleTextDirection} handleFontSize={handleFontSize} handleCopy={handleCopy} />
                     </div>
                 </div>
             </div>

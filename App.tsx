@@ -29,6 +29,10 @@ import { ComponentsGalleryModal } from './components/ComponentsGalleryModal.tsx'
 import { AddComponentModal } from './components/AddComponentModal.tsx';
 import { AddHtmlComponentModal } from './components/AddHtmlComponentModal.tsx';
 import { EditHtmlComponentModal } from './components/EditHtmlComponentModal.tsx';
+import { EditComponentModal } from './components/EditComponentModal.tsx';
+import { ComponentPreviewModal } from './components/ComponentPreviewModal.tsx';
+import { ConversionTypeModal } from './components/ConversionTypeModal.tsx';
+
 
 export default function App() {
   const { 
@@ -52,12 +56,21 @@ export default function App() {
     setIsAddComponentModalOpen,
     isAddHtmlComponentModalOpen,
     setIsAddHtmlComponentModalOpen,
+    customComponents,
     setCustomComponents,
     setCustomHtmlComponents,
     isEditHtmlComponentModalOpen,
     closeEditHtmlComponentModal,
     editingHtmlComponent,
     handleUpdateHtmlComponent,
+    isEditComponentModalOpen,
+    closeEditComponentModal,
+    editingComponent,
+    handleUpdateCustomComponent,
+    isComponentPreviewOpen,
+    closeComponentPreviewModal,
+    componentToPreview,
+    previewBackground,
   } = useAppContext();
 
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
@@ -108,6 +121,8 @@ export default function App() {
         if (isAddComponentModalOpen) setIsAddComponentModalOpen(false);
         if (isAddHtmlComponentModalOpen) setIsAddHtmlComponentModalOpen(false);
         if (isEditHtmlComponentModalOpen) closeEditHtmlComponentModal();
+        if (isEditComponentModalOpen) closeEditComponentModal();
+        if (isComponentPreviewOpen) closeComponentPreviewModal();
         closeContextMenu();
       }
 
@@ -158,7 +173,7 @@ export default function App() {
       window.removeEventListener('keydown', handleKeyDown);
       window.removeEventListener('click', handleClick);
     };
-  }, [isSettingsOpen, isHistoryOpen, isConversationSettingsOpen, isAddComponentModalOpen, isAddHtmlComponentModalOpen, isEditHtmlComponentModalOpen, setIsSettingsOpen, setIsHistoryOpen, setIsConversationSettingsOpen, setIsAddComponentModalOpen, setIsAddHtmlComponentModalOpen, closeEditHtmlComponentModal, setConversationMode, handleShowHistory, activeConversation, closeContextMenu, handleNewConversation]);
+  }, [isSettingsOpen, isHistoryOpen, isConversationSettingsOpen, isAddComponentModalOpen, isAddHtmlComponentModalOpen, isEditHtmlComponentModalOpen, isEditComponentModalOpen, isComponentPreviewOpen, setIsSettingsOpen, setIsHistoryOpen, setIsConversationSettingsOpen, setIsAddComponentModalOpen, setIsAddHtmlComponentModalOpen, closeEditHtmlComponentModal, closeEditComponentModal, closeComponentPreviewModal, setConversationMode, handleShowHistory, activeConversation, closeContextMenu, handleNewConversation]);
 
   const handleGlobalContextMenu = (e: React.MouseEvent) => {
     e.preventDefault();
@@ -190,7 +205,7 @@ export default function App() {
                     className="flex flex-col flex-1 bg-[#0a0a0f] min-h-0"
                     onContextMenu={handleGlobalContextMenu}
                 >
-                    <div className="flex-shrink-0 h-[10vh]">
+                    <div className="flex-shrink-0">
                       <ConversationSubHeader conversation={activeConversation} />
                     </div>
                     
@@ -258,6 +273,23 @@ export default function App() {
               onUpdateComponent={handleUpdateHtmlComponent}
           />
         )}
+         {editingComponent && (
+          <EditComponentModal
+              isOpen={isEditComponentModalOpen}
+              onClose={closeEditComponentModal}
+              componentToEdit={editingComponent}
+              onUpdateComponent={handleUpdateCustomComponent}
+          />
+        )}
+        {componentToPreview && (
+            <ComponentPreviewModal
+                isOpen={isComponentPreviewOpen}
+                onClose={closeComponentPreviewModal}
+                componentToPreview={componentToPreview}
+                backgroundStyle={previewBackground}
+            />
+        )}
+        <ConversionTypeModal />
     </div>
   );
 }

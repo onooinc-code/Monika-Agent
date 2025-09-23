@@ -16,3 +16,5 @@ export interface ContextMenuItem {
 }
 
 export type SoundEvent = 'open' | 'close' | 'success' | 'send' | 'receive' | 'error' | 'action';
+
+export type ConversionType = 'Multi' | 'Continuous';

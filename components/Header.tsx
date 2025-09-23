@@ -162,7 +162,7 @@ export const Header: React.FC<{
   const { agents, agentManager } = useAppContext();
 
   return (
-    <header className="AppHeader p-2 flex items-stretch gap-4 z-20 h-[30vh] lg:h-[20vh] flex-shrink-0">
+    <header className="AppHeader p-2 flex items-stretch gap-4 z-20 h-[30vh] xl:h-[20vh] flex-shrink-0">
         <div className="HeaderLeftSection flex aspect-square">
             <HeaderLeftActions />
         </div>
