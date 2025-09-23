@@ -1,10 +1,6 @@
 import React from 'react';
-<<<<<<< HEAD
-import RadioActions from "./RadioActions";
-=======
 import { PowerSwitch } from './PowerSwitch.tsx';
 import { MonicaButton } from './MonicaButton.tsx';
->>>>>>> 71baaecbe163aa7a168c6115e277741e1614fec4
 
 export const TitleBar: React.FC = () => {
     return (
@@ -12,17 +8,6 @@ export const TitleBar: React.FC = () => {
             <div className="flex items-center gap-3">
                 <MonicaButton />
             </div>
-<<<<<<< HEAD
-             <RadioActions />
-            <div className="flex items-center gap-3">
-                <div className="flex items-center gap-2" title="System Status">
-                    <div className="w-3 h-3 rounded-full bg-green-400 flashing-dot"></div>
-                    <span className="text-sm font-medium text-gray-300 hidden sm:inline">Online</span>
-                </div>
-                {/* Placeholder for future buttons */}
-                <div className="hidden md:flex items-center gap-2">
-                </div>
-=======
             {/* Placeholder for future buttons */}
             <div className="hidden md:flex items-center gap-2">
             </div>
@@ -33,7 +18,6 @@ export const TitleBar: React.FC = () => {
                 <PowerSwitch color="#eab308" title="API Gateway" initialChecked={true} />
                 <PowerSwitch color="#8b5cf6" title="Cognitive Engine" initialChecked={true} />
                 <PowerSwitch color="#ec4899" title="Creative Module" initialChecked={true} />
->>>>>>> 71baaecbe163aa7a168c6115e277741e1614fec4
             </div>
         </div>
     );
