@@ -22,3 +22,12 @@ dist-ssr
 *.njsproj
 *.sln
 *.sw?
+builderagent.json
+package-lock.json
+.kilocode/mcp.json
+.kilocode/rules/memory-bank-instructions.md
+.kilocode/rules/memory-bank/architecture.md
+.kilocode/rules/memory-bank/brief.md
+.kilocode/rules/memory-bank/context.md
+.kilocode/rules/memory-bank/product.md
+.kilocode/rules/memory-bank/tech.md
