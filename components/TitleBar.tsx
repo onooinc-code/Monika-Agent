@@ -1,4 +1,5 @@
 import React from 'react';
+import RadioActions from "./RadioActions";
 
 export const TitleBar: React.FC = () => {
     return (
@@ -8,6 +9,7 @@ export const TitleBar: React.FC = () => {
                     Monica V2
                 </h1>
             </div>
+             <RadioActions />
             <div className="flex items-center gap-3">
                 <div className="flex items-center gap-2" title="System Status">
                     <div className="w-3 h-3 rounded-full bg-green-400 flashing-dot"></div>
