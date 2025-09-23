@@ -1,4 +1,6 @@
 
+
+
 import React, { useEffect, useRef, useState } from 'react';
 import { Message, Agent, Conversation } from '../types/index.ts';
 import { MANAGER_COLOR } from '../constants/agentConstants.ts';
@@ -161,7 +163,8 @@ export const MessageBubble: React.FC<MessageBubbleProps> = ({ message, agent, fe
             contentRef.current.querySelectorAll('pre').forEach((preElement) => {
                 if (preElement.querySelector('.code-toolbar')) return;
                 const code = preElement.querySelector('code');
-                const lang = Array.from(code?.classList || []).find(cls => cls.startsWith('language-'))?.replace('language-', '') || '';
+                // FIX: Cast Array.from(classList) to string[] to ensure TypeScript knows the array type. This resolves potential errors where find() could return 'unknown', causing issues with subsequent method calls.
+                const lang = (Array.from(code?.classList || []) as string[]).find(cls => cls.startsWith('language-'))?.replace('language-', '') || '';
                 const toolbar = document.createElement('div');
                 toolbar.className = 'code-toolbar glass-pane rounded-t-md px-3 py-1 flex justify-between items-center text-xs';
                 const langSpan = document.createElement('span');

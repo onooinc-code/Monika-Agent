@@ -1,5 +1,5 @@
-import { useState } from 'react';
-import { PipelineStep, Message, ContextMenuItem, Agent, AgentManager, HtmlComponent } from '../../types/index.ts';
+import React, { useState } from 'react';
+import { PipelineStep, Message, ContextMenuItem, Agent, AgentManager, HtmlComponent, CustomComponent } from '../../types/index.ts';
 
 export interface ActionModalButton {
     label: string;
@@ -50,6 +50,13 @@ export const useModalManager = () => {
     const [isAddHtmlComponentModalOpen, setIsAddHtmlComponentModalOpen] = useState(false);
     const [isEditHtmlComponentModalOpen, setIsEditHtmlComponentModalOpen] = useState(false);
     const [editingHtmlComponent, setEditingHtmlComponent] = useState<HtmlComponent | null>(null);
+    const [isEditComponentModalOpen, setIsEditComponentModalOpen] = useState(false);
+    const [editingComponent, setEditingComponent] = useState<CustomComponent | null>(null);
+    const [isComponentPreviewOpen, setIsComponentPreviewOpen] = useState(false);
+    const [componentToPreview, setComponentToPreview] = useState<any | null>(null);
+    const [previewBackground, setPreviewBackground] = useState<React.CSSProperties>({});
+    const [isConversionTypeModalOpen, setIsConversionTypeModalOpen] = useState(false);
+
 
     const [contextMenuState, setContextMenuState] = useState<ContextMenuState>({
         isOpen: false,
@@ -129,6 +136,27 @@ export const useModalManager = () => {
         setEditingHtmlComponent(null);
     };
 
+    const openEditComponentModal = (component: CustomComponent) => {
+        setEditingComponent(component);
+        setIsEditComponentModalOpen(true);
+    };
+
+    const closeEditComponentModal = () => {
+        setIsEditComponentModalOpen(false);
+        setEditingComponent(null);
+    };
+
+    const openComponentPreviewModal = (component: any, background: React.CSSProperties) => {
+        setComponentToPreview(component);
+        setPreviewBackground(background);
+        setIsComponentPreviewOpen(true);
+    };
+
+    const closeComponentPreviewModal = () => {
+        setIsComponentPreviewOpen(false);
+        setComponentToPreview(null);
+    };
+
     return {
         isSettingsOpen, setIsSettingsOpen,
         isHistoryOpen, setIsHistoryOpen,
@@ -157,6 +185,16 @@ export const useModalManager = () => {
         editingHtmlComponent,
         openEditHtmlComponentModal,
         closeEditHtmlComponentModal,
+        isEditComponentModalOpen,
+        editingComponent,
+        openEditComponentModal,
+        closeEditComponentModal,
+        isComponentPreviewOpen,
+        componentToPreview,
+        previewBackground,
+        openComponentPreviewModal,
+        closeComponentPreviewModal,
+        isConversionTypeModalOpen, setIsConversionTypeModalOpen,
         contextMenuState, openContextMenu, closeContextMenu,
     };
 };

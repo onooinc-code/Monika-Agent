@@ -13,11 +13,17 @@ interface State {
 class ErrorBoundary extends Component<Props, State> {
   public state: State = {
     hasError: false,
+    error: undefined,
+    errorInfo: undefined,
   };
 
   public static getDerivedStateFromError(_: Error): State {
     // Update state so the next render will show the fallback UI.
-    return { hasError: true };
+    return { 
+        hasError: true,
+        error: _,
+        errorInfo: undefined 
+    };
   }
 
   public componentDidCatch(error: Error, errorInfo: ErrorInfo) {

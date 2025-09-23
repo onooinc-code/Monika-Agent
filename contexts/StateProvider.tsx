@@ -1,5 +1,5 @@
 import React, { createContext, useContext, useRef, useCallback, useState } from 'react';
-import { Agent, AgentManager, ConversationMode, Attachment, ManualSuggestion, HistoryView, Conversation, PipelineStep, UsageMetrics, Message, LongTermMemoryData, BubbleSettings, ContextMenuItem, SoundEvent, CustomComponent, HtmlComponent } from '../types/index.ts';
+import { Agent, AgentManager, ConversationMode, Attachment, ManualSuggestion, HistoryView, Conversation, PipelineStep, UsageMetrics, Message, LongTermMemoryData, BubbleSettings, ContextMenuItem, SoundEvent, CustomComponent, HtmlComponent, ConversionType } from '../types/index.ts';
 import { useLocalStorage } from '../hooks/useLocalStorage.ts';
 import { useConversationManager } from './hooks/useConversationManager.ts';
 import { useChatHandler, LoadingStage } from './hooks/useChatHandler.ts';
@@ -41,6 +41,8 @@ interface AppState {
     isSoundEnabled: boolean;
     setIsSoundEnabled: React.Dispatch<React.SetStateAction<boolean>>;
     playSound: (event: SoundEvent) => void;
+    conversionType: ConversionType;
+    setConversionType: React.Dispatch<React.SetStateAction<ConversionType>>;
 
     messagesEndRef: React.RefObject<HTMLDivElement>;
     
@@ -170,12 +172,31 @@ interface AppState {
     customHtmlComponents: HtmlComponent[];
     setCustomHtmlComponents: React.Dispatch<React.SetStateAction<HtmlComponent[]>>;
     handleUpdateHtmlComponent: (component: HtmlComponent) => void;
+    handleUpdateCustomComponent: (component: CustomComponent) => void;
+    handleConvertToReactComponent: (componentId: string) => void;
     
     // Edit HTML Component Modal
     isEditHtmlComponentModalOpen: boolean;
     editingHtmlComponent: HtmlComponent | null;
     openEditHtmlComponentModal: (component: HtmlComponent) => void;
     closeEditHtmlComponentModal: () => void;
+    
+    // Edit React Component Modal
+    isEditComponentModalOpen: boolean;
+    editingComponent: CustomComponent | null;
+    openEditComponentModal: (component: CustomComponent) => void;
+    closeEditComponentModal: () => void;
+
+    // Component Preview Modal
+    isComponentPreviewOpen: boolean;
+    componentToPreview: any | null;
+    openComponentPreviewModal: (component: any, background: React.CSSProperties) => void;
+    closeComponentPreviewModal: () => void;
+    previewBackground: React.CSSProperties;
+
+    // Conversion Type Modal
+    isConversionTypeModalOpen: boolean;
+    setIsConversionTypeModalOpen: (isOpen: boolean) => void;
 
 
     // UI Preferences
@@ -197,6 +218,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     const [userBubbleSettings, setUserBubbleSettings] = useLocalStorage<BubbleSettings>('user-bubble-settings', { alignment: 'right', scale: 1, textDirection: 'ltr', fontSize: 1 });
     const [customComponents, setCustomComponents] = useLocalStorage<CustomComponent[]>('custom-components', []);
     const [customHtmlComponents, setCustomHtmlComponents] = useLocalStorage<HtmlComponent[]>('custom-html-components', []);
+    const [conversionType, setConversionType] = useLocalStorage<ConversionType>('conversion-type', 'Multi');
     
     // 2. Refs & Local State
     const messagesEndRef = useRef<HTMLDivElement>(null);
@@ -298,6 +320,59 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
             prev.map(c => c.id === updatedComponent.id ? updatedComponent : c)
         );
     };
+    
+    const handleUpdateCustomComponent = (updatedComponent: CustomComponent) => {
+        setCustomComponents(prev => 
+            prev.map(c => c.name === updatedComponent.name ? updatedComponent : c)
+        );
+    };
+
+    const handleConvertToReactComponent = (componentId: string) => {
+        const componentToConvert = customHtmlComponents.find(c => c.id === componentId);
+        if (!componentToConvert) {
+            alert('Error: Component not found.');
+            return;
+        }
+
+        const newReactComponentName = componentToConvert.name.replace(/[^a-zA-Z0-9]/g, '');
+        
+        // Check for naming conflict
+        if(customComponents.some(c => c.name === newReactComponentName)) {
+            alert(`Error: A React component named "${newReactComponentName}" already exists. Please rename the HTML component first.`);
+            return;
+        }
+        
+        // Using backticks and template literals for multiline strings.
+        // CSS is embedded directly in a <style> tag.
+        // HTML is rendered using dangerouslySetInnerHTML.
+        const componentCode = `
+const ${newReactComponentName} = () => {
+  return (
+    <div>
+      <style>{\`
+        ${componentToConvert.css.replace(/`/g, '\\`')}
+      \`}</style>
+      <div dangerouslySetInnerHTML={{ __html: \`
+        ${componentToConvert.html.replace(/`/g, '\\`')}
+      \` }} />
+    </div>
+  );
+}
+
+export default ${newReactComponentName};
+`;
+
+        const newReactComponent: CustomComponent = {
+            name: newReactComponentName,
+            category: componentToConvert.category,
+            code: componentCode,
+        };
+
+        // Update state: add new React component and remove old HTML one
+        setCustomComponents(prev => [...prev, newReactComponent]);
+        setCustomHtmlComponents(prev => prev.filter(c => c.id !== componentId));
+        playSound('success');
+    };
 
     // 6. Wrapped modal setters with sound effects
     const createSoundifiedSetter = (setter: (isOpen: boolean) => void) => (isOpen: boolean) => {
@@ -317,6 +392,8 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     const setIsComponentsGalleryOpen = createSoundifiedSetter(modalManager.setIsComponentsGalleryOpen);
     const setIsAddComponentModalOpen = createSoundifiedSetter(modalManager.setIsAddComponentModalOpen);
     const setIsAddHtmlComponentModalOpen = createSoundifiedSetter(modalManager.setIsAddHtmlComponentModalOpen);
+    const setIsConversionTypeModalOpen = createSoundifiedSetter(modalManager.setIsConversionTypeModalOpen);
+    
     const openEditHtmlComponentModal = (component: HtmlComponent) => {
         playSound('open');
         modalManager.openEditHtmlComponentModal(component);
@@ -325,6 +402,25 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
         playSound('close');
         modalManager.closeEditHtmlComponentModal();
     };
+
+    const openEditComponentModal = (component: CustomComponent) => {
+        playSound('open');
+        modalManager.openEditComponentModal(component);
+    };
+    const closeEditComponentModal = () => {
+        playSound('close');
+        modalManager.closeEditComponentModal();
+    };
+    
+    const openComponentPreviewModal = (component: any, background: React.CSSProperties) => {
+        playSound('open');
+        modalManager.openComponentPreviewModal(component, background);
+    };
+    const closeComponentPreviewModal = () => {
+        playSound('close');
+        modalManager.closeComponentPreviewModal();
+    };
+
 
     const openAgentSettingsModal = (agent: Agent | AgentManager) => {
         playSound('open');
@@ -362,6 +458,8 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
         isSoundEnabled,
         setIsSoundEnabled,
         playSound,
+        conversionType,
+        setConversionType,
         
         // From useConversationManager
         conversations: conversationManager.conversations.map(c => ({...c, isGeneratingTitle: c.id === conversationManager.activeConversationId && isGeneratingTitle})),
@@ -416,6 +514,8 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
         setIsAddComponentModalOpen,
         isAddHtmlComponentModalOpen: modalManager.isAddHtmlComponentModalOpen,
         setIsAddHtmlComponentModalOpen,
+        isConversionTypeModalOpen: modalManager.isConversionTypeModalOpen,
+        setIsConversionTypeModalOpen,
 
 
         // Message actions from useConversationManager
@@ -485,12 +585,28 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
         customHtmlComponents,
         setCustomHtmlComponents,
         handleUpdateHtmlComponent,
+        handleUpdateCustomComponent,
+        handleConvertToReactComponent,
 
         // Edit HTML Component Modal
         isEditHtmlComponentModalOpen: modalManager.isEditHtmlComponentModalOpen,
         editingHtmlComponent: modalManager.editingHtmlComponent,
         openEditHtmlComponentModal,
         closeEditHtmlComponentModal,
+        
+        // Edit React Component Modal
+        isEditComponentModalOpen: modalManager.isEditComponentModalOpen,
+        editingComponent: modalManager.editingComponent,
+        openEditComponentModal,
+        closeEditComponentModal,
+
+        // Component Preview Modal
+        isComponentPreviewOpen: modalManager.isComponentPreviewOpen,
+        componentToPreview: modalManager.componentToPreview,
+        openComponentPreviewModal,
+        closeComponentPreviewModal,
+        previewBackground: modalManager.previewBackground,
+
 
         // UI Preferences
         isPermanentlyVisible: uiPrefsManager.isPermanentlyVisible,

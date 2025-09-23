@@ -4,6 +4,12 @@ import { CloseIcon, SearchIcon, FilterIcon, FolderIcon, ChevronDownIcon, CopyIco
 
 const elementData = [
   {
+    group: 'Branding',
+    elements: [
+      { name: 'Monica Button', description: 'The main branding button with star and glow animations, used in the Title Bar.', descriptionAr: 'زر العلامة التجارية الرئيسي مع رسوم متحركة للنجوم والتوهج، يستخدم في شريط العنوان.', classNames: 'btn, container-stars, glow' }
+    ]
+  },
+  {
     group: 'Header',
     elements: [
       { name: 'Header Container', description: 'The main container for the entire header.', descriptionAr: 'الحاوية الرئيسية للهيدر بأكمله.', classNames: 'AppHeader' },
@@ -23,38 +29,32 @@ const elementData = [
   {
     group: 'Header Actions',
     elements: [
-      { name: 'API Usage Button', description: 'Opens the API usage modal.', descriptionAr: 'يفتح نافذة استخدام الـ API.', classNames: 'ApiUsageActionButton' },
-      { name: 'Settings Button', description: 'Opens the main settings modal.', descriptionAr: 'يفتح نافذة الإعدادات الرئيسية.', classNames: 'SettingsActionButton' },
-      { name: 'Team Generator Button', description: 'Opens the team generator modal.', descriptionAr: 'يفتح نافذة مولد الفرق.', classNames: 'TeamGeneratorActionButton' },
-      { name: 'Developer Info Button', description: 'Opens this developer info modal.', descriptionAr: 'يفتح نافذة معلومات المطورين هذه.', classNames: 'DeveloperInfoActionButton' },
+      { name: 'Header Actions Container', description: 'The animated card holding the new radio button actions.', descriptionAr: 'البطاقة المتحركة التي تحتوي على أزرار الإجراءات الراديوية الجديدة.', classNames: 'header-action-card' },
+      { name: 'Radio Input Container', description: 'The main grid container for the four action buttons.', descriptionAr: 'حاوية الشبكة الرئيسية لأزرار الإجراءات الأربعة.', classNames: 'radio-input' },
+      { name: 'Radio Label', description: 'The clickable label for an individual action.', descriptionAr: 'التسمية القابلة للنقر للإجراء الفردي.', classNames: 'label' },
+      { name: 'Settings Button (Spring)', description: 'The button for opening settings, styled as "Spring".', descriptionAr: 'زر فتح الإعدادات، المصمم بنمط "الربيع".', classNames: 'spring' },
+      { name: 'Menu Button (Summer)', description: 'The button for toggling the sidebar, styled as "Summer".', descriptionAr: 'زر تبديل الشريط الجانبي، المصمم بنمط "الصيف".', classNames: 'summer' },
+      { name: 'Gallery Button (Autumn)', description: 'The button for opening the components gallery, styled as "Autumn".', descriptionAr: 'زر فتح معرض المكونات، المصمم بنمط "الخريف".', classNames: 'autumn' },
+      { name: 'Mode Button (Winter)', description: 'The button for changing conversation mode, styled as "Winter".', descriptionAr: 'زر تغيير وضع المحادثة، المصمم بنمط "الشتاء".', classNames: 'winter' },
+      { name: 'Center Diamond', description: 'The central decorative diamond element.', descriptionAr: 'العنصر الزخرفي المركزي على شكل معين.', classNames: 'center' },
+    ]
+  },
+   {
+    group: 'Flip Switch',
+    elements: [
+      { name: 'Flip Switch Container', description: 'The main container for the animated flip switch.', descriptionAr: 'الحاوية الرئيسية لمفتاح التبديل المتحرك.', classNames: 'flip-switch-container' },
+      { name: 'Flip Switch', description: 'The inner container that holds the options and the flipping card.', descriptionAr: 'الحاوية الداخلية التي تحتوي على الخيارات والبطاقة المتحركة.', classNames: 'flip-switch' },
+      { name: 'Switch Button', description: 'The clickable label for each option in the switch.', descriptionAr: 'التسمية القابلة للنقر لكل خيار في المفتاح.', classNames: 'switch-button' },
+      { name: 'Switch Card', description: 'The animated card that flips between options.', descriptionAr: 'البطاقة المتحركة التي تتقلب بين الخيارات.', classNames: 'switch-card' }
     ]
   },
   {
     group: 'Conversation Sub-Header',
     elements: [
-      { name: 'Sub-Header Container', description: 'The main container for the sub-header.', descriptionAr: 'الحاوية الرئيسية للهيدر الفرعي.', classNames: 'ConversationSubHeader' },
-      { name: 'Title Section', description: 'Container for the conversation title and its actions.', descriptionAr: 'حاوية عنوان المحادثة وإجراءاتها.', classNames: 'ConversationTitleSection' },
-      { name: 'Title Input', description: 'The input field for editing the title.', descriptionAr: 'حقل الإدخال لتعديل العنوان.', classNames: 'ConversationTitleInput' },
-      { name: 'Title Display', description: 'The displayed conversation title text.', descriptionAr: 'نص عنوان المحادثة المعروض.', classNames: 'ConversationTitle' },
-      { name: 'Mode Badge', description: 'Badge indicating "Moderated" chat mode.', descriptionAr: 'شارة توضح وضع "المحادثة المدارة".', classNames: 'ConversationModeBadge' },
-      { name: 'Save Title Button', description: 'Button to save the edited title.', descriptionAr: 'زر لحفظ العنوان المعدل.', classNames: 'SaveTitleButton' },
-      { name: 'Title Actions', description: 'Container for the title action buttons (edit, generate, settings).', descriptionAr: 'حاوية أزرار إجراءات العنوان (تعديل، توليد، إعدادات).', classNames: 'ConversationTitleActions' },
-      { name: 'Edit Title Button', description: 'Button to enable title editing.', descriptionAr: 'زر لتفعيل تعديل العنوان.', classNames: 'EditTitleButton' },
-      { name: 'Generate Title Button', description: 'Button to generate a title with AI.', descriptionAr: 'زر لتوليد عنوان بالذكاء الاصطناعي.', classNames: 'GenerateTitleButton' },
-      { name: 'Conversation Settings Button', description: 'Button to open conversation-specific settings.', descriptionAr: 'زر لفتح الإعدادات الخاصة بالمحادثة.', classNames: 'ConversationSettingsButton' },
-      { name: 'Mode Selector', description: 'Container for the conversation mode toggle buttons.', descriptionAr: 'حاوية أزرار تبديل وضع المحادثة.', classNames: 'ConversationModeSelector' },
-      { name: 'Mode Button', description: 'General class for all mode buttons.', descriptionAr: 'كلاس عام لجميع أزرار الوضع.', classNames: 'ModeButton' },
-      { name: 'Dynamic Mode Button', description: 'Button to select Dynamic mode.', descriptionAr: 'زر لاختيار الوضع الديناميكي.', classNames: 'DynamicModeButton' },
-      { name: 'Continuous Mode Button', description: 'Button to select Continuous mode.', descriptionAr: 'زر لاختيار الوضع المستمر.', classNames: 'ContinuousModeButton' },
-      { name: 'Manual Mode Button', description: 'Button to select Manual mode.', descriptionAr: 'زر لاختيار الوضع اليدوي.', classNames: 'ManualModeButton' },
-      { name: 'Desktop Actions', description: 'Container for right-side actions on desktop.', descriptionAr: 'حاوية الإجراءات اليمنى على سطح المكتب.', classNames: 'ConversationActions' },
-      { name: 'Archive Button', description: 'Button to open the message archive.', descriptionAr: 'زر لفتح أرشيف الرسائل.', classNames: 'ArchiveButton' },
-      { name: 'Bookmarks Button', description: 'Button to open the bookmarks panel.', descriptionAr: 'زر لفتح لوحة الإشارات المرجعية.', classNames: 'BookmarksButton' },
-      { name: 'History Button', description: 'Button to open the conversation history modal.', descriptionAr: 'زر لفتح نافذة سجل المحادثة.', classNames: 'HistoryButton' },
-      { name: 'Mobile Actions', description: 'Container for the mobile menu.', descriptionAr: 'حاوية القائمة للجوال.', classNames: 'MobileActions' },
-      { name: 'Mobile Menu Button', description: 'The ellipsis button to open the mobile menu.', descriptionAr: 'زر النقاط لفتح قائمة الجوال.', classNames: 'MobileMenuButton' },
-      { name: 'Mobile Menu', description: 'The dropdown menu on mobile.', descriptionAr: 'القائمة المنسدلة على الجوال.', classNames: 'MobileMenu' },
-      { name: 'Mobile Menu Item', description: 'An individual item within the mobile menu.', descriptionAr: 'عنصر فردي داخل قائمة الجوال.', classNames: 'MobileMenuItem' },
+      { name: 'Sub-Header Container', description: 'The main flex container for the sub-header.', descriptionAr: 'حاوية فلكس الرئيسية للهيدر الفرعي.', classNames: 'ConversationSubHeader' },
+      { name: 'Conversation Title', description: 'The cyberpunk-style card component that displays the conversation title on the left.', descriptionAr: 'مكون بطاقة السايبربانك الذي يعرض عنوان المحادثة على اليسار.', classNames: 'ConversationTitle' },
+      { name: 'Navigation Tabs', description: 'The central component for switching conversation modes (Dynamic, Continuous, Manual).', descriptionAr: 'المكون المركزي لتبديل أوضاع المحادثة.', classNames: 'nav-tabs-container' },
+      { name: 'Conversation Actions', description: 'The pill-style container on the right with all the action icon-buttons.', descriptionAr: 'حاوية الأزرار الأيقونية للإجراءات على اليمين.', classNames: 'ConversationActions' },
     ]
   },
   {

@@ -1,6 +1,7 @@
 import React, { useState, useRef } from "react";
 import { Attachment } from "../types/index.ts";
 import { useAppContext } from "../contexts/StateProvider.tsx";
+import { ProfileActions } from "./ProfileActions.tsx";
 
 const AttachmentIconV2 = () => (
   <svg
@@ -136,7 +137,7 @@ export const MessageInput: React.FC = () => {
         </div>
 
         {/* New Action Bar */}
-        <div className="MessageInputActionBar glass-pane rounded-2xl px-4 flex justify-between items-center">
+        <div className="MessageInputActionBar group glass-pane rounded-2xl px-4 flex justify-between items-center">
             <div className="MessageInputActionButtonsContainer flex items-center gap-2">
                 <input
                     type="file"
@@ -155,6 +156,9 @@ export const MessageInput: React.FC = () => {
                 <button className="BrowseWebButton message-input-actions-btn" title="Browse web">
                     <GlobeIcon />
                 </button>
+
+                <div className="w-px h-5 bg-white/20 mx-1 opacity-50 transition-all duration-300 group-hover:bg-cyan-400 group-hover:opacity-100 group-hover:shadow-[0_0_8px_0_rgba(34,211,238,0.8)]"></div>
+                <ProfileActions />
             </div>
             <button
                 onClick={handleSend}
