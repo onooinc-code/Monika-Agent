@@ -103,7 +103,7 @@
                     <span class="tag tag-solution">Implemented Fix</span>
                     <span>Stabilization of Core Handlers via `useCallback`</span>
                 </h3>
-                <p class="mt-3 text-gray-300">The critical flaw has been rectified by wrapping all state-modifying functions in code>useConversationManager.ts</code> with the `useCallback` hook. This ensures that these functions maintain a stable identity across re-renders, breaking the unstable dependency chain.</p>
+                <p class="mt-3 text-gray-300">The critical flaw has been rectified by wrapping all state-modifying functions in <code>useConversationManager.ts</code> with the `useCallback` hook. This ensures that these functions maintain a stable identity across re-renders, breaking the unstable dependency chain.</p>
                 <details class="mt-2 text-sm">
                     <summary class="font-semibold">View Code Example (Before vs. After)</summary>
                     <div class="grid grid-cols-2 gap-4 mt-2">

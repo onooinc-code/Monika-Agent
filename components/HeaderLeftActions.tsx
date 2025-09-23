@@ -3,7 +3,7 @@ import { useAppContext } from '../contexts/StateProvider.tsx';
 import { GlassIconButton } from './GlassIconButton.tsx';
 
 export const HeaderLeftActions: React.FC = () => {
-    const { setIsTeamGeneratorOpen, setIsApiUsageOpen, setIsDeveloperInfoOpen, setIsComponentsGalleryOpen } = useAppContext();
+    const { setIsTeamGeneratorOpen, setIsApiUsageOpen, setIsDeveloperInfoOpen } = useAppContext();
 
     return (
         <div className="HeaderLeftActions header-action-card">
@@ -14,13 +14,6 @@ export const HeaderLeftActions: React.FC = () => {
                     aria-label="Open API Usage"
                     gradient="cyan"
                     className="ApiUsageActionButton"
-                />
-                <GlassIconButton
-                    onClick={() => setIsComponentsGalleryOpen(true)}
-                    title="Components Gallery"
-                    aria-label="Open Components Gallery"
-                    gradient="indigo"
-                    className="ComponentsGalleryActionButton"
                 />
                 <GlassIconButton
                     onClick={() => setIsTeamGeneratorOpen(true)}

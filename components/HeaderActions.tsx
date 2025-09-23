@@ -8,7 +8,7 @@ interface HeaderActionsProps {
 }
 
 export const HeaderActions: React.FC<HeaderActionsProps> = ({ toggleSidebar, sidebarAnimationState }) => {
-    const { setIsSettingsOpen } = useAppContext();
+    const { setIsSettingsOpen, setIsComponentsGalleryOpen } = useAppContext();
 
     const animationClass = {
         slow: 'animate-neon-blink-slow',
@@ -35,8 +35,13 @@ export const HeaderActions: React.FC<HeaderActionsProps> = ({ toggleSidebar, sid
                         className="MenuButton"
                     />
                 </div>
-                {/* Placeholders for more buttons */}
-                <div/>
+                <GlassIconButton
+                    onClick={() => setIsComponentsGalleryOpen(true)}
+                    title="Components Gallery"
+                    aria-label="Open Components Gallery"
+                    gradient="dev"
+                    className="ComponentsGalleryActionButton"
+                />
                 <div/>
             </div>
         </div>
