@@ -12,8 +12,8 @@ export const MessageList: React.FC = () => {
     }
     
     return (
-        <div className="p-6">
-            <div className="max-w-4xl mx-auto">
+        <div className="MessageList">
+            <div className="MessageListContainer max-w-4xl mx-auto">
                 {activeConversation.messages.map(message => {
                     if (message.messageType === 'topic_divider') {
                         return <TopicDivider key={message.id} text={message.text} timestamp={message.timestamp} />;

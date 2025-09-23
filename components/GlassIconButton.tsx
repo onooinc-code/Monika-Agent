@@ -1,11 +1,12 @@
-import React from 'react';
+import React, { useId } from 'react';
 
 interface GlassIconButtonProps {
     onClick: () => void;
     title: string;
-    ariaLabel: string;
-    gradient: 'indigo' | 'cyan' | 'purple';
+    'aria-label': string;
+    gradient: 'indigo' | 'cyan' | 'purple' | 'dev' | 'menu';
     iconUrl?: string;
+    className?: string;
 }
 
 const FALLBACK_ICONS = {
@@ -30,59 +31,66 @@ const FALLBACK_ICONS = {
             <circle cx="32" cy="32" r="10" stroke="white" strokeWidth="6"/>
         </g>
     ),
+    dev: (
+        <g transform="translate(16, 16) scale(0.5)">
+            <path d="M20 28L12 36l8 8m12-16l8 8-8 8M36 12L28 52" stroke="white" strokeWidth="6" strokeLinecap="round" strokeLinejoin="round"/>
+        </g>
+    ),
+    menu: (
+        <g transform="translate(16, 16) scale(0.5)">
+            <rect x="8" y="12" width="48" height="8" rx="4" stroke="white" strokeWidth="6" strokeLinejoin="round" fill="none"/>
+            <rect x="8" y="28" width="48" height="8" rx="4" stroke="white" strokeWidth="6" strokeLinejoin="round" fill="none"/>
+            <rect x="8" y="44" width="48" height="8" rx="4" stroke="white" strokeWidth="6" strokeLinejoin="round" fill="none"/>
+        </g>
+    ),
 };
 
 
-interface GlassIconButtonProps {
-    onClick: () => void;
-    title: string;
-    ariaLabel: string;
-    gradient: 'indigo' | 'cyan' | 'purple';
-    iconUrl?: string;
-    className?: string; // Added for custom sizing
-}
-
-export const GlassIconButton: React.FC<GlassIconButtonProps> = ({ onClick, title, ariaLabel, gradient, iconUrl, className = '' }) => {
+export const GlassIconButton: React.FC<GlassIconButtonProps> = ({ onClick, title, 'aria-label': ariaLabel, gradient, iconUrl, className }) => {
     
+    const uniqueId = useId();
+
     const gradients = {
-        indigo: { id: 'grad-glass-indigo-btn', stop1: '#818cf8', stop2: '#4f46e5' },
-        cyan: { id: 'grad-glass-cyan-btn', stop1: '#67e8f9', stop2: '#06b6d4' },
-        purple: { id: 'grad-glass-purple-btn', stop1: '#c084fc', stop2: '#9333ea' },
+        indigo: { id: `grad-glass-indigo-btn-${uniqueId}`, stop1: '#818cf8', stop2: '#4f46e5' },
+        cyan: { id: `grad-glass-cyan-btn-${uniqueId}`, stop1: '#67e8f9', stop2: '#06b6d4' },
+        purple: { id: `grad-glass-purple-btn-${uniqueId}`, stop1: '#c084fc', stop2: '#9333ea' },
+        dev: { id: `grad-glass-dev-btn-${uniqueId}`, stop1: '#9ca3af', stop2: '#4b5563' },
+        menu: { id: `grad-glass-menu-btn-${uniqueId}`, stop1: '#a78bfa', stop2: '#7c3aed' },
     };
 
     const selectedGradient = gradients[gradient];
+    const filterId = `shadow-glass-btn-${gradient}-${uniqueId}`;
 
     return (
         <button
             onClick={onClick}
             title={title}
             aria-label={ariaLabel}
-            className={`relative w-10 h-10 ${className} transition-transform transform hover:scale-110 focus:outline-none`}
+            className={`w-full h-full transition-transform transform hover:scale-110 focus:outline-none ${className || ''}`}
         >
-            <svg viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg" className="absolute inset-0">
+            <svg viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg">
                 <defs>
                     <linearGradient id={selectedGradient.id} x1="0%" y1="0%" x2="0%" y2="100%">
                         <stop offset="0%" stopColor={selectedGradient.stop1} />
                         <stop offset="100%" stopColor={selectedGradient.stop2} />
                     </linearGradient>
-                    <filter id={`shadow-glass-btn-${gradient}`} x="-20%" y="-20%" width="140%" height="140%">
+                    <filter id={filterId} x="-20%" y="-20%" width="140%" height="140%">
                         <feDropShadow dx="1" dy="2" stdDeviation="2" floodColor="#000000" floodOpacity="0.4" />
                     </filter>
                 </defs>
-                <g filter={`url(#shadow-glass-btn-${gradient})`}>
+                <g filter={`url(#${filterId})`}>
                     <rect x="4" y="4" width="56" height="56" rx="16" fill={`url(#${selectedGradient.id})`} />
                     <path d="M4 20C18 14 46 14 60 20L60 16C60 9.37 54.63 4 48 4L16 4C9.37 4 4 9.37 4 16L4 20Z" fill="white" fillOpacity="0.3" />
+                    
+                    {iconUrl ? (
+                        <foreignObject x="12" y="12" width="40" height="40">
+                             <img src={iconUrl} alt={title} className="w-full h-full object-contain" />
+                        </foreignObject>
+                    ) : (
+                        FALLBACK_ICONS[gradient]
+                    )}
                 </g>
             </svg>
-            {iconUrl ? (
-                <img src={iconUrl} alt={title} className="absolute inset-0 w-full h-full object-contain p-2" />
-            ) : (
-                <svg viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg" className="absolute inset-0">
-                    <g filter={`url(#shadow-glass-btn-${gradient})`}>
-                        {FALLBACK_ICONS[gradient]}
-                    </g>
-                </svg>
-            )}
         </button>
     );
 };

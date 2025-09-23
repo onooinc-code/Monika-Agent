@@ -1,0 +1,18 @@
+Feature: Developer Tools
+ID: 22
+
+Description:
+Implement a suite of in-app tools aimed at developers to facilitate testing, debugging, and understanding of the application's component-based architecture.
+
+Core Functionalities:
+1.  **Component Gallery:**
+    -   A modal that displays a browsable and searchable list of all major UI components in the application.
+    -   Each component should have a live, interactive preview pane.
+    -   Users should be able to manipulate the component's props (e.g., text, color, state) through a GUI and see the changes in real-time.
+    -   The gallery should provide sample JSX and CSS code snippets for easy reuse.
+    -   It should include features for responsive testing (mobile, tablet, desktop views) and an "X-Ray" mode to visualize component boundaries.
+
+2.  **Developer Information Panel:**
+    -   A modal that provides a comprehensive, searchable, and filterable list of key CSS class names used for UI elements throughout the application.
+    -   Each entry should include the element's name, a description of its purpose (in English and Arabic), and the primary CSS class name for easy selection and testing.
+    -   This panel acts as a dynamic "cheatsheet" for developers or QA engineers to quickly identify and inspect specific parts of the UI.

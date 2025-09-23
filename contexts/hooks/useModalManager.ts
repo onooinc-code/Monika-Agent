@@ -44,15 +44,14 @@ export const useModalManager = () => {
     const [isBookmarksPanelOpen, setIsBookmarksPanelOpen] = useState(false);
     const [isAgentSettingsModalOpen, setIsAgentSettingsModalOpen] = useState(false);
     const [selectedAgentForModal, setSelectedAgentForModal] = useState<Agent | AgentManager | null>(null);
+    const [isDeveloperInfoOpen, setIsDeveloperInfoOpen] = useState(false);
+    const [isComponentsGalleryOpen, setIsComponentsGalleryOpen] = useState(false);
     const [contextMenuState, setContextMenuState] = useState<ContextMenuState>({
         isOpen: false,
         x: 0,
         y: 0,
         menuItems: []
     });
-    const [isSidebarOpen, setIsSidebarOpen] = useState(false);
-    const [isSidebarPinned, setIsSidebarPinned] = useState(false);
-    const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
 
     const handleShowHtmlPreview = (html: string) => {
         setHtmlPreviewContent(html);
@@ -135,9 +134,8 @@ export const useModalManager = () => {
         selectedAgentForModal,
         openAgentSettingsModal,
         closeAgentSettingsModal,
+        isDeveloperInfoOpen, setIsDeveloperInfoOpen,
+        isComponentsGalleryOpen, setIsComponentsGalleryOpen,
         contextMenuState, openContextMenu, closeContextMenu,
-        isSidebarOpen, setIsSidebarOpen,
-        isSidebarPinned, setIsSidebarPinned,
-        isAuthModalOpen, setIsAuthModalOpen,
     };
 };

@@ -2,15 +2,14 @@ import React from "react";
 import { Agent, AgentManager } from "../types/index.ts";
 import { useAppContext } from "../contexts/StateProvider.tsx";
 import {
-  MenuIcon,
   PowerIcon,
   InformationCircleIcon,
   CpuIcon,
 } from "./Icons.tsx";
 import { safeRender } from "../services/utils/safeRender.ts";
 import { HeaderActions } from "./HeaderActions.tsx";
-import AgentCardV2 from './AgentCardV2.tsx';
-import ManagerCardV2 from './ManagerCardV2.tsx';
+import { HeaderLeftActions } from "./HeaderLeftActions.tsx";
+import { TitleBar } from "./TitleBar.tsx";
 
 
 const getTodayDateString = (): string => {
@@ -21,64 +20,171 @@ const getTodayDateString = (): string => {
   return `${year}-${month}-${day}`;
 };
 
-const agentGradients = [
-  { from: '#3B82F6', to: '#6366F1' }, // Blue-Indigo
-  { from: '#10B981', to: '#059669' }, // Green-DarkGreen
-  { from: '#EF4444', to: '#DC2626' }, // Red-DarkRed
-  { from: '#F59E0B', to: '#D97706' }, // Amber-Orange
-  { from: '#8B5CF6', to: '#7C3AED' }, // Purple-DarkPurple
-  { from: '#EC4899', to: '#DB2777' }, // Pink-DarkPink
-];
-
-// Main Header component is now the Dashboard Header
-export const Header: React.FC = () => {
+const AgentCard: React.FC<{ agent: Agent }> = ({ agent }) => {
   const {
-    agents,
-    agentManager,
+    usageMetrics,
+    lastTurnAgentIds,
+    handleToggleAgentEnabled,
+    openAgentSettingsModal,
   } = useAppContext();
+  const todayStr = getTodayDateString();
+
+  const stats = usageMetrics.agentUsage[agent.id] || {
+    totalMessages: 0,
+    dailyUsage: [],
+  };
+  const todayStats = stats.dailyUsage.find((d) => d.date === todayStr) || {
+    tokens: 0,
+    messages: 0,
+  };
+  const wasUsed = lastTurnAgentIds.has(agent.id);
+  const isEnabled = agent.isEnabled ?? true;
+
+  const formatStat = (num: number) => {
+    if (num > 1000) return `${(num / 1000).toFixed(1)}k`;
+    return String(num);
+  };
+
+  const borderColorClass =
+    typeof agent.color === "string"
+      ? agent.color.replace("bg-", "border-")
+      : "border-gray-500";
+
   return (
-    <header
-      className="header-component sticky top-0 py-1 flex justify-between items-center gap-2 flex-shrink-0 z-30 border-b border-white/10 shadow-lg glass-pane rounded-xl px-4 flex justify-between items-center"
-      style={{
-        background: "rgba(33, 33, 33, 0.7)",
-        backdropFilter: "blur(10px)",
-        backgroundSize: "400% 400%",
-        animation: "animated-gradient-bg 15s ease infinite",
-      }}
-    >
-      <div className="flex-shrink-0 md:w-[25%] flex items-center gap-2">
+    <div className="AgentCard HeaderCards flex-1 min-w-0 glass-pane rounded-lg flex flex-col transition-all duration-300 transform hover:-translate-y-1 hover:shadow-lg hover:shadow-indigo-500/20">
+      <div
+        className={`flex items-center justify-between p-2 border-b-2 ${borderColorClass}`}
+      >
+        <h3 className="font-bold text-sm text-white truncate">
+          {safeRender(agent.name)}
+        </h3>
+        <button
+          onClick={() => openAgentSettingsModal(agent)}
+          className="p-1 rounded-full text-gray-400 hover:bg-white/20 hover:text-white transition-colors"
+          title={`View details for ${safeRender(agent.name)}`}
+        >
+          <InformationCircleIcon className="w-4 h-4" />
+        </button>
       </div>
-
-      <div className="flex-1 md:w-[50%] flex flex-col">
-        <div className="flex items-center justify-center">
-          <h1
-            className="text-2xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-indigo-400 via-cyan-400 to-indigo-400"
-            style={{
-              backgroundSize: "200% 200%",
-              animation: "animated-gradient-text 5s ease infinite",
-            }}
-          ></h1>
+      <div className="flex-1 p-2 flex items-center justify-around text-center">
+        <div
+          className="flex-1 flex flex-col items-center justify-center"
+          title={isEnabled ? "Click to Disable Agent" : "Click to Enable Agent"}
+        >
+          <button
+            onClick={() => handleToggleAgentEnabled(agent.id)}
+            className={`p-2 rounded-full transition-colors ${
+              isEnabled
+                ? "text-green-400 hover:bg-red-500/20 hover:text-red-400"
+                : "text-gray-500 hover:bg-green-500/20 hover:text-green-400"
+            }`}
+          >
+            <PowerIcon className="w-5 h-5" />
+          </button>
         </div>
-        <div className="hidden md:flex flex-1 items-center justify-center gap-2">
-          {agents.map((agent, index) => (
-            <AgentCardV2
-              key={agent.id}
-              agent={agent}
-              gradientColors={agentGradients[index % agentGradients.length]}
-              gradientId={`agent-gradient-${index}`}
+        <div
+          className="flex-1 flex flex-col items-center justify-center"
+          title={wasUsed ? "Used in last turn" : "Not used in last turn"}
+        >
+          <div
+            className={`w-4 h-4 rounded-full ${
+              wasUsed ? "bg-green-400 flashing-dot" : "bg-red-500"
+            }`}
+          ></div>
+        </div>
+        <div
+          className="flex-1 flex flex-col items-center justify-center"
+          title="Tokens used today (estimate)"
+        >
+          <p className="font-mono font-bold text-sm text-white">
+            {formatStat(todayStats.tokens)}
+          </p>
+          <p className="text-xs text-white">Tokens</p>
+        </div>
+        <div
+          className="flex-1 flex flex-col items-center justify-center"
+          title="Requests today (estimate)"
+        >
+          <p className="font-mono font-bold text-sm text-white">
+            {formatStat(todayStats.messages)}
+          </p>
+          <p className="text-xs text-white">Reqs</p>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+const ManagerCard: React.FC<{ manager: AgentManager }> = ({ manager }) => {
+  const { usageMetrics, openAgentSettingsModal } = useAppContext();
+  const stats = usageMetrics.agentUsage["manager"] || { totalMessages: 0 };
+
+  const formatStat = (num: number) => {
+    if (num > 1000) return `${(num / 1000).toFixed(1)}k`;
+    return String(num);
+  };
+
+  return (
+    <div className="ManagerCard HeaderCards flex-1 min-w-0 glass-pane rounded-lg flex flex-col transition-all duration-300 transform hover:-translate-y-1 hover:shadow-lg hover:shadow-yellow-500/20">
+      <div className="flex items-center justify-between p-2 border-b-2 border-yellow-500">
+        <h3 className="font-bold text-sm text-white truncate">Agent Manager</h3>
+        <button
+          onClick={() => openAgentSettingsModal(manager)}
+          className="p-1 rounded-full text-gray-400 hover:bg-white/20 hover:text-white transition-colors"
+          title="View details for Agent Manager"
+        >
+          <InformationCircleIcon className="w-4 h-4" />
+        </button>
+      </div>
+      <div className="flex-1 p-2 flex items-center justify-around text-center">
+        <div className="flex-1 flex flex-col items-center justify-center text-yellow-400">
+          <CpuIcon className="w-6 h-6" />
+        </div>
+        <div
+          className="flex-1 flex flex-col items-center justify-center"
+          title="Total decisions made"
+        >
+          <p className="font-mono font-bold text-sm text-white">
+            {formatStat(stats.totalMessages)}
+          </p>
+          <p className="text-xs text-white">Decisions</p>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+export const Header: React.FC<{
+  isSidebarOpen: boolean;
+  toggleSidebar: () => void;
+  sidebarAnimationState: 'idle' | 'slow' | 'fast';
+}> = ({ isSidebarOpen, toggleSidebar, sidebarAnimationState }) => {
+  const { agents, agentManager } = useAppContext();
+
+  return (
+    <header className="AppHeader p-2 flex items-stretch gap-4 z-20 h-[30vh] lg:h-[20vh] flex-shrink-0">
+        <div className="HeaderLeftSection flex aspect-square">
+            <HeaderLeftActions />
+        </div>
+        <div className="HeaderCenterSection flex-1 min-w-0 flex flex-col gap-2">
+            <div className="h-[30%]">
+                <TitleBar />
+            </div>
+            <div className="h-[70%]">
+                <div className="HeaderCardsContainer grid grid-cols-2 md:grid-cols-4 gap-2 min-w-0 h-full">
+                    <ManagerCard manager={agentManager} />
+                    {agents.map((agent) => (
+                      <AgentCard key={agent.id} agent={agent} />
+                    ))}
+                </div>
+            </div>
+        </div>
+        <div className="HeaderRightSection flex aspect-square">
+            <HeaderActions 
+                toggleSidebar={toggleSidebar} 
+                sidebarAnimationState={sidebarAnimationState} 
             />
-          ))}
-          <ManagerCardV2 manager={agentManager} />
         </div>
-      </div>
-
-      <div className="flex-shrink-0 md:w-auto flex items-center justify-end">
-        <div className="hidden md:flex">
-          <HeaderActions />
-        </div>
-        {/* Placeholder for mobile to balance flexbox */}
-        <div className="w-6 h-6 md:hidden"></div>
-      </div>
     </header>
   );
-}
+};

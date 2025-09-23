@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Header } from './components/Header.tsx';
 import { MessageList } from './components/MessageList.tsx';
 import { ManualSuggestions } from './components/ManualSuggestions.tsx';
@@ -24,8 +24,8 @@ import { ConversationSubHeader } from './components/ConversationSubHeader.tsx';
 import { ContextMenuItem } from './types/index.ts';
 import { PlusIcon, SettingsIcon, AlignLeftIcon } from './components/Icons.tsx';
 import { AgentSettingsModal } from './components/AgentSettingsModal.tsx';
-import { SidebarToggler } from './components/SidebarToggler.tsx';
-import { AuthModal } from './components/auth/AuthModal.tsx';
+import { DeveloperInfoModal } from './components/DeveloperInfoModal.tsx';
+import { ComponentsGalleryModal } from './components/ComponentsGalleryModal.tsx';
 
 export default function App() {
   const { 
@@ -45,15 +45,44 @@ export default function App() {
     closeContextMenu,
     handleNewConversation,
     setIsArchiveOpen,
-    isSidebarOpen,
-    isAuthModalOpen,
-    setIsAuthModalOpen,
   } = useAppContext();
+
+  const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+  const [sidebarAnimationState, setSidebarAnimationState] = useState<'idle' | 'slow' | 'fast'>('idle');
 
   // Scroll to bottom of messages on new message
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
   }, [activeConversation?.messages, messagesEndRef]);
+
+  // Effect for sidebar animation and auto-close
+  useEffect(() => {
+    let slowTimer: number;
+    let closeTimer: number;
+
+    if (isSidebarOpen) {
+      // Start the animation sequence
+      setSidebarAnimationState('slow');
+
+      slowTimer = window.setTimeout(() => {
+        setSidebarAnimationState('fast');
+      }, 10000); // After 10 seconds, switch to fast blinking
+
+      closeTimer = window.setTimeout(() => {
+        setIsSidebarOpen(false); // After a total of 20 seconds, close the sidebar
+      }, 20000);
+    } else {
+      // If sidebar is closed manually or by the timer, reset animation state
+      setSidebarAnimationState('idle');
+    }
+
+    // Cleanup timers on component unmount or if isSidebarOpen changes before timers fire
+    return () => {
+      clearTimeout(slowTimer);
+      clearTimeout(closeTimer);
+    };
+  }, [isSidebarOpen, setIsSidebarOpen]);
+
 
   // Global keyboard shortcuts & click listeners
   useEffect(() => {
@@ -133,26 +162,28 @@ export default function App() {
 
   return (
     <div className="flex h-screen bg-[#0a0a0f] text-gray-200" style={{fontFamily: "'Inter', sans-serif"}}>
-        <SidebarToggler />
-        <ConversationList />
-        <div className={`flex flex-1 flex-col min-w-0 transition-all duration-300 ease-in-out ${isSidebarOpen ? 'ml-72' : 'ml-0'}`}>
-             <Header />
+        <ConversationList isOpen={isSidebarOpen} />
+        <div className="flex flex-1 flex-col min-w-0">
+            <Header 
+                isSidebarOpen={isSidebarOpen} 
+                toggleSidebar={() => setIsSidebarOpen(!isSidebarOpen)}
+                sidebarAnimationState={sidebarAnimationState}
+            />
             <div className="flex flex-1 min-h-0">
                 <main
                     className="flex flex-col flex-1 bg-[#0a0a0f] min-h-0"
                     onContextMenu={handleGlobalContextMenu}
                 >
+                    <div className="flex-shrink-0 h-[10vh]">
+                      <ConversationSubHeader conversation={activeConversation} />
+                    </div>
+                    
+                    {/* Main Content Area */}
                     {activeConversation ? (
-                        <>
-                            <ConversationSubHeader conversation={activeConversation} />
-                            <div className="flex-1 overflow-y-auto">
-                                <MessageList />
-                                <div ref={messagesEndRef} />
-                            </div>
-                            {conversationMode === 'Manual' && <ManualSuggestions />}
-                            <LiveStatusIndicator />
-                            <MessageInput />
-                        </>
+                        <div className="flex-1 overflow-y-auto pt-2">
+                            <MessageList />
+                            <div ref={messagesEndRef} />
+                        </div>
                     ) : (
                         <div className="flex-1 flex items-center justify-center p-6">
                             <div className="text-center">
@@ -161,9 +192,21 @@ export default function App() {
                             </div>
                         </div>
                     )}
-                    <StatusBar />
+
+                    {/* Input Area */}
+                    {activeConversation && (
+                        <div className="flex-shrink-0">
+                          {conversationMode === 'Manual' && <ManualSuggestions />}
+                          <LiveStatusIndicator />
+                          <MessageInput />
+                        </div>
+                    )}
                 </main>
                 <BookmarkedMessagesPanel isOpen={isBookmarksPanelOpen} />
+            </div>
+            {/* The StatusBar is now outside the main scrolling area, fixed at the bottom of the column */}
+            <div className="flex-shrink-0">
+                <StatusBar />
             </div>
         </div>
         <SettingsModal />
@@ -179,7 +222,8 @@ export default function App() {
         <MessageArchiveModal />
         <ContextMenu />
         <AgentSettingsModal />
-        <AuthModal isOpen={isAuthModalOpen} onClose={() => setIsAuthModalOpen(false)} />
+        <DeveloperInfoModal />
+        <ComponentsGalleryModal />
     </div>
   );
 }

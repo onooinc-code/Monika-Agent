@@ -71,107 +71,86 @@
         <section class="glass-pane rounded-xl p-8 prose prose-invert max-w-none prose-p:text-gray-300 prose-headings:text-white">
             <h2 class="!text-3xl !text-cyan-400 border-b-2 border-cyan-400/30 pb-2">Executive Summary</h2>
             <p>The "Monica" application is a well-architected and sophisticated frontend platform for multi-agent AI conversations. The codebase demonstrates a strong adherence to modern development principles, including separation of concerns, a clear state management pattern, and a highly reusable component structure. The core features, such as the dynamic and moderated chat modes, are implemented with robust and sound logic.</p>
-            <p>However, the project contains one significant non-functional feature inherited from a previous architectural iteration (the Chrome Extension) which requires immediate removal. Additionally, there are inherent architectural risks related to its client-side nature that should be acknowledged. The project's own documentation provides a clear and ambitious roadmap for future development, which this report will also outline.</p>
-            <p>This audit provides a clear, actionable path to rectify immediate issues and align the project for future growth as outlined in its own vision.</p>
+            <p>This audit was commissioned to diagnose a persistent and critical "black screen" rendering failure. The root cause was identified as a state management instability issue stemming from the creation of new state update functions on every render. This created a cascade of unnecessary re-renders, leading to a fatal application crash.</p>
+            <p>This report details the root cause, the corrective actions taken, and outlines the next steps for the project, which is now in a stable, feature-complete state (v3.0.0) for its client-side iteration.</p>
         </section>
 
         <section class="glass-pane rounded-xl p-8 space-y-6">
-            <h2 class="text-3xl font-bold text-white border-b-2 border-indigo-400/30 pb-2">1. Unsound Logic & Architectural Risks</h2>
-            <div class="glass-pane -m-4 p-6 rounded-lg">
-                <h3 class="font-semibold text-xl text-indigo-300 flex items-center gap-3">
-                    <span class="tag tag-risk">Architectural Risk</span>
-                    <span>Dependency on AI for JSON Formatting</span>
-                </h3>
-                <p class="mt-3 text-gray-300">Multiple services (e.g., `managerService`, `teamGenerationService`) rely on the Gemini API returning a perfectly structured JSON object that matches a predefined schema. While the application code is written defensively with `try...catch` blocks around `JSON.parse` and uses the `safeRender` utility in the UI, this remains an inherent point of fragility.</p>
-                <p class="mt-2 text-gray-400">If the AI model, for any reason (e.g., model updates, safety blocks, ambiguous prompts), fails to return valid JSON, the feature will fail. The current implementation correctly prevents the app from crashing, but the user experience is impacted.</p>
-                <p class="mt-2 text-gray-400"><strong>Conclusion:</strong> The logic is not "unsound" in its implementation (it handles errors correctly), but the architectural choice to rely on client-side parsing of AI-generated JSON is a risk. This is acceptable for the current client-only architecture but should be a primary consideration for a backend migration.</p>
-            </div>
-        </section>
-
-        <section class="glass-pane rounded-xl p-8 space-y-6">
-            <h2 class="text-3xl font-bold text-white border-b-2 border-red-400/30 pb-2">2. Incorrect or Non-Functional Features</h2>
+            <h2 class="text-3xl font-bold text-white border-b-2 border-red-400/30 pb-2">1. Critical Bug Analysis: The "Black Screen"</h2>
             <div class="glass-pane -m-4 p-6 rounded-lg">
                 <h3 class="font-semibold text-xl text-red-300 flex items-center gap-3">
-                    <span class="tag tag-critical">Non-Functional</span>
-                    <span>MCP Server Manager</span>
+                    <span class="tag tag-critical">Root Cause</span>
+                    <span>State Management Instability</span>
                 </h3>
-                <p class="mt-3 text-gray-300">This feature is entirely non-operational. Its logic, from the UI components to the state management hooks (`useMcpManager`), is designed exclusively to communicate with a browser extension via `window.postMessage`.</p>
-                <p class="mt-2 text-gray-400">As all files related to the Chrome Extension (`Monica-Extension/`, `manifest.json`, etc.) have been removed from the project, the MCP Server Manager is now "dead code". It attempts to send messages to a non-existent receiver and listens for responses that will never arrive. The UI is still present, which can cause significant user confusion.</p>
-                <p class="mt-2 text-gray-400"><strong>Conclusion:</strong> This feature is incorrectly implemented in the context of the current project structure because its required counterpart is missing. It must be removed completely.</p>
+                <p class="mt-3 text-gray-300">The primary reason for the application crash was the instability of core state management functions within <code>useConversationManager.ts</code>. Functions like `handleDeleteMessage`, `handleUpdateConversation`, etc., were being redefined on every single render of the `AppProvider` component.</p>
+                <p class="mt-2 text-gray-400">Because these functions were passed as dependencies to other hooks (like `useChatHandler`), this created a chain reaction:
+                    <ol class="list-decimal list-inside mt-2 space-y-1">
+                        <li>A piece of state changes.</li>
+                        <li>`AppProvider` re-renders, creating new versions of all handler functions.</li>
+                        <li>Child hooks see these "new" functions and re-trigger their own `useEffect` or `useCallback` hooks.</li>
+                        <li>This can lead to further state updates, creating an infinite or unstable loop that crashes React's rendering process before anything can be displayed.</li>
+                    </ol>
+                </p>
+                <p class="mt-2 text-gray-400"><strong>Conclusion:</strong> The issue was not a simple bug in one component, but a fundamental architectural flaw in how state update functions were defined and passed through the application, leading to a fatal rendering cascade.</p>
             </div>
         </section>
-        
+
         <section class="glass-pane rounded-xl p-8 space-y-6">
-            <h2 class="text-3xl font-bold text-white border-b-2 border-purple-400/30 pb-2">3. Remaining Features & Future Roadmap</h2>
+            <h2 class="text-3xl font-bold text-white border-b-2 border-green-400/30 pb-2">2. Systematic Solutions & Corrective Actions</h2>
+
+            <div class="glass-pane -m-4 p-6 rounded-lg">
+                <h3 class="font-semibold text-xl text-green-300 flex items-center gap-3">
+                    <span class="tag tag-solution">Implemented Fix</span>
+                    <span>Stabilization of Core Handlers via `useCallback`</span>
+                </h3>
+                <p class="mt-3 text-gray-300">The critical flaw has been rectified by wrapping all state-modifying functions in code>useConversationManager.ts</code> with the `useCallback` hook. This ensures that these functions maintain a stable identity across re-renders, breaking the unstable dependency chain.</p>
+                <details class="mt-2 text-sm">
+                    <summary class="font-semibold">View Code Example (Before vs. After)</summary>
+                    <div class="grid grid-cols-2 gap-4 mt-2">
+                        <pre class="bg-black/30 p-2 rounded text-xs"><code><span class="text-red-400">// Before (Unstable)</span>
+const handleDeleteConversation = (id) => {
+  setConversations(prev => ...);
+};</code></pre>
+                        <pre class="bg-black/30 p-2 rounded text-xs"><code><span class="text-green-400">// After (Stable)</span>
+const handleDeleteConversation = useCallback((id) => {
+  setConversations(prev => ...);
+}, [setConversations]);</code></pre>
+                    </div>
+                </details>
+            </div>
+
+            <div class="glass-pane -m-4 p-6 rounded-lg">
+                <h3 class="font-semibold text-xl text-green-300 flex items-center gap-3">
+                    <span class="tag tag-solution">Documentation & Versioning</span>
+                    <span>Project State Alignment</span>
+                </h3>
+                <p class="mt-3 text-gray-300">To reflect the successful resolution of this issue and the completion of a major feature development phase, the following actions were taken:</p>
+                <ul class="list-disc list-inside mt-2 text-gray-300 space-y-1">
+                    <li>The application version has been updated to <strong>v3.0.0</strong> in `StatusBar.tsx`.</li>
+                    <li>The main `README.md` has been updated to reflect all completed features and the new version number.</li>
+                    <li>All feature definition files in `develop/` have been moved from `Remaining` to `Completed`.</li>
+                    <li>This audit report has been generated to serve as a definitive record of the problem and its resolution.</li>
+                </ul>
+            </div>
+        </section>
+
+        <section class="glass-pane rounded-xl p-8 space-y-6">
+            <h2 class="text-3xl font-bold text-white border-b-2 border-purple-400/30 pb-2">3. Next Steps & Future Roadmap</h2>
              <div class="glass-pane -m-4 p-6 rounded-lg">
                 <h3 class="font-semibold text-xl text-purple-300 flex items-center gap-3">
                     <span class="tag tag-roadmap">Roadmap</span>
-                    <span>Backend Migration & Collaboration Platform</span>
+                    <span>Transition to Backend Architecture</span>
                 </h3>
-                <p class="mt-3 text-gray-300">The project's own documentation (`Monica-Documentation/future_features_with_backend.html`) outlines a clear and ambitious vision. The most significant "remaining feature" is the evolution of Monica from a client-side application into a full-fledged, backend-powered AI collaboration platform.</p>
-                <p class="mt-2 text-gray-400">The high-level roadmap includes:</p>
+                <p class="mt-3 text-gray-300">With the client-side application now stable and feature-rich, the project is perfectly positioned to evolve according to its documented "Future Vision." The next logical phase of development should focus on building a backend to unlock a new tier of capabilities.</p>
+                <p class="mt-2 text-gray-400">High-priority next steps should include:</p>
                 <ul class="list-disc list-inside mt-2 text-gray-300 space-y-1">
-                    <li><strong>Core Platform:</strong> User Accounts, Multi-Device Sync, Team Workspaces.</li>
-                    <li><strong>Advanced Intelligence:</strong> Shared Team Memory, Dynamic Knowledge Base Integration (Notion, Drive), and Agent Self-Improvement.</li>
-                    <li><strong>Workflow Automation:</strong> A visual drag-and-drop workflow builder for automating complex tasks.</li>
-                    <li><strong>Analytics & Monetization:</strong> Dashboards for cost analysis, a marketplace for community agents, and subscription tiers.</li>
+                    <li><strong>User Authentication:</strong> Implement a secure login system.</li>
+                    <li><strong>Database Integration:</strong> Migrate conversation and agent data from `localStorage` to a cloud database (e.g., Vercel Postgres or Firestore) to enable persistence and sync.</li>
+                    <li><strong>Server-Side API Calls:</strong> Move Gemini API calls to a secure backend endpoint to protect API keys and handle complex logic reliably.</li>
+                    <li><strong>Real-time Collaboration:</strong> Begin implementing features like presence indicators and real-time message updates using a service like Firebase Realtime Database.</li>
                 </ul>
-                <p class="mt-2 text-gray-400"><strong>Conclusion:</strong> There is a well-defined long-term plan. The next logical step in the project's lifecycle is to begin implementing the foundational backend features.</p>
             </div>
         </section>
-        
-        <section class="glass-pane rounded-xl p-8 space-y-6">
-            <h2 class="text-3xl font-bold text-white border-b-2 border-green-400/30 pb-2">4. Systematic Solutions & Next Steps</h2>
-
-            <div class="glass-pane -m-4 p-6 rounded-lg">
-                <h3 class="font-semibold text-xl text-green-300 flex items-center gap-3">
-                    <span class="tag tag-solution">Immediate Action</span>
-                    <span>Complete Removal of MCP Server Manager</span>
-                </h3>
-                <p class="mt-3 text-gray-300">To resolve the non-functional feature, a surgical removal of all associated code is necessary. This action has been performed alongside the generation of this report.</p>
-                <details class="mt-2 text-sm">
-                    <summary class="font-semibold">View Removal Steps</summary>
-                    <ol class="list-decimal list-inside mt-2 text-gray-400 space-y-1 bg-black/30 p-4 rounded-b-lg">
-                        <li>Deleted component file: <code>components/McpServerManagerModal.tsx</code>.</li>
-                        <li>Deleted associated icon: <code>components/icons/ServerStackIcon.tsx</code>.</li>
-                        <li>Deleted state management hook: <code>contexts/hooks/useMcpManager.ts</code>.</li>
-                        <li>Deleted type definitions: <code>types/mcp.ts</code>.</li>
-                        <li>Removed logic and state from the main provider: <code>contexts/StateProvider.tsx</code>.</li>
-                        <li>Removed the modal from the main layout: <code>App.tsx</code>.</li>
-                        <li>Removed the trigger button from the header: <code>components/Header.tsx</code>.</li>
-                    </ol>
-                </details>
-            </div>
-
-            <div class="glass-pane -m-4 p-6 rounded-lg">
-                <h3 class="font-semibold text-xl text-green-300 flex items-center gap-3">
-                    <span class="tag tag-solution">Architectural Mitigation</span>
-                    <span>Mitigating JSON Parsing Risks</span>
-                </h3>
-                <p class="mt-3 text-gray-300">The long-term solution to the JSON reliability risk is to move the AI interaction to a backend service. This aligns perfectly with the project's future roadmap.</p>
-                 <details class="mt-2 text-sm">
-                    <summary class="font-semibold">View Backend Logic Flow</summary>
-                    <ol class="list-decimal list-inside mt-2 text-gray-400 space-y-1 bg-black/30 p-4 rounded-b-lg">
-                        <li>Client sends a request to a secure backend endpoint (e.g., `/api/generatePlan`).</li>
-                        <li>The backend server constructs the prompt and calls the Gemini API.</li>
-                        <li>The server receives the response from Gemini.</li>
-                        <li>The server validates that the response is valid JSON and conforms to the expected schema.</li>
-                        <li>If invalid, the server can retry the API call with a modified prompt or return a structured error to the client.</li>
-                        <li>If valid, the server sends the clean, guaranteed-to-be-correct JSON to the client.</li>
-                        <li>The client can now use the JSON data without needing `try...catch` blocks, simplifying the frontend logic.</li>
-                    </ol>
-                </details>
-            </div>
-
-            <div class="glass-pane -m-4 p-6 rounded-lg">
-                <h3 class="font-semibold text-xl text-green-300 flex items-center gap-3">
-                    <span class="tag tag-solution">Next Steps</span>
-                    <span>Proceed with the Roadmap</span>
-                </h3>
-                <p class="mt-3 text-gray-300">With the immediate cleanup complete, the project is in a stable state. The next development phase should focus on implementing the foundational elements of the documented "Future Vision," starting with User Authentication and Database Integration.</p>
-            </div>
-        </section>
-
     </main>
 
 </body>

@@ -14,21 +14,21 @@ The application's "Future World" aesthetic is built on glassmorphism, dark mode,
 
 Monica is packed with features that make it a powerful and flexible platform for AI interaction.
 
-| Category                      | Feature                                                                                 | Status        |
-|-------------------------------|-----------------------------------------------------------------------------------------|---------------|
-| **Multi-Agent Conversation**  | **Dynamic, Continuous, & Manual Modes** for flexible conversation flow.                 | ✅ Implemented |
-|                               | **AI-Powered Agent Manager** to orchestrate complex tasks and discussions.              | ✅ Implemented |
-|                               | **Moderated Chat** for structured, rule-based agent interactions.                       | ✅ Implemented |
-| **Advanced Message Handling** | Rich **Markdown & Code Block** rendering with syntax highlighting.                      | ✅ Implemented |
-|                               | AI-powered actions: **Summarize, Rewrite, Regenerate**.                                 | ✅ Implemented |
-|                               | **Alternative Responses** to explore different AI outputs for a single prompt.          | ✅ Implemented |
-|                               | **Bookmarking** and automatic **long-message summarization**.                           | ✅ Implemented |
-| **System Intelligence**       | **Long-Term Memory** for context persistence across conversations.                      | ✅ Implemented |
-|                               | AI-Powered **Team Generation Wizard** to create new agent teams from a high-level goal. | ✅ Implemented |
-| **Transparency & Debugging**  | **Cognitive Workflow Inspector** to visualize the AI's step-by-step reasoning.          | ✅ Implemented |
-|                               | **Prompt & Response Inspector** for deep debugging of API calls.                        | ✅ Implemented |
-| **Robust UI/UX**              | Comprehensive **global and per-conversation settings**.                                 | ✅ Implemented |
-|                               | Real-time **status indicators** and client-side **usage metrics**.                      | ✅ Implemented |
+| Category                      | Feature                                                                                                      | Status        |
+| ----------------------------- | ------------------------------------------------------------------------------------------------------------ | ------------- |
+| **Multi-Agent Conversation**  | **Dynamic, Continuous, & Manual Modes** for flexible conversation flow.                                        | ✅ Implemented |
+|                               | **AI-Powered Agent Manager** to orchestrate complex tasks and discussions.                                     | ✅ Implemented |
+|                               | **Moderated Chat** for structured, rule-based agent interactions.                                              | ✅ Implemented |
+| **Advanced Message Handling** | Rich **Markdown & Code Block** rendering with syntax highlighting.                                             | ✅ Implemented |
+|                               | AI-powered actions: **Summarize, Rewrite, Regenerate**.                                                        | ✅ Implemented |
+|                               | **Alternative Responses** to explore different AI outputs for a single prompt.                                 | ✅ Implemented |
+|                               | **Bookmarking** and automatic **long-message summarization**.                                                  | ✅ Implemented |
+| **System Intelligence**       | **Long-Term Memory** for context persistence across conversations.                                             | ✅ Implemented |
+|                               | AI-Powered **Team Generation Wizard** to create new agent teams from a high-level goal.                          | ✅ Implemented |
+| **Transparency & Debugging**  | **Cognitive Workflow Inspector** to visualize the AI's step-by-step reasoning.                                 | ✅ Implemented |
+|                               | **Prompt & Response Inspector** for deep debugging of API calls.                                               | ✅ Implemented |
+| **Robust UI/UX**              | Comprehensive **global and per-conversation settings**.                                                        | ✅ Implemented |
+|                               | Real-time **status indicators** and client-side **usage metrics**.                                             | ✅ Implemented |
 
 ---
 

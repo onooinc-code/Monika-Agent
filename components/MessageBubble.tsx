@@ -187,8 +187,8 @@ export const MessageBubble: React.FC<MessageBubbleProps> = ({ message, agent, fe
 
     if (message.isEditing) {
         return (
-            <div className="flex w-full px-4 md:px-8 mb-6 animate-fade-in-up">
-                 <Avatar name={senderName} color={agentColorIndicator} />
+            <div className="MessageBubbleEditing flex w-full px-4 md:px-8 mb-6 animate-fade-in-up">
+                 <div className="MessageAvatar"><Avatar name={senderName} color={agentColorIndicator} /></div>
                 <div className="flex flex-col w-full ml-4">
                     <div className="rounded-lg p-4 bg-gray-700">
                         <CopyClearWrapper value={editText} onClear={() => setEditText('')}>
@@ -201,13 +201,13 @@ export const MessageBubble: React.FC<MessageBubbleProps> = ({ message, agent, fe
                                     e.target.style.height = `${e.target.scrollHeight}px`;
                                 }}
                                 onKeyDown={handleEditKeyDown}
-                                className="w-full bg-gray-600 text-white rounded-md p-2 focus:outline-none focus:ring-2 focus:ring-indigo-500 resize-none"
+                                className="MessageEditInput w-full bg-gray-600 text-white rounded-md p-2 focus:outline-none focus:ring-2 focus:ring-indigo-500 resize-none"
                                 rows={1}
                             />
                         </CopyClearWrapper>
-                        <div className="mt-2 flex justify-end gap-2">
-                            <button onClick={handleCancelEdit} className="px-3 py-1 text-sm bg-gray-500 hover:bg-gray-600 rounded">Cancel</button>
-                            <button onClick={handleSaveEdit} className="px-3 py-1 text-sm bg-indigo-600 hover:bg-indigo-700 rounded">Save & Submit</button>
+                        <div className="MessageEditActions mt-2 flex justify-end gap-2">
+                            <button onClick={handleCancelEdit} className="MessageEditCancelButton px-3 py-1 text-sm bg-gray-500 hover:bg-gray-600 rounded">Cancel</button>
+                            <button onClick={handleSaveEdit} className="MessageEditSaveButton px-3 py-1 text-sm bg-indigo-600 hover:bg-indigo-700 rounded">Save & Submit</button>
                         </div>
                     </div>
                 </div>
@@ -222,45 +222,45 @@ export const MessageBubble: React.FC<MessageBubbleProps> = ({ message, agent, fe
     const isInsight = message.messageType === 'insight';
 
     return (
-        <div id={message.id} className="w-full px-4 md:px-8 mb-6 animate-fade-in-up" onContextMenu={handleContextMenu}>
+        <div id={message.id} className="MessageBubble w-full px-4 md:px-8 mb-6 animate-fade-in-up" onContextMenu={handleContextMenu}>
             <div className={`flex items-start w-full ${isUser ? 'justify-end' : 'justify-start'}`}>
                 <div className={`flex items-start w-auto max-w-3xl ${isUser ? 'flex-row-reverse' : 'flex-row'}`}>
-                    <Avatar name={senderName} color={agentColorIndicator} />
+                    <div className="MessageAvatar"><Avatar name={senderName} color={agentColorIndicator} /></div>
                     <div 
-                        className={`group flex flex-col w-full rounded-xl shadow-md overflow-hidden border ${isUser ? 'border-indigo-700' : 'border-slate-700'} ${isInsight ? '!border-yellow-500/50' : ''} ${isUser ? 'ml-0 mr-4' : 'ml-4'} transition-transform duration-300`}
+                        className={`MessageContentContainer group flex flex-col w-full rounded-xl shadow-md overflow-hidden border ${isUser ? 'border-indigo-700' : 'border-slate-700'} ${isInsight ? '!border-yellow-500/50' : ''} ${isUser ? 'ml-0 mr-4' : 'ml-4'} transition-transform duration-300`}
                     >
                         {/* Header */}
-                        <div className={`flex items-center justify-between p-3 bg-primary-header ${isInsight ? '!bg-yellow-900/50' : ''} ${isUser ? 'flex-row-reverse' : ''}`} style={{backgroundColor: isInsight ? '' : 'var(--color-primary-header)'}}>
+                        <div className={`MessageBubbleHeader flex items-center justify-between p-3 bg-primary-header ${isInsight ? '!bg-yellow-900/50' : ''} ${isUser ? 'flex-row-reverse' : ''}`} style={{backgroundColor: isInsight ? '' : 'var(--color-primary-header)'}}>
                              <div className={`flex items-center ${isUser ? 'flex-row-reverse' : ''}`}>
                                 <div className={`w-3 h-3 rounded-sm ${agentColorIndicator}`}></div>
                                 <div className={`mx-3 text-sm font-semibold ${isUser ? 'text-right' : 'text-left'}`}>
-                                    <p className="text-white">{senderName}</p>
-                                    <p className="text-white text-xs">{senderJob}</p>
+                                    <p className="SenderName text-white">{senderName}</p>
+                                    <p className="SenderJob text-white text-xs">{senderJob}</p>
                                 </div>
                             </div>
                              <div className="flex items-center text-xs text-gray-500">
                                 {hasAlternatives && (
-                                    <div className="flex items-center gap-2 mr-2 text-white">
+                                    <div className="AlternativeResponseNavigator flex items-center gap-2 mr-2 text-white">
                                         <button onClick={() => handleChangeAlternativeResponse(message.id, 'prev')} disabled={currentResponseIndex <= -1} className="disabled:opacity-50">&lt;</button>
                                         <span>{currentResponseIndex + 2} / {totalResponses}</span>
                                         <button onClick={() => handleChangeAlternativeResponse(message.id, 'next')} disabled={currentResponseIndex >= totalResponses - 2} className="disabled:opacity-50">&gt;</button>
                                     </div>
                                 )}
-                                <span>{formattedTime}</span>
+                                <span className="MessageTimestamp">{formattedTime}</span>
                             </div>
                         </div>
 
                         {/* Content */}
                         <div
-                            className={`p-4 ${isUser ? 'content-bg-user prose-user' : 'content-bg-agent prose-agent'}`}
+                            className={`MessageBubbleBody p-4 ${isUser ? 'content-bg-user prose-user' : 'content-bg-agent prose-agent'}`}
                         >
                             {message.plan ? (
-                                <PlanDisplay plan={message.plan} />
+                                <div className="PlanDisplayContainer"><PlanDisplay plan={message.plan} /></div>
                             ) : (
                                 <>
                                     <div
                                         ref={contentRef}
-                                        className="prose max-w-none prose-p:my-2 prose-headings:my-3"
+                                        className="MessageText prose max-w-none prose-p:my-2 prose-headings:my-3"
                                         dangerouslySetInnerHTML={{ __html: getMessageContent() }}
                                     />
                                     {message.isStreaming && <span className="streaming-cursor"></span>}
@@ -270,14 +270,14 @@ export const MessageBubble: React.FC<MessageBubbleProps> = ({ message, agent, fe
                             {hasSummary && !isUser && (
                                  <button
                                     onClick={() => setIsExpanded(!isExpanded)}
-                                    className="text-indigo-400 hover:text-indigo-200 text-sm font-semibold mt-2 focus:outline-none bg-black bg-opacity-20 px-2 py-1 rounded"
+                                    className="ExpandMessageButton text-indigo-400 hover:text-indigo-200 text-sm font-semibold mt-2 focus:outline-none bg-black bg-opacity-20 px-2 py-1 rounded"
                                 >
                                     {isExpanded ? 'Show Summary' : 'Show Full Text'}
                                 </button>
                             )}
                              {message.attachment && (
                                 <div className="mt-2">
-                                    <img src={`data:${message.attachment.mimeType};base64,${message.attachment.base64}`} alt="Attachment" className="max-w-xs rounded-lg border-2 border-gray-200" />
+                                    <img src={`data:${message.attachment.mimeType};base64,${message.attachment.base64}`} alt="Attachment" className="MessageAttachment max-w-xs rounded-lg border-2 border-gray-200" />
                                 </div>
                             )}
                         </div>
