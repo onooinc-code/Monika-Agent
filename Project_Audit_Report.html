@@ -72,7 +72,7 @@
             <h2 class="!text-3xl !text-cyan-400 border-b-2 border-cyan-400/30 pb-2">Executive Summary</h2>
             <p>The "Monica" application is a well-architected and sophisticated frontend platform for multi-agent AI conversations. The codebase demonstrates a strong adherence to modern development principles, including separation of concerns, a clear state management pattern, and a highly reusable component structure. The core features, such as the dynamic and moderated chat modes, are implemented with robust and sound logic.</p>
             <p>This audit was commissioned to diagnose a persistent and critical "black screen" rendering failure. The root cause was identified as a state management instability issue stemming from the creation of new state update functions on every render. This created a cascade of unnecessary re-renders, leading to a fatal application crash.</p>
-            <p>This report details the root cause, the corrective actions taken, and outlines the next steps for the project, which is now in a stable, feature-complete state (v3.0.0) for its client-side iteration.</p>
+            <p>This report details the root cause, the corrective actions taken, and outlines the next steps for the project, which is now in a stable, feature-complete state (v3.5.0) for its client-side iteration.</p>
         </section>
 
         <section class="glass-pane rounded-xl p-8 space-y-6">
@@ -126,7 +126,7 @@ const handleDeleteConversation = useCallback((id) => {
                 </h3>
                 <p class="mt-3 text-gray-300">To reflect the successful resolution of this issue and the completion of a major feature development phase, the following actions were taken:</p>
                 <ul class="list-disc list-inside mt-2 text-gray-300 space-y-1">
-                    <li>The application version has been updated to <strong>v3.0.0</strong> in `StatusBar.tsx`.</li>
+                    <li>The application version has been updated to <strong>v3.5.0</strong> in `StatusBar.tsx`.</li>
                     <li>The main `README.md` has been updated to reflect all completed features and the new version number.</li>
                     <li>All feature definition files in `develop/` have been moved from `Remaining` to `Completed`.</li>
                     <li>This audit report has been generated to serve as a definitive record of the problem and its resolution.</li>
