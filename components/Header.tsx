@@ -1,6 +1,7 @@
+'use client';
+
 import React from "react";
-// FIX: Corrected the import path for types to point to the barrel file.
-import { Agent, AgentManager } from "@/types/index";
+import { Agent, AgentManager } from "@/types";
 import { useAppContext } from "@/contexts/StateProvider";
 import {
   PowerIcon,

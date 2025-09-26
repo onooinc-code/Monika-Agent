@@ -1,8 +1,7 @@
-
+'use client';
 
 import React, { useEffect, useRef, useState } from 'react';
-// FIX: Corrected the import path for types to point to the barrel file.
-import { Message, Agent, Conversation, BubbleSettings } from '@/types/index';
+import { Message, Agent, Conversation, BubbleSettings } from '@/types';
 import { MANAGER_COLOR } from '@/constants/agentConstants';
 import { useAppContext } from '@/contexts/StateProvider';
 import { Avatar } from '@/components/Avatar';

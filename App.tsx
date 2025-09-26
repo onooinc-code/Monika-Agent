@@ -23,7 +23,7 @@ import { BookmarkedMessagesPanel } from '@/components/BookmarkedMessagesPanel';
 import { MessageArchiveModal } from '@/components/MessageArchiveModal';
 import { ContextMenu } from '@/components/ContextMenu';
 import { ConversationSubHeader } from '@/components/ConversationSubHeader';
-import { ContextMenuItem } from '@/types/index';
+import { ContextMenuItem } from '@/types';
 import { PlusIcon, SettingsIcon, AlignLeftIcon } from '@/components/Icons';
 import { AgentSettingsModal } from '@/components/AgentSettingsModal';
 import { DeveloperInfoModal } from '@/components/DeveloperInfoModal';
