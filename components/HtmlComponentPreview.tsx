@@ -16,7 +16,7 @@ const scopeCss = (css: string, scopeId: string): string => {
         if (selector.trim().startsWith('@')) {
             return match;
         }
-        const scopedSelector = selector.split(',').map(part => {
+        const scopedSelector = selector.split(',').map((part: string) => {
             const trimmed = part.trim();
             if (trimmed) {
                 return `#${scopeId} ${trimmed}`;

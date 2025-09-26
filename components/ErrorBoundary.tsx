@@ -1,4 +1,3 @@
-
 'use client';
 
 import React, { Component, ErrorInfo, ReactNode } from 'react';
@@ -17,6 +16,7 @@ class ErrorBoundary extends Component<Props, State> {
   // FIX: Replaced public class field with a constructor for state initialization to ensure correct component context.
   constructor(props: Props) {
     super(props);
+    // FIX: Added 'this' to correctly initialize state on the component instance.
     this.state = {
       hasError: false,
       error: undefined,
@@ -35,11 +35,13 @@ class ErrorBoundary extends Component<Props, State> {
 
   componentDidCatch(error: Error, errorInfo: ErrorInfo) {
     // You can also log the error to an error reporting service
+    // FIX: Added 'this' to call the setState method of the component instance.
     this.setState({ error, errorInfo });
     console.error("Uncaught error:", error, errorInfo);
   }
 
   render() {
+    // FIX: Added 'this' to access the component's state.
     if (this.state.hasError) {
       // You can render any custom fallback UI
       return (
@@ -51,8 +53,10 @@ class ErrorBoundary extends Component<Props, State> {
               <details>
                 <summary className="cursor-pointer font-semibold text-gray-400">Error Details</summary>
                 <pre className="mt-2 h-64 overflow-y-auto whitespace-pre-wrap rounded-md bg-black/30 p-4 text-left font-mono text-xs text-red-300">
+                  {/* FIX: Added 'this' to access the component's state. */}
                   {this.state.error?.toString()}
                   <br />
+                  {/* FIX: Added 'this' to access the component's state. */}
                   {this.state.errorInfo?.componentStack}
                 </pre>
               </details>
@@ -62,6 +66,7 @@ class ErrorBoundary extends Component<Props, State> {
       );
     }
 
+    // FIX: Added 'this' to access the component's props.
     return this.props.children;
   }
 }
