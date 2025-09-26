@@ -73,7 +73,9 @@ export async function generateOverallSummaryAndTopics(messages: Message[], manag
         }
 
         const overallSummary = typeof json.overallSummary === 'string' ? json.overallSummary : "No summary available.";
-        const topics = Array.isArray(json.topics) && json.topics.every(t => typeof t === 'string') 
+        // FIX: The parameter 't' implicitly has an 'any' type.
+        // Explicitly type the parameter 't' to 'any' to resolve the TypeScript error.
+        const topics = Array.isArray(json.topics) && json.topics.every((t: any) => typeof t === 'string') 
             ? json.topics 
             : [];
         

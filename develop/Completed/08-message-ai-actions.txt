@@ -1,0 +1,26 @@
+Feature: Message AI Actions
+ID: 08
+
+Description:
+Empower users to leverage AI to perform transformative actions on existing messages in the conversation. These actions go beyond simple text manipulation and provide intelligent assistance for refining and understanding the chat content.
+
+Core Functionalities:
+1.  **Summarize Message:**
+    -   On any AI-generated message, a "Summarize" action is available.
+    -   When triggered, it sends the message content to the AI Manager with a prompt to create a concise summary.
+    -   The summary is displayed in a clean, readable modal.
+
+2.  **Rewrite Prompt:**
+    -   On any user-written message, a "Rewrite" action is available.
+    -   This sends the user's prompt to the AI Manager, asking it to rephrase the prompt to be clearer, more detailed, and more effective for an AI.
+    -   The rewritten prompt is shown in a modal with an action button to "Use & Send," allowing the user to accept the suggestion and re-submit it.
+
+3.  **Regenerate Response:**
+    -   On any AI-generated message, a "Regenerate" action is available.
+    -   This re-sends the original user prompt that led to the AI message back to the same agent.
+    -   The new response is added as an "alternative" to the original message, allowing the user to cycle through different AI outputs for the same input.
+
+4.  **Action Response Modal:**
+    -   All AI-powered actions present their results in a consistent `ActionResponseModal`.
+    -   This modal clearly displays the title of the action (e.g., "Summary," "Rewrite Suggestion") and the resulting text.
+    -   It supports custom action buttons for interactive results (like the "Use & Send" button for rewriting).

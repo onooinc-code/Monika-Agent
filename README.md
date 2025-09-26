@@ -10,7 +10,7 @@ The application's "Future World" aesthetic is built on glassmorphism, dark mode,
 
 ---
 
-## ✨ Key Features (Client-Side v3.5.0 - Feature Complete)
+## ✨ Key Features (Client-Side v3.5.0 - Feature Complete & Stable)
 
 Monica is packed with features that make it a powerful and flexible platform for AI interaction.
 
@@ -23,7 +23,6 @@ Monica is packed with features that make it a powerful and flexible platform for
 |                               | AI-powered actions: **Summarize, Rewrite, Regenerate**.                                                        | ✅ Implemented |
 |                               | **Alternative Responses** to explore different AI outputs for a single prompt.                                 | ✅ Implemented |
 |                               | **Bookmarking** and automatic **long-message summarization**.                                                  | ✅ Implemented |
-|                               | Interactive **Message Toolbar** for quick actions and settings.                                                | ✅ Implemented |
 | **System Intelligence**       | **Long-Term Memory** for context persistence across conversations.                                             | ✅ Implemented |
 |                               | AI-Powered **Team Generation Wizard** to create new agent teams from a high-level goal.                          | ✅ Implemented |
 | **Transparency & Debugging**  | **Cognitive Workflow Inspector** to visualize the AI's step-by-step reasoning.                                 | ✅ Implemented |

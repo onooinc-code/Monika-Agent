@@ -1,0 +1,31 @@
+Feature: Message Interaction Toolbar
+ID: 07
+
+Description:
+Provide a rich, hover-activated toolbar on each message bubble to give users quick access to common actions and view/display settings without cluttering the interface.
+
+Core Functionalities:
+1.  **Hover-to-Reveal:**
+    -   The toolbar is hidden by default and smoothly appears when the user hovers their mouse over the message bubble.
+
+2.  **Common Actions:**
+    -   Provide one-click buttons for essential message interactions:
+        -   **Copy:** Copies the message's text content to the clipboard.
+        -   **Bookmark:** Toggles the bookmarked state of the message.
+        -   **Delete:** Deletes the message from the conversation (with a confirmation).
+
+3.  **Contextual Actions:**
+    -   Show actions relevant to the message type:
+        -   For **User Messages:** An "Edit" button to modify the prompt.
+        -   For **AI Messages:** A "Regenerate" button to get an alternative response.
+
+4.  **Display & Formatting Controls:**
+    -   Include controls for adjusting the visual presentation of the message bubble:
+        -   **Alignment:** Buttons to align the bubble to the left or right.
+        -   **Font Size:** Buttons to increase or decrease the text size within the bubble.
+        -   **Text Direction:** Buttons to toggle between Left-to-Right (LTR) and Right-to-Left (RTL) text rendering.
+
+5.  **Metadata Display:**
+    -   Subtly display useful metadata within the toolbar:
+        -   **Token Count:** Show the estimated number of tokens for the message.
+        -   **Response Time:** For AI messages, show the time it took to generate the response in milliseconds.
