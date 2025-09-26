@@ -1,9 +1,7 @@
 
-
-
 'use client';
 
-import React, { useState, useRef } from "react";
+import React, { useState, useRef, useCallback } from "react";
 // FIX: Corrected import path for types to point to the barrel file.
 import { Attachment } from "@/types/index";
 import { useAppContext } from "@/contexts/StateProvider";
@@ -75,7 +73,7 @@ export const MessageInput: React.FC = () => {
   const [error, setError] = useState<string>("");
   const fileInputRef = useRef<HTMLInputElement>(null);
 
-  const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+  const handleFileChange = useCallback((event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
     if (file) {
       if (file.size > MAX_FILE_SIZE_BYTES) {
@@ -95,9 +93,9 @@ export const MessageInput: React.FC = () => {
       };
       reader.readAsDataURL(file);
     }
-  };
+  }, []);
 
-  const handleSend = () => {
+  const handleSend = useCallback(() => {
     if (!text.trim() && !attachment) return;
     handleSendMessage(text, attachment || undefined);
     setText("");
@@ -105,9 +103,9 @@ export const MessageInput: React.FC = () => {
     if (fileInputRef.current) {
       fileInputRef.current.value = "";
     }
-  };
+  }, [text, attachment, handleSendMessage]);
 
-  const handleKeyPress = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
+  const handleKeyPress = useCallback((e: React.KeyboardEvent<HTMLTextAreaElement>) => {
     if (sendOnEnter) {
       if (e.key === "Enter" && !e.shiftKey) {
         e.preventDefault();
@@ -119,7 +117,7 @@ export const MessageInput: React.FC = () => {
         handleSend();
       }
     }
-  };
+  }, [sendOnEnter, handleSend]);
 
   return (
     <footer className="MessageInputFooter flex flex-col items-center p-2">

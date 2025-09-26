@@ -1,5 +1,5 @@
 
-import React, { useState } from 'react';
+import React, { useState, useCallback } from 'react';
 // FIX: Corrected import path for types to point to the barrel file.
 import { PipelineStep, Message, ContextMenuItem, Agent, AgentManager, HtmlComponent, CustomComponent } from '@/types/index';
 
@@ -67,97 +67,97 @@ export const useModalManager = () => {
         menuItems: []
     });
 
-    const handleShowHtmlPreview = (html: string) => {
+    const handleShowHtmlPreview = useCallback((html: string) => {
         setHtmlPreviewContent(html);
         setIsHtmlPreviewOpen(true);
-    };
+    }, []);
 
-    const handleCloseHtmlPreview = () => {
+    const handleCloseHtmlPreview = useCallback(() => {
         setIsHtmlPreviewOpen(false);
         setHtmlPreviewContent('');
-    };
+    }, []);
 
-    const openActionModal = (config: { title: string; content: string; actions?: ActionModalButton[] }) => {
+    const openActionModal = useCallback((config: { title: string; content: string; actions?: ActionModalButton[] }) => {
         setActionModalState({
             isOpen: true,
             title: config.title,
             content: config.content,
             actions: config.actions || null,
         });
-    };
+    }, []);
 
-    const closeActionModal = () => {
+    const closeActionModal = useCallback(() => {
         setActionModalState({ isOpen: false, title: '', content: '', actions: null });
-    };
+    }, []);
 
-    const openInspectorModal = (pipeline: PipelineStep[]) => {
+    const openInspectorModal = useCallback((pipeline: PipelineStep[]) => {
         setInspectorData(pipeline);
         setIsInspectorOpen(true);
-    };
+    }, []);
 
-    const closeInspectorModal = () => {
+    const closeInspectorModal = useCallback(() => {
         setIsInspectorOpen(false);
         setInspectorData(null);
-    };
+    }, []);
 
-    const openPromptInspectorModal = (message: Message) => {
+    const openPromptInspectorModal = useCallback((message: Message) => {
         setPromptInspectorData(message);
         setIsPromptInspectorOpen(true);
-    };
+    }, []);
 
-    const closePromptInspectorModal = () => {
+    const closePromptInspectorModal = useCallback(() => {
         setIsPromptInspectorOpen(false);
         setPromptInspectorData(null);
-    };
+    }, []);
 
-    const openAgentSettingsModal = (agent: Agent | AgentManager) => {
+    const openAgentSettingsModal = useCallback((agent: Agent | AgentManager) => {
         setSelectedAgentForModal(agent);
         setIsAgentSettingsModalOpen(true);
-    };
+    }, []);
 
-    const closeAgentSettingsModal = () => {
+    const closeAgentSettingsModal = useCallback(() => {
         setIsAgentSettingsModalOpen(false);
         setSelectedAgentForModal(null);
-    };
+    }, []);
     
-    const openContextMenu = (x: number, y: number, menuItems: ContextMenuItem[]) => {
+    const openContextMenu = useCallback((x: number, y: number, menuItems: ContextMenuItem[]) => {
         setContextMenuState({ isOpen: true, x, y, menuItems });
-    };
+    }, []);
 
-    const closeContextMenu = () => {
+    const closeContextMenu = useCallback(() => {
         setContextMenuState(prev => ({ ...prev, isOpen: false }));
-    };
+    }, []);
 
-    const openEditHtmlComponentModal = (component: HtmlComponent) => {
+    const openEditHtmlComponentModal = useCallback((component: HtmlComponent) => {
         setEditingHtmlComponent(component);
         setIsEditHtmlComponentModalOpen(true);
-    };
+    }, []);
 
-    const closeEditHtmlComponentModal = () => {
+    const closeEditHtmlComponentModal = useCallback(() => {
         setIsEditHtmlComponentModalOpen(false);
         setEditingHtmlComponent(null);
-    };
+    }, []);
 
-    const openEditComponentModal = (component: CustomComponent) => {
+    const openEditComponentModal = useCallback((component: CustomComponent) => {
         setEditingComponent(component);
         setIsEditComponentModalOpen(true);
-    };
+    }, []);
 
-    const closeEditComponentModal = () => {
+    const closeEditComponentModal = useCallback(() => {
         setIsEditComponentModalOpen(false);
         setEditingComponent(null);
-    };
+    }, []);
 
-    const openComponentPreviewModal = (component: any, background: React.CSSProperties) => {
+    const openComponentPreviewModal = useCallback((component: any, background: React.CSSProperties) => {
         setComponentToPreview(component);
         setPreviewBackground(background);
         setIsComponentPreviewOpen(true);
-    };
+    }, []);
 
-    const closeComponentPreviewModal = () => {
+    const closeComponentPreviewModal = useCallback(() => {
         setIsComponentPreviewOpen(false);
         setComponentToPreview(null);
-    };
+    }, []);
 
     return {
         isSettingsOpen, setIsSettingsOpen,

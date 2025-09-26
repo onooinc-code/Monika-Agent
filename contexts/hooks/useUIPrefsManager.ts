@@ -1,3 +1,5 @@
+
+import { useCallback } from 'react';
 // FIX: Restored useLocalStorage to ensure data persistence.
 import { useLocalStorage } from './useLocalStorage';
 
@@ -9,16 +11,16 @@ export const useUIPrefsManager = () => {
     // FIX: Replaced useState with useLocalStorage to fix data loss on refresh.
     const [secureInputVisibility, setSecureInputVisibility] = useLocalStorage<SecureInputVisibilityState>('secureInputVisibility', {});
 
-    const isPermanentlyVisible = (id: string): boolean => {
+    const isPermanentlyVisible = useCallback((id: string): boolean => {
         return secureInputVisibility[id] ?? false;
-    };
+    }, [secureInputVisibility]);
 
-    const togglePermanentVisibility = (id: string) => {
+    const togglePermanentVisibility = useCallback((id: string) => {
         setSecureInputVisibility(prev => ({
             ...prev,
-            [id]: !isPermanentlyVisible(id),
+            [id]: !(prev[id] ?? false),
         }));
-    };
+    }, [setSecureInputVisibility]);
 
     return {
         isPermanentlyVisible,

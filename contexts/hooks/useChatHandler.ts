@@ -1,5 +1,5 @@
 
-import { useState, useRef } from 'react';
+import { useState, useRef, useCallback } from 'react';
 // FIX: Corrected import path for types to point to the barrel file.
 import { Conversation, Agent, AgentManager, Attachment, ManualSuggestion, Message, ConversationMode, LongTermMemoryData, PlanStep, SoundEvent } from '@/types/index';
 import * as AgentService from '@/services/chat/agentService';
@@ -45,7 +45,7 @@ export const useChatHandler = ({ agents, agentManager, globalApiKey, activeConve
     
     const isChatLoading = loadingStage.stage !== 'idle';
 
-    const handleSendMessage = async (text: string, attachment?: Attachment) => {
+    const handleSendMessage = useCallback(async (text: string, attachment?: Attachment) => {
         if ((!text.trim() && !attachment) || isChatLoading || !activeConversation) return;
 
         playSound('send');
@@ -298,9 +298,9 @@ export const useChatHandler = ({ agents, agentManager, globalApiKey, activeConve
             setLoadingStage({ stage: 'idle' });
             setLastTurnAgentIds(usedAgentIds);
         }
-    };
+    }, [isChatLoading, activeConversation, playSound, setLastTurnAgentIds, onUpdateConversation, logUsage, onAppendToMessageText, onFinalizeMessage, agents, agentManager, globalApiKey, conversationMode, longTermMemory]);
 
-    const handleManualSelection = async (agentId: string) => {
+    const handleManualSelection = useCallback(async (agentId: string) => {
         if (!activeConversation) return;
         const usedAgentIds = new Set<string>([agentId]);
         setLastTurnAgentIds(new Set());
@@ -371,9 +371,9 @@ export const useChatHandler = ({ agents, agentManager, globalApiKey, activeConve
             setLoadingStage({ stage: 'idle' });
             setLastTurnAgentIds(usedAgentIds);
         }
-    };
+    }, [activeConversation, setLastTurnAgentIds, playSound, onAppendToMessageText, agents, onUpdateConversation, onFinalizeMessage, longTermMemory, globalApiKey, logUsage]);
 
-    const handleSummarizeMessage = async (messageId: string) => {
+    const handleSummarizeMessage = useCallback(async (messageId: string) => {
         if (!activeConversation) return;
         const message = activeConversation.messages.find(m => m.id === messageId);
         if (!message) return;
@@ -389,9 +389,9 @@ export const useChatHandler = ({ agents, agentManager, globalApiKey, activeConve
             const errorMessage = (error instanceof Error) ? getApiErrorMessage(error) : 'Could not generate summary.';
             openActionModal({ title: 'Error', content: errorMessage });
         }
-    };
+    }, [activeConversation, playSound, openActionModal, agentManager, globalApiKey, logUsage]);
 
-    const handleRewritePrompt = async (messageId: string) => {
+    const handleRewritePrompt = useCallback(async (messageId: string) => {
         if (!activeConversation) return;
         const message = activeConversation.messages.find(m => m.id === messageId);
         if (!message || message.sender !== 'user') return;
@@ -414,9 +414,9 @@ export const useChatHandler = ({ agents, agentManager, globalApiKey, activeConve
              const errorMessage = (error instanceof Error) ? getApiErrorMessage(error) : 'Could not rewrite prompt.';
              openActionModal({ title: 'Error', content: errorMessage });
         }
-    };
+    }, [activeConversation, playSound, openActionModal, agentManager, globalApiKey, logUsage, handleSendMessage, closeActionModal]);
 
-    const handleRegenerateResponse = async (aiMessageId: string) => {
+    const handleRegenerateResponse = useCallback(async (aiMessageId: string) => {
         if (!activeConversation) return;
         const usedAgentIds = new Set<string>();
         setLastTurnAgentIds(new Set());
@@ -475,7 +475,7 @@ export const useChatHandler = ({ agents, agentManager, globalApiKey, activeConve
             setLoadingStage({ stage: 'idle' });
             setLastTurnAgentIds(usedAgentIds);
         }
-    };
+    }, [activeConversation, setLastTurnAgentIds, playSound, agents, longTermMemory, globalApiKey, onUpdateConversation, logUsage]);
 
 
     return {

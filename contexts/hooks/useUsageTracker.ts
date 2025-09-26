@@ -1,3 +1,5 @@
+
+import { useCallback } from 'react';
 // FIX: Restored useLocalStorage to ensure data persistence.
 import { useLocalStorage } from './useLocalStorage';
 // FIX: Corrected import path for types to point to the barrel file.
@@ -20,7 +22,7 @@ export const useUsageTracker = () => {
         agentUsage: {},
     });
 
-    const logUsage = (tokens: number, agentId?: string, requestCount?: number) => {
+    const logUsage = useCallback((tokens: number, agentId?: string, requestCount?: number) => {
         const todayStr = getTodayDateString();
         // Handle the case where requestCount is not provided. Default to 1 if an agentId exists, otherwise 0.
         const finalRequestCount = requestCount ?? (agentId ? 1 : 0);
@@ -68,7 +70,7 @@ export const useUsageTracker = () => {
                 agentUsage
             };
         });
-    };
+    }, [setUsageMetrics]);
 
     return { usageMetrics, logUsage };
 };

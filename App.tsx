@@ -1,7 +1,7 @@
 
 'use client';
 
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useMemo, useCallback } from 'react';
 import { Header } from '@/components/Header';
 import { MessageList } from '@/components/MessageList';
 import { ManualSuggestions } from '@/components/ManualSuggestions';
@@ -21,7 +21,6 @@ import { AgentStatsModal } from '@/components/AgentStatsModal';
 import { TeamGeneratorModal } from '@/components/TeamGeneratorModal';
 import { ApiUsageModal } from '@/components/ApiUsageModal';
 import { BookmarkedMessagesPanel } from '@/components/BookmarkedMessagesPanel';
-import { MessageArchiveModal } from '@/components/MessageArchiveModal';
 import { ContextMenu } from '@/components/ContextMenu';
 import { ConversationSubHeader } from '@/components/ConversationSubHeader';
 // FIX: Corrected import path for types to point to the barrel file.
@@ -36,6 +35,8 @@ import { EditHtmlComponentModal } from '@/components/EditHtmlComponentModal';
 import { EditComponentModal } from '@/components/EditComponentModal';
 import { ComponentPreviewModal } from '@/components/ComponentPreviewModal';
 import { ConversionTypeModal } from '@/components/ConversionTypeModal';
+// FIX: Import MessageArchiveModal to resolve reference error.
+import { MessageArchiveModal } from '@/components/MessageArchiveModal';
 
 
 export default function App() {
@@ -177,22 +178,32 @@ export default function App() {
       window.removeEventListener('keydown', handleKeyDown);
       window.removeEventListener('click', handleClick);
     };
-  }, [isSettingsOpen, isHistoryOpen, isConversationSettingsOpen, isAddComponentModalOpen, isAddHtmlComponentModalOpen, isEditHtmlComponentModalOpen, isEditComponentModalOpen, isComponentPreviewOpen, setIsSettingsOpen, setIsHistoryOpen, setIsConversationSettingsOpen, setIsAddComponentModalOpen, setIsAddHtmlComponentModalOpen, closeEditHtmlComponentModal, closeEditComponentModal, closeComponentPreviewModal, setConversationMode, handleShowHistory, activeConversation, closeContextMenu, handleNewConversation]);
+  }, [
+      isSettingsOpen, isHistoryOpen, isConversationSettingsOpen, 
+      isAddComponentModalOpen, isAddHtmlComponentModalOpen, 
+      isEditHtmlComponentModalOpen, isEditComponentModalOpen, 
+      isComponentPreviewOpen, setIsSettingsOpen, setIsHistoryOpen, 
+      setIsConversationSettingsOpen, setIsAddComponentModalOpen, 
+      setIsAddHtmlComponentModalOpen, closeEditHtmlComponentModal, 
+      closeEditComponentModal, closeComponentPreviewModal, setConversationMode, 
+      handleShowHistory, activeConversation, closeContextMenu, handleNewConversation
+  ]);
 
-  const handleGlobalContextMenu = (e: React.MouseEvent) => {
+  const globalActions = useMemo<ContextMenuItem[]>(() => [
+     { label: 'New Chat', icon: <PlusIcon/>, action: handleNewConversation },
+     { isSeparator: true },
+     { label: `Mode: Dynamic`, action: () => setConversationMode('Dynamic') },
+     { label: `Mode: Continuous`, action: () => setConversationMode('Continuous') },
+     { label: `Mode: Manual`, action: () => setConversationMode('Manual') },
+     { isSeparator: true },
+     { label: 'Open Settings', icon: <SettingsIcon/>, action: () => setIsSettingsOpen(true) },
+     { label: 'Open Archive', icon: <AlignLeftIcon/>, action: () => setIsArchiveOpen(true) },
+  ], [handleNewConversation, setConversationMode, setIsSettingsOpen, setIsArchiveOpen]);
+
+  const handleGlobalContextMenu = useCallback((e: React.MouseEvent) => {
     e.preventDefault();
-    const globalActions: ContextMenuItem[] = [
-       { label: 'New Chat', icon: <PlusIcon/>, action: handleNewConversation },
-       { isSeparator: true },
-       { label: `Mode: Dynamic`, action: () => setConversationMode('Dynamic') },
-       { label: `Mode: Continuous`, action: () => setConversationMode('Continuous') },
-       { label: `Mode: Manual`, action: () => setConversationMode('Manual') },
-       { isSeparator: true },
-       { label: 'Open Settings', icon: <SettingsIcon/>, action: () => setIsSettingsOpen(true) },
-       { label: 'Open Archive', icon: <AlignLeftIcon/>, action: () => setIsArchiveOpen(true) },
-    ];
     openContextMenu(e.clientX, e.clientY, globalActions);
-  };
+  }, [openContextMenu, globalActions]);
 
 
   return (

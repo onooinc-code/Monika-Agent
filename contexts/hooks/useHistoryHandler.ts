@@ -1,5 +1,5 @@
 
-import { useState } from 'react';
+import { useState, useCallback } from 'react';
 // FIX: Corrected import path for types to point to the barrel file.
 import { Conversation, AgentManager, HistoryView, Message } from '@/types/index';
 import * as HistoryService from '@/services/analysis/historyService';
@@ -9,7 +9,7 @@ export const useHistoryHandler = () => {
     const [historyView, setHistoryView] = useState<HistoryView | null>(null);
     const [isGeneratingHistory, setIsLoading] = useState(false);
 
-    const handleShowHistory = async (conversation: Conversation | null, agentManager: AgentManager, globalApiKey: string): Promise<boolean> => {
+    const handleShowHistory = useCallback(async (conversation: Conversation | null, agentManager: AgentManager, globalApiKey: string): Promise<boolean> => {
         if (!conversation) return false;
 
         setIsLoading(true);
@@ -56,7 +56,7 @@ export const useHistoryHandler = () => {
             setIsLoading(false);
         }
         return true; // Signal that the process is complete
-    };
+    }, []);
 
     return {
         historyView,

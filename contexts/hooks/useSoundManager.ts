@@ -1,5 +1,5 @@
 
-import { useMemo } from 'react';
+import { useMemo, useCallback } from 'react';
 // FIX: Corrected import path for types to point to the barrel file.
 import { SoundEvent } from '@/types/index';
 import { SOUNDS } from '@/assets/sounds';
@@ -18,7 +18,7 @@ export const useSoundManager = ({ isSoundEnabled }: SoundManagerProps) => {
         return null;
     }, []);
 
-    const playSound = (event: SoundEvent) => {
+    const playSound = useCallback((event: SoundEvent) => {
         if (isSoundEnabled && audio && SOUNDS[event]) {
             try {
                 audio.src = SOUNDS[event];
@@ -27,7 +27,7 @@ export const useSoundManager = ({ isSoundEnabled }: SoundManagerProps) => {
                 console.error("Failed to play sound:", error);
             }
         }
-    };
+    }, [isSoundEnabled, audio]);
     
     return { playSound };
 };

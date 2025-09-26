@@ -134,35 +134,51 @@ export const useConversationManager = () => {
     }, [setConversations]);
 
     const handleToggleMessageBookmark = useCallback((messageId: string) => {
-        if (!activeConversation) return;
-        const updatedMessages = activeConversation.messages.map(m => 
-            m.id === messageId ? { ...m, isBookmarked: !m.isBookmarked } : m
-        );
-        handleUpdateConversation(activeConversation.id, { messages: updatedMessages });
-    }, [activeConversation, handleUpdateConversation]);
+        setConversations(prev => prev.map(c => {
+            if (c.id === activeConversationId) {
+                const updatedMessages = c.messages.map(m => 
+                    m.id === messageId ? { ...m, isBookmarked: !m.isBookmarked } : m
+                );
+                return { ...c, messages: updatedMessages };
+            }
+            return c;
+        }));
+    }, [activeConversationId, setConversations]);
 
     const handleDeleteMessage = useCallback((messageId: string) => {
-        if (!activeConversation) return;
         if (!window.confirm('Are you sure you want to delete this message? This cannot be undone.')) return;
-        const updatedMessages = activeConversation.messages.filter(m => m.id !== messageId);
-        handleUpdateConversation(activeConversation.id, { messages: updatedMessages });
-    }, [activeConversation, handleUpdateConversation]);
+        setConversations(prev => prev.map(c => {
+            if (c.id === activeConversationId) {
+                const updatedMessages = c.messages.filter(m => m.id !== messageId);
+                return { ...c, messages: updatedMessages };
+            }
+            return c;
+        }));
+    }, [activeConversationId, setConversations]);
 
     const handleToggleMessageEdit = useCallback((messageId: string) => {
-         if (!activeConversation) return;
-        const updatedMessages = activeConversation.messages.map(m => 
-            m.id === messageId ? { ...m, isEditing: !m.isEditing } : { ...m, isEditing: false }
-        );
-        handleUpdateConversation(activeConversation.id, { messages: updatedMessages });
-    }, [activeConversation, handleUpdateConversation]);
+        setConversations(prev => prev.map(c => {
+            if (c.id === activeConversationId) {
+                const updatedMessages = c.messages.map(m => 
+                    m.id === messageId ? { ...m, isEditing: !m.isEditing } : { ...m, isEditing: false }
+                );
+                return { ...c, messages: updatedMessages };
+            }
+            return c;
+        }));
+    }, [activeConversationId, setConversations]);
 
     const handleUpdateMessageText = useCallback((messageId: string, newText: string) => {
-         if (!activeConversation) return;
-        const updatedMessages = activeConversation.messages.map(m => 
-            m.id === messageId ? { ...m, text: newText, isEditing: false } : m
-        );
-        handleUpdateConversation(activeConversation.id, { messages: updatedMessages });
-    }, [activeConversation, handleUpdateConversation]);
+        setConversations(prev => prev.map(c => {
+            if (c.id === activeConversationId) {
+                const updatedMessages = c.messages.map(m => 
+                    m.id === messageId ? { ...m, text: newText, isEditing: false } : m
+                );
+                return { ...c, messages: updatedMessages };
+            }
+            return c;
+        }));
+    }, [activeConversationId, setConversations]);
 
     const handleAppendToMessageText = useCallback((conversationId: string, messageId: string, textChunk: string) => {
         setConversations(prev => prev.map(c => {
@@ -195,29 +211,30 @@ export const useConversationManager = () => {
     }, [setConversations]);
 
     const handleChangeAlternativeResponse = useCallback((messageId: string, direction: 'next' | 'prev') => {
-        if (!activeConversation) return;
-        
-        const updatedMessages = activeConversation.messages.map(m => {
-            if (m.id === messageId && m.alternatives && m.alternatives.length > 0) {
-                let currentIndex = m.activeAlternativeIndex ?? -1;
-                let nextIndex;
-                
-                if (direction === 'next') {
-                    nextIndex = currentIndex + 1;
-                    if (nextIndex >= m.alternatives.length) nextIndex = m.alternatives.length - 1; // Cap at the end
-                } else { // 'prev'
-                    nextIndex = currentIndex - 1;
-                    if (nextIndex < -1) nextIndex = -1; // Cap at original
-                }
-                
-                return { ...m, activeAlternativeIndex: nextIndex };
+        setConversations(prev => prev.map(c => {
+            if (c.id === activeConversationId) {
+                const updatedMessages = c.messages.map(m => {
+                    if (m.id === messageId && m.alternatives && m.alternatives.length > 0) {
+                        let currentIndex = m.activeAlternativeIndex ?? -1;
+                        let nextIndex;
+                        
+                        if (direction === 'next') {
+                            nextIndex = currentIndex + 1;
+                            if (nextIndex >= m.alternatives.length) nextIndex = m.alternatives.length - 1; // Cap at the end
+                        } else { // 'prev'
+                            nextIndex = currentIndex - 1;
+                            if (nextIndex < -1) nextIndex = -1; // Cap at original
+                        }
+                        
+                        return { ...m, activeAlternativeIndex: nextIndex };
+                    }
+                    return m;
+                });
+                return { ...c, messages: updatedMessages };
             }
-            return m;
-        });
-
-        handleUpdateConversation(activeConversation.id, { messages: updatedMessages });
-
-    }, [activeConversation, handleUpdateConversation]);
+            return c;
+        }));
+    }, [activeConversationId, setConversations]);
 
     return {
         conversations,

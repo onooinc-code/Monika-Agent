@@ -1,3 +1,4 @@
+
 'use client';
 
 import React, { createContext, useContext, useRef, useCallback, useState, useMemo } from 'react';
@@ -279,20 +280,20 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
         return agents.find(a => a.id === id);
     }, [agents]);
 
-    const handleGenerateTitle = async (conversationId: string) => {
+    const handleGenerateTitle = useCallback(async (conversationId: string) => {
         setIsGeneratingTitle(true);
         await conversationManager.handleGenerateTitle(conversationId, agentManager, globalApiKey, (id, updates) => {
             conversationManager.handleUpdateConversation(id, updates);
             setIsGeneratingTitle(false);
         });
-    }
+    }, [conversationManager, agentManager, globalApiKey]);
 
-    const handleReplaceAgents = (newAgents: Agent[]) => {
+    const handleReplaceAgents = useCallback((newAgents: Agent[]) => {
         setAgents(newAgents);
         modalManager.setIsTeamGeneratorOpen(false);
-    };
+    }, [setAgents, modalManager]);
 
-    const handleExtractAndUpdateMemory = async () => {
+    const handleExtractAndUpdateMemory = useCallback(async () => {
         if (!conversationManager.activeConversation || isLoading) return;
 
         setIsExtractingMemory(true);
@@ -314,37 +315,37 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
         } finally {
             setIsExtractingMemory(false);
         }
-    };
+    }, [conversationManager.activeConversation, isLoading, agentManager, memoryManager, globalApiKey, playSound]);
 
-    const handleToggleAgentEnabled = (agentId: string) => {
+    const handleToggleAgentEnabled = useCallback((agentId: string) => {
         setAgents(prev => prev.map(agent => 
             agent.id === agentId
                 ? { ...agent, isEnabled: !(agent.isEnabled ?? true) }
                 : agent
         ));
-    };
+    }, [setAgents]);
     
-    const handleUpdateSingleAgent = (agentId: string, updates: Partial<Agent>) => {
+    const handleUpdateSingleAgent = useCallback((agentId: string, updates: Partial<Agent>) => {
         setAgents(prev => prev.map(agent => agent.id === agentId ? { ...agent, ...updates } : agent));
-    };
+    }, [setAgents]);
 
-    const handleUpdateAgentManager = (updates: Partial<AgentManager>) => {
+    const handleUpdateAgentManager = useCallback((updates: Partial<AgentManager>) => {
         setAgentManager(prev => ({ ...prev, ...updates }));
-    };
+    }, [setAgentManager]);
 
-    const handleUpdateHtmlComponent = (updatedComponent: HtmlComponent) => {
+    const handleUpdateHtmlComponent = useCallback((updatedComponent: HtmlComponent) => {
         setCustomHtmlComponents(prev => 
             prev.map(c => c.id === updatedComponent.id ? updatedComponent : c)
         );
-    };
+    }, [setCustomHtmlComponents]);
     
-    const handleUpdateCustomComponent = (updatedComponent: CustomComponent) => {
+    const handleUpdateCustomComponent = useCallback((updatedComponent: CustomComponent) => {
         setCustomComponents(prev => 
             prev.map(c => c.name === updatedComponent.name ? updatedComponent : c)
         );
-    };
+    }, [setCustomComponents]);
 
-    const handleConvertToReactComponent = (componentId: string) => {
+    const handleConvertToReactComponent = useCallback((componentId: string) => {
         const componentToConvert = customHtmlComponents.find(c => c.id === componentId);
         if (!componentToConvert) {
             alert('Error: Component not found.');
@@ -389,70 +390,71 @@ export default ${newReactComponentName};
         setCustomComponents(prev => [...prev, newReactComponent]);
         setCustomHtmlComponents(prev => prev.filter(c => c.id !== componentId));
         playSound('success');
-    };
+    }, [customHtmlComponents, customComponents, setCustomComponents, setCustomHtmlComponents, playSound]);
 
     // 6. Wrapped modal setters with sound effects
-    const createSoundifiedSetter = (setter: (isOpen: boolean) => void) => (isOpen: boolean) => {
+    const createSoundifiedSetter = useCallback((setter: (isOpen: boolean) => void) => (isOpen: boolean) => {
         playSound(isOpen ? 'open' : 'close');
         setter(isOpen);
-    };
+    }, [playSound]);
     
-    const setIsSettingsOpen = createSoundifiedSetter(modalManager.setIsSettingsOpen);
-    const setIsHistoryOpen = createSoundifiedSetter(modalManager.setIsHistoryOpen);
-    const setIsConversationSettingsOpen = createSoundifiedSetter(modalManager.setIsConversationSettingsOpen);
-    const setIsAgentStatsOpen = createSoundifiedSetter(modalManager.setIsAgentStatsOpen);
-    const setIsTeamGeneratorOpen = createSoundifiedSetter(modalManager.setIsTeamGeneratorOpen);
-    const setIsApiUsageOpen = createSoundifiedSetter(modalManager.setIsApiUsageOpen);
-    const setIsArchiveOpen = createSoundifiedSetter(modalManager.setIsArchiveOpen);
-    const setIsBookmarksPanelOpen = createSoundifiedSetter(modalManager.setIsBookmarksPanelOpen);
-    const setIsDeveloperInfoOpen = createSoundifiedSetter(modalManager.setIsDeveloperInfoOpen);
-    const setIsComponentsGalleryOpen = createSoundifiedSetter(modalManager.setIsComponentsGalleryOpen);
-    const setIsAddComponentModalOpen = createSoundifiedSetter(modalManager.setIsAddComponentModalOpen);
-    const setIsAddHtmlComponentModalOpen = createSoundifiedSetter(modalManager.setIsAddHtmlComponentModalOpen);
-    const setIsConversionTypeModalOpen = createSoundifiedSetter(modalManager.setIsConversionTypeModalOpen);
+    const setIsSettingsOpen = useMemo(() => createSoundifiedSetter(modalManager.setIsSettingsOpen), [createSoundifiedSetter, modalManager.setIsSettingsOpen]);
+    const setIsHistoryOpen = useMemo(() => createSoundifiedSetter(modalManager.setIsHistoryOpen), [createSoundifiedSetter, modalManager.setIsHistoryOpen]);
+    const setIsConversationSettingsOpen = useMemo(() => createSoundifiedSetter(modalManager.setIsConversationSettingsOpen), [createSoundifiedSetter, modalManager.setIsConversationSettingsOpen]);
+    const setIsAgentStatsOpen = useMemo(() => createSoundifiedSetter(modalManager.setIsAgentStatsOpen), [createSoundifiedSetter, modalManager.setIsAgentStatsOpen]);
+    const setIsTeamGeneratorOpen = useMemo(() => createSoundifiedSetter(modalManager.setIsTeamGeneratorOpen), [createSoundifiedSetter, modalManager.setIsTeamGeneratorOpen]);
+    const setIsApiUsageOpen = useMemo(() => createSoundifiedSetter(modalManager.setIsApiUsageOpen), [createSoundifiedSetter, modalManager.setIsApiUsageOpen]);
+    const setIsArchiveOpen = useMemo(() => createSoundifiedSetter(modalManager.setIsArchiveOpen), [createSoundifiedSetter, modalManager.setIsArchiveOpen]);
+    const setIsBookmarksPanelOpen = useMemo(() => createSoundifiedSetter(modalManager.setIsBookmarksPanelOpen), [createSoundifiedSetter, modalManager.setIsBookmarksPanelOpen]);
+    const setIsDeveloperInfoOpen = useMemo(() => createSoundifiedSetter(modalManager.setIsDeveloperInfoOpen), [createSoundifiedSetter, modalManager.setIsDeveloperInfoOpen]);
+    const setIsComponentsGalleryOpen = useMemo(() => createSoundifiedSetter(modalManager.setIsComponentsGalleryOpen), [createSoundifiedSetter, modalManager.setIsComponentsGalleryOpen]);
+    const setIsAddComponentModalOpen = useMemo(() => createSoundifiedSetter(modalManager.setIsAddComponentModalOpen), [createSoundifiedSetter, modalManager.setIsAddComponentModalOpen]);
+    const setIsAddHtmlComponentModalOpen = useMemo(() => createSoundifiedSetter(modalManager.setIsAddHtmlComponentModalOpen), [createSoundifiedSetter, modalManager.setIsAddHtmlComponentModalOpen]);
+    const setIsConversionTypeModalOpen = useMemo(() => createSoundifiedSetter(modalManager.setIsConversionTypeModalOpen), [createSoundifiedSetter, modalManager.setIsConversionTypeModalOpen]);
     
-    const openEditHtmlComponentModal = (component: HtmlComponent) => {
+    const openEditHtmlComponentModal = useCallback((component: HtmlComponent) => {
         playSound('open');
         modalManager.openEditHtmlComponentModal(component);
-    };
-    const closeEditHtmlComponentModal = () => {
+    }, [playSound, modalManager.openEditHtmlComponentModal]);
+    const closeEditHtmlComponentModal = useCallback(() => {
         playSound('close');
         modalManager.closeEditHtmlComponentModal();
-    };
+    }, [playSound, modalManager.closeEditHtmlComponentModal]);
 
-    const openEditComponentModal = (component: CustomComponent) => {
+    const openEditComponentModal = useCallback((component: CustomComponent) => {
         playSound('open');
         modalManager.openEditComponentModal(component);
-    };
-    const closeEditComponentModal = () => {
+    }, [playSound, modalManager.openEditComponentModal]);
+    const closeEditComponentModal = useCallback(() => {
         playSound('close');
         modalManager.closeEditComponentModal();
-    };
+    }, [playSound, modalManager.closeEditComponentModal]);
     
-    const openComponentPreviewModal = (component: any, background: React.CSSProperties) => {
+    const openComponentPreviewModal = useCallback((component: any, background: React.CSSProperties) => {
         playSound('open');
         modalManager.openComponentPreviewModal(component, background);
-    };
-    const closeComponentPreviewModal = () => {
+    }, [playSound, modalManager.openComponentPreviewModal]);
+    const closeComponentPreviewModal = useCallback(() => {
         playSound('close');
         modalManager.closeComponentPreviewModal();
-    };
+    }, [playSound, modalManager.closeComponentPreviewModal]);
 
 
-    const openAgentSettingsModal = (agent: Agent | AgentManager) => {
+    const openAgentSettingsModal = useCallback((agent: Agent | AgentManager) => {
         playSound('open');
         modalManager.openAgentSettingsModal(agent);
-    };
-    const closeAgentSettingsModal = () => {
+    }, [playSound, modalManager.openAgentSettingsModal]);
+    const closeAgentSettingsModal = useCallback(() => {
         playSound('close');
         modalManager.closeAgentSettingsModal();
-    };
-    const handleShowHistory = async () => {
+    }, [playSound, modalManager.closeAgentSettingsModal]);
+
+    const handleShowHistory = useCallback(async () => {
         if (conversationManager.activeConversation) {
             setIsHistoryOpen(true);
             await historyHandler.handleShowHistory(conversationManager.activeConversation, agentManager, globalApiKey);
         }
-    };
+    }, [conversationManager.activeConversation, agentManager, globalApiKey, historyHandler, setIsHistoryOpen]);
     
     // 7. Assemble the context value, ensuring the AppState interface is matched
     const value: AppState = {

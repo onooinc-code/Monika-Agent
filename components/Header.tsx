@@ -1,3 +1,4 @@
+
 'use client';
 
 import React from "react";
@@ -15,7 +16,7 @@ import { HeaderLeftActions } from "@/components/HeaderLeftActions";
 import { TitleBar } from "@/components/TitleBar";
 
 
-const AgentCard: React.FC<{ agent: Agent }> = ({ agent }) => {
+const AgentCard: React.FC<{ agent: Agent }> = React.memo(({ agent }) => {
   const {
     lastTurnAgentIds,
     handleToggleAgentEnabled,
@@ -100,9 +101,10 @@ const AgentCard: React.FC<{ agent: Agent }> = ({ agent }) => {
       </div>
     </div>
   );
-};
+});
+AgentCard.displayName = 'AgentCard';
 
-const ManagerCard: React.FC<{ manager: AgentManager }> = ({ manager }) => {
+const ManagerCard: React.FC<{ manager: AgentManager }> = React.memo(({ manager }) => {
   const { usageMetrics, openAgentSettingsModal } = useAppContext();
   const stats = usageMetrics.agentUsage["manager"] || { totalMessages: 0 };
 
@@ -139,7 +141,8 @@ const ManagerCard: React.FC<{ manager: AgentManager }> = ({ manager }) => {
       </div>
     </div>
   );
-};
+});
+ManagerCard.displayName = 'ManagerCard';
 
 export const Header: React.FC<{
   isSidebarOpen: boolean;
