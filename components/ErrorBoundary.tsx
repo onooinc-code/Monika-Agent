@@ -12,9 +12,8 @@ interface State {
   errorInfo?: ErrorInfo;
 }
 
-// FIX: Changed to extend React.Component directly. This resolves type errors where
-// `setState` and `props` are not found on the component instance by ensuring
-// the class is correctly recognized as a React Component.
+// FIX: The ErrorBoundary class must extend React.Component to function correctly as a React Error Boundary.
+// This inheritance provides access to component lifecycle methods like componentDidCatch, as well as state management (this.setState) and props (this.props).
 class ErrorBoundary extends React.Component<Props, State> {
   state: State = {
     hasError: false,

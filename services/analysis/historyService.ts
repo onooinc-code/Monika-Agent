@@ -34,13 +34,15 @@ export const generateOverallSummaryAndTopics = async (messages: Message[], manag
     const context = buildContext(messages);
     const prompt = `Analyze the following conversation and provide an overall summary and a list of the main topics discussed.\n\n${context}`;
     
-    const apiKey = manager.apiKey || globalApiKey;
-    if (!apiKey) {
-        throw new Error("API Key not configured for the Agent Manager. Please set it in the settings.");
-    }
-    const ai = getGenAIClient(apiKey);
+    let responseText: string | undefined = undefined;
 
     try {
+        const apiKey = manager.apiKey || globalApiKey;
+        if (!apiKey) {
+            throw new Error("API Key not configured for the Agent Manager. Please set it in the settings.");
+        }
+        const ai = getGenAIClient(apiKey);
+
         const response = await ai.models.generateContent({
             model: manager.model,
             contents: prompt,
@@ -60,15 +62,11 @@ export const generateOverallSummaryAndTopics = async (messages: Message[], manag
             }
         });
 
-        let json;
-        try {
-            json = JSON.parse(response.text);
-        } catch (e) {
-            handleAndThrowError(e, 'generateOverallSummaryAndTopics (JSON Parsing)', prompt, response.text);
-        }
+        responseText = response.text;
+        const json = JSON.parse(responseText);
 
         if (typeof json !== 'object' || json === null) {
-            handleAndThrowError(new Error('AI response is not a valid JSON object.'), 'generateOverallSummaryAndTopics (Validation)', prompt, response.text);
+            throw new Error('AI response is not a valid JSON object.');
         }
 
         const overallSummary = typeof json.overallSummary === 'string' ? json.overallSummary : "No summary available.";
@@ -81,9 +79,6 @@ export const generateOverallSummaryAndTopics = async (messages: Message[], manag
             topics,
         };
     } catch (error) {
-        if (error instanceof AIError) {
-            throw error;
-        }
-        handleAndThrowError(error, 'generateOverallSummaryAndTopics (API Call)', prompt);
+        handleAndThrowError(error, 'generateOverallSummaryAndTopics', prompt, responseText);
     }
 };
