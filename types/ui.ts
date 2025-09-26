@@ -15,6 +15,21 @@ export interface ContextMenuItem {
     isSeparator?: boolean;
 }
 
-export type SoundEvent = 'open' | 'close' | 'success' | 'send' | 'receive' | 'error' | 'action';
+export type SoundEvent = 'open' | 'close' | 'success' | 'send' | 'receive' | 'error' | 'action' | 'connect' | 'disconnect';
 
 export type ConversionType = 'Multi' | 'Continuous';
+
+export interface TranscriptionEntry {
+    speaker: 'user' | 'model';
+    text: string;
+    isFinal: boolean;
+}
+
+export interface LiveHandlerState {
+    isConnected: boolean;
+    isConnecting: boolean;
+    error: string | null;
+    transcriptionHistory: TranscriptionEntry[];
+    startSession: () => void;
+    closeSession: () => void;
+}

@@ -37,6 +37,8 @@ export { LockOpenIcon } from './icons/LockOpenIcon';
 export { MaximizeIcon } from './icons/MaximizeIcon';
 export { MenuIcon } from './icons/MenuIcon';
 export { MessageCountIcon } from './icons/MessageCountIcon';
+export { MicrophoneIcon } from './icons/MicrophoneIcon';
+export { MicrophoneOffIcon } from './icons/MicrophoneOffIcon';
 export { PlusIcon } from './icons/PlusIcon';
 export { PowerIcon } from './icons/PowerIcon';
 export { RegenerateIcon } from './icons/RegenerateIcon';

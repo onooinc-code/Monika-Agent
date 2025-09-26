@@ -23,7 +23,6 @@ import { ApiUsageModal } from '@/components/ApiUsageModal';
 import { BookmarkedMessagesPanel } from '@/components/BookmarkedMessagesPanel';
 import { ContextMenu } from '@/components/ContextMenu';
 import { ConversationSubHeader } from '@/components/ConversationSubHeader';
-// FIX: Corrected import path for types to point to the barrel file.
 import { ContextMenuItem } from '@/types/index';
 import { PlusIcon, SettingsIcon, AlignLeftIcon } from '@/components/Icons';
 import { AgentSettingsModal } from '@/components/AgentSettingsModal';
@@ -35,8 +34,8 @@ import { EditHtmlComponentModal } from '@/components/EditHtmlComponentModal';
 import { EditComponentModal } from '@/components/EditComponentModal';
 import { ComponentPreviewModal } from '@/components/ComponentPreviewModal';
 import { ConversionTypeModal } from '@/components/ConversionTypeModal';
-// FIX: Import MessageArchiveModal to resolve reference error.
 import { MessageArchiveModal } from '@/components/MessageArchiveModal';
+import { LiveConversationBar } from '@/components/LiveConversationBar';
 
 
 export default function App() {
@@ -61,7 +60,6 @@ export default function App() {
     setIsAddComponentModalOpen,
     isAddHtmlComponentModalOpen,
     setIsAddHtmlComponentModalOpen,
-    customComponents,
     setCustomComponents,
     setCustomHtmlComponents,
     isEditHtmlComponentModalOpen,
@@ -76,6 +74,8 @@ export default function App() {
     closeComponentPreviewModal,
     componentToPreview,
     previewBackground,
+    isConnected,
+    isConnecting,
   } = useAppContext();
 
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
@@ -92,33 +92,23 @@ export default function App() {
     let closeTimer: number;
 
     if (isSidebarOpen) {
-      // Start the animation sequence
       setSidebarAnimationState('slow');
-
-      slowTimer = window.setTimeout(() => {
-        setSidebarAnimationState('fast');
-      }, 10000); // After 10 seconds, switch to fast blinking
-
-      closeTimer = window.setTimeout(() => {
-        setIsSidebarOpen(false); // After a total of 20 seconds, close the sidebar
-      }, 20000);
+      slowTimer = window.setTimeout(() => setSidebarAnimationState('fast'), 10000);
+      closeTimer = window.setTimeout(() => setIsSidebarOpen(false), 20000);
     } else {
-      // If sidebar is closed manually or by the timer, reset animation state
       setSidebarAnimationState('idle');
     }
 
-    // Cleanup timers on component unmount or if isSidebarOpen changes before timers fire
     return () => {
       clearTimeout(slowTimer);
       clearTimeout(closeTimer);
     };
-  }, [isSidebarOpen, setIsSidebarOpen]);
+  }, [isSidebarOpen]);
 
 
   // Global keyboard shortcuts & click listeners
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
-      // Close modals with Escape key
       if (e.key === 'Escape') {
         if (isSettingsOpen) setIsSettingsOpen(false);
         if (isHistoryOpen) setIsHistoryOpen(false);
@@ -131,46 +121,23 @@ export default function App() {
         closeContextMenu();
       }
 
-      // Alt-based shortcuts
       if (e.altKey) {
         e.preventDefault();
         switch (e.key) {
-          case '1':
-            setConversationMode('Dynamic');
-            break;
-          case '2':
-            setConversationMode('Continuous');
-            break;
-          case '3':
-            setConversationMode('Manual');
-            break;
-          case 's':
-            setIsSettingsOpen(true);
-            break;
-          case 'o':
-            if (activeConversation) setIsConversationSettingsOpen(true);
-            break;
-          case 'c':
-            if(activeConversation) handleShowHistory();
-            break;
-          case 'f':
-            document.documentElement.requestFullscreen().catch(console.error);
-            break;
-          case 'm':
-            if (document.fullscreenElement) {
-              document.exitFullscreen().catch(console.error);
-            }
-            break;
-          case 'n':
-            handleNewConversation();
-            break;
+          case '1': setConversationMode('Dynamic'); break;
+          case '2': setConversationMode('Continuous'); break;
+          case '3': setConversationMode('Manual'); break;
+          case 's': setIsSettingsOpen(true); break;
+          case 'o': if (activeConversation) setIsConversationSettingsOpen(true); break;
+          case 'c': if(activeConversation) handleShowHistory(); break;
+          case 'f': document.documentElement.requestFullscreen().catch(console.error); break;
+          case 'm': if (document.fullscreenElement) document.exitFullscreen().catch(console.error); break;
+          case 'n': handleNewConversation(); break;
         }
       }
     };
     
-    const handleClick = () => {
-        closeContextMenu();
-    };
+    const handleClick = () => closeContextMenu();
 
     window.addEventListener('keydown', handleKeyDown);
     window.addEventListener('click', handleClick);
@@ -205,6 +172,7 @@ export default function App() {
     openContextMenu(e.clientX, e.clientY, globalActions);
   }, [openContextMenu, globalActions]);
 
+  const isLiveModeActive = isConnected || isConnecting;
 
   return (
     <div className="flex h-screen bg-[#0a0a0f] text-gray-200" style={{fontFamily: "'Inter', sans-serif"}}>
@@ -224,7 +192,6 @@ export default function App() {
                       <ConversationSubHeader conversation={activeConversation} />
                     </div>
                     
-                    {/* Main Content Area */}
                     {activeConversation ? (
                         <div className="flex-1 overflow-y-auto pt-2">
                             <MessageList />
@@ -239,8 +206,7 @@ export default function App() {
                         </div>
                     )}
 
-                    {/* Input Area */}
-                    {activeConversation && (
+                    {activeConversation && !isLiveModeActive && (
                         <div className="flex-shrink-0">
                           {conversationMode === 'Manual' && <ManualSuggestions />}
                           <LiveStatusIndicator />
@@ -250,11 +216,11 @@ export default function App() {
                 </main>
                 <BookmarkedMessagesPanel isOpen={isBookmarksPanelOpen} />
             </div>
-            {/* The StatusBar is now outside the main scrolling area, fixed at the bottom of the column */}
             <div className="flex-shrink-0">
                 <StatusBar />
             </div>
         </div>
+        {isLiveModeActive && <LiveConversationBar />}
         <SettingsModal />
         <HistoryModal />
         <ConversationSettingsModal />

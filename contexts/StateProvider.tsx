@@ -1,8 +1,9 @@
+
 'use client';
 
 import React, { createContext, useContext, useRef, useCallback, useState, useMemo } from 'react';
 // FIX: Corrected import path for types to point to the barrel file.
-import { Agent, AgentManager, ConversationMode, Attachment, ManualSuggestion, HistoryView, Conversation, PipelineStep, UsageMetrics, Message, LongTermMemoryData, BubbleSettings, ContextMenuItem, SoundEvent, CustomComponent, HtmlComponent, ConversionType } from '@/types/index';
+import { Agent, AgentManager, ConversationMode, Attachment, ManualSuggestion, HistoryView, Conversation, PipelineStep, UsageMetrics, Message, LongTermMemoryData, BubbleSettings, ContextMenuItem, SoundEvent, CustomComponent, HtmlComponent, ConversionType, LiveHandlerState } from '@/types/index';
 import { useConversationManager } from '@/contexts/hooks/useConversationManager';
 import { useChatHandler, LoadingStage } from '@/contexts/hooks/useChatHandler';
 import { useHistoryHandler } from '@/contexts/hooks/useHistoryHandler';
@@ -11,12 +12,13 @@ import { useUsageTracker } from '@/contexts/hooks/useUsageTracker';
 import { useMemoryManager } from '@/contexts/hooks/useMemoryManager';
 import { useUIPrefsManager } from '@/contexts/hooks/useUIPrefsManager';
 import { useSoundManager } from '@/contexts/hooks/useSoundManager';
+import { useLiveHandler } from '@/contexts/hooks/useLiveHandler';
 import * as MemoryService from '@/services/analysis/memoryService';
 import { ActionModalState, ContextMenuState } from '@/contexts/hooks/useModalManager';
 import * as AgentConstants from '@/constants/agentConstants';
 import { useLocalStorage } from './hooks/useLocalStorage';
 
-interface AppState {
+interface AppState extends LiveHandlerState {
     agents: Agent[];
     setAgents: React.Dispatch<React.SetStateAction<Agent[]>>;
     handleReplaceAgents: (newAgents: Agent[]) => void;
@@ -237,6 +239,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     const usageTracker = useUsageTracker();
     const memoryManager = useMemoryManager();
     const uiPrefsManager = useUIPrefsManager();
+    const liveHandler = useLiveHandler(agentManager, globalApiKey, playSound);
     
     const enabledAgents = useMemo(() => agents.filter(a => a.isEnabled ?? true), [agents]);
 
@@ -353,15 +356,11 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
 
         const newReactComponentName = componentToConvert.name.replace(/[^a-zA-Z0-9]/g, '');
         
-        // Check for naming conflict
         if(customComponents.some(c => c.name === newReactComponentName)) {
             alert(`Error: A React component named "${newReactComponentName}" already exists. Please rename the HTML component first.`);
             return;
         }
         
-        // Using backticks and template literals for multiline strings.
-        // CSS is embedded directly in a <style> tag.
-        // HTML is rendered using dangerouslySetInnerHTML.
         const componentCode = `
 const ${newReactComponentName} = () => {
   return (
@@ -385,13 +384,11 @@ export default ${newReactComponentName};
             code: componentCode,
         };
 
-        // Update state: add new React component and remove old HTML one
         setCustomComponents(prev => [...prev, newReactComponent]);
         setCustomHtmlComponents(prev => prev.filter(c => c.id !== componentId));
         playSound('success');
     }, [customHtmlComponents, customComponents, setCustomComponents, setCustomHtmlComponents, playSound]);
 
-    // 6. Wrapped modal setters with sound effects
     const createSoundifiedSetter = useCallback((setter: (isOpen: boolean) => void) => (isOpen: boolean) => {
         playSound(isOpen ? 'open' : 'close');
         setter(isOpen);
@@ -455,7 +452,6 @@ export default ${newReactComponentName};
         }
     }, [conversationManager.activeConversation, agentManager, globalApiKey, historyHandler, setIsHistoryOpen]);
     
-    // 7. Assemble the context value, ensuring the AppState interface is matched
     const value: AppState = {
         // Core state
         agents,
@@ -585,6 +581,9 @@ export default ${newReactComponentName};
         setLongTermMemory: memoryManager.setLongTermMemory,
         clearMemory: memoryManager.clearMemory,
         handleExtractAndUpdateMemory,
+        
+        // From useLiveHandler
+        ...liveHandler,
 
         // UI Prefs & Bubble settings
         agentBubbleSettings,
