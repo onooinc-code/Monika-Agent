@@ -126,9 +126,8 @@ export const generateResponse = async (
             },
         });
         const response = result;
-        // FIX: The compiler incorrectly infers that 'candidates' might be undefined.
-        // Optional chaining is used to safely access nested properties.
-        const functionCall = response.candidates?.[0]?.content?.parts[0]?.functionCall;
+        // FIX: Add optional chaining to `parts` array access to prevent crashes on empty arrays.
+        const functionCall = response.candidates?.[0]?.content?.parts?.[0]?.functionCall;
 
         pipeline.push({
             stage: 'Initial Model Invocation',
@@ -137,8 +136,8 @@ export const generateResponse = async (
             durationMs: Math.round(performance.now() - startTime),
         });
 
-        // Step 2: Check for a function call.
-        if (functionCall) {
+        // Step 2: Check for a function call. Add extra checks to satisfy TypeScript's type inference.
+        if (functionCall && response.candidates?.[0]?.content) {
             const toolOutputForStream = `\n\n> **Using tool: \`${functionCall.name}\` with arguments: \`${JSON.stringify(functionCall.args)}\`**\n\n`;
             onStream(toolOutputForStream);
             fullText += toolOutputForStream;
