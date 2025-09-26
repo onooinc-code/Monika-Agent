@@ -1,5 +1,7 @@
+
 import { useState, useRef } from 'react';
-import { Conversation, Agent, AgentManager, Attachment, ManualSuggestion, Message, ConversationMode, LongTermMemoryData, PlanStep, SoundEvent } from '@/types';
+// FIX: Corrected import path for types to point to the barrel file.
+import { Conversation, Agent, AgentManager, Attachment, ManualSuggestion, Message, ConversationMode, LongTermMemoryData, PlanStep, SoundEvent } from '@/types/index';
 import * as AgentService from '@/services/chat/agentService';
 import * as ManagerService from '@/services/chat/managerService';
 import * as MessageActionsService from '@/services/chat/messageActionsService';

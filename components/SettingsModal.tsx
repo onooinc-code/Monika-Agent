@@ -1,7 +1,9 @@
+
 'use client';
 
 import React, { useState, useEffect, useRef } from 'react';
-import { Agent, AgentManager, LongTermMemoryData } from '@/types';
+// FIX: Corrected import path for types to point to the barrel file.
+import { Agent, AgentManager, LongTermMemoryData } from '@/types/index';
 import { useAppContext } from '@/contexts/StateProvider';
 import { ToggleSwitch } from '@/components/ToggleSwitch';
 import { CloseIcon, CpuIcon } from '@/components/Icons';

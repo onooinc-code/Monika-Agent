@@ -1,3 +1,4 @@
+
 'use client';
 
 import React, { Component, ErrorInfo, ReactNode } from 'react';
@@ -13,15 +14,12 @@ interface State {
 }
 
 class ErrorBoundary extends Component<Props, State> {
-  // FIX: Replaced public state field with a constructor to ensure `this` context for props and state is correctly initialized.
-  constructor(props: Props) {
-    super(props);
-    this.state = {
-      hasError: false,
-      error: undefined,
-      errorInfo: undefined,
-    };
-  }
+  // FIX: Initialized state as a public class field to resolve component context issues.
+  public state: State = {
+    hasError: false,
+    error: undefined,
+    errorInfo: undefined,
+  };
 
   public static getDerivedStateFromError(error: Error): State {
     // Update state so the next render will show the fallback UI.

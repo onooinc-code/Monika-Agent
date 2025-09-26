@@ -1,7 +1,9 @@
+
 import React, { useState, useEffect } from 'react';
 import { useAppContext } from '@/contexts/StateProvider';
 import { ToggleSwitch } from '@/components/ToggleSwitch';
-import { DiscussionSettings, ManagerSettings } from '@/types';
+// FIX: Corrected import path for types to point to the barrel file.
+import { DiscussionSettings, ManagerSettings } from '@/types/index';
 import { Spinner } from '@/components/Spinner';
 import * as DiscussionService from '@/services/creation/discussionService';
 import { CloseIcon, SparklesIcon, CpuIcon } from '@/components/Icons';

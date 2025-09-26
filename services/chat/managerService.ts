@@ -1,5 +1,7 @@
+
 import { getGenAIClient } from '@/services/gemini/client';
-import { Agent, Message, AgentManager, ManualSuggestion, PipelineStep, PlanStep } from '@/types';
+// FIX: Corrected import path for types to point to the barrel file.
+import { Agent, Message, AgentManager, ManualSuggestion, PipelineStep, PlanStep } from '@/types/index';
 import { buildContext } from '@/services/utils/contextBuilder';
 import { Type } from "@google/genai";
 import { handleAndThrowError } from '@/services/utils/errorHandler';

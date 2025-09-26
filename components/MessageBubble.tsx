@@ -374,4 +374,62 @@ export const MessageBubble: React.FC<MessageBubbleProps> = ({ message, agent, fe
                         </div>
                          <div className="flex items-center text-xs text-gray-500">
                             {hasAlternatives && (
-                                <div className="flex items-center gap-2 mr-2
+                                <div className="flex items-center gap-2 mr-2">
+                                    <button onClick={() => handleChangeAlternativeResponse(message.id, 'prev')} disabled={currentResponseIndex < 0} className="p-1 rounded-full text-white hover:bg-white/10 disabled:opacity-50 disabled:cursor-not-allowed" title="Previous Response">
+                                        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15 19l-7-7 7-7"></path></svg>
+                                    </button>
+                                    <span className="font-mono" title="Response Version">{currentResponseIndex > -1 ? `#${currentResponseIndex + 2}` : "Original"} / {totalResponses}</span>
+                                    <button onClick={() => handleChangeAlternativeResponse(message.id, 'next')} disabled={currentResponseIndex >= (message.alternatives?.length ?? 0) -1} className="p-1 rounded-full text-white hover:bg-white/10 disabled:opacity-50 disabled:cursor-not-allowed" title="Next Response">
+                                         <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 5l7 7-7 7"></path></svg>
+                                    </button>
+                                </div>
+                            )}
+                            <span>{formattedTime}</span>
+                        </div>
+                    </div>
+
+                    <div 
+                        className={`p-4 content-bg-${isUser ? 'user' : 'agent'}`}
+                        style={{ backgroundColor: isInsight ? 'transparent' : '' }}
+                    >
+                         {message.plan ? (
+                            <PlanDisplay plan={message.plan} />
+                        ) : (
+                            <div
+                                className={`prose max-w-none ${isUser ? 'prose-user' : 'prose-agent'}`}
+                                dir={settings.textDirection}
+                                style={{ fontSize: `${settings.fontSize}rem` }}
+                                ref={contentRef}
+                                dangerouslySetInnerHTML={{ __html: getMessageContent() }}
+                            />
+                        )}
+                        {message.isStreaming && <span className="streaming-cursor"></span>}
+                        {message.attachment && (
+                            <div className="mt-2">
+                                <img src={`data:${message.attachment.mimeType};base64,${message.attachment.base64}`} alt="Attachment" className="max-w-xs rounded-lg border-2 border-gray-700" />
+                            </div>
+                        )}
+                        {!isExpanded && (
+                            <div className="mt-2 text-center">
+                                <button onClick={() => setIsExpanded(true)} className="text-indigo-400 text-sm font-semibold hover:underline">Show More</button>
+                            </div>
+                        )}
+                    </div>
+                    
+                    <div className="MessageBubbleFooter flex items-center p-2 bg-primary-header/50 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+                         <MessageToolbar 
+                            message={message} 
+                            isUser={isUser}
+                            isContinuous={false}
+                            settings={settings}
+                            handleAlignment={handleAlignment}
+                            handleTextDirection={handleTextDirection}
+                            handleFontSize={handleFontSize}
+                            handleCopy={handleCopy}
+                         />
+                    </div>
+                </div>
+            </div>
+        </div>
+    );
+};

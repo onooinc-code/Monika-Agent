@@ -1,5 +1,7 @@
+
 import { getGenAIClient } from '@/services/gemini/client';
-import { AgentManager } from '@/types';
+// FIX: Corrected import path for types to point to the barrel file.
+import { AgentManager } from '@/types/index';
 import { handleAndThrowError } from '@/services/utils/errorHandler';
 
 export const summarizeMessage = async (text: string, manager: AgentManager, globalApiKey: string): Promise<string> => {

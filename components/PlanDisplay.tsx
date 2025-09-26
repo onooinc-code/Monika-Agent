@@ -1,7 +1,9 @@
+
 'use client';
 
 import React from 'react';
-import { PlanStep } from '@/types';
+// FIX: Corrected import path for types to point to the barrel file.
+import { PlanStep } from '@/types/index';
 import { useAppContext } from '@/contexts/StateProvider';
 import { PlanIcon } from '@/components/Icons';
 import { safeRender } from '@/services/utils/safeRender';

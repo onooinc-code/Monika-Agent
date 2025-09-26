@@ -1,7 +1,9 @@
+
 'use client';
 
 import React, { createContext, useContext, useRef, useCallback, useState } from 'react';
-import { Agent, AgentManager, ConversationMode, Attachment, ManualSuggestion, HistoryView, Conversation, PipelineStep, UsageMetrics, Message, LongTermMemoryData, BubbleSettings, ContextMenuItem, SoundEvent, CustomComponent, HtmlComponent, ConversionType } from '@/types';
+// FIX: Corrected import path for types to point to the barrel file.
+import { Agent, AgentManager, ConversationMode, Attachment, ManualSuggestion, HistoryView, Conversation, PipelineStep, UsageMetrics, Message, LongTermMemoryData, BubbleSettings, ContextMenuItem, SoundEvent, CustomComponent, HtmlComponent, ConversionType } from '@/types/index';
 import { useConversationManager } from '@/contexts/hooks/useConversationManager';
 import { useChatHandler, LoadingStage } from '@/contexts/hooks/useChatHandler';
 import { useHistoryHandler } from '@/contexts/hooks/useHistoryHandler';

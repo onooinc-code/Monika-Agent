@@ -1,9 +1,11 @@
+
 'use client';
 
 import React, { useRef, useState, useEffect } from 'react';
 import { useAppContext } from '@/contexts/StateProvider';
 import { safeRender } from '@/services/utils/safeRender';
-import { ContextMenuItem } from '@/types';
+// FIX: Corrected import path for types to point to the barrel file.
+import { ContextMenuItem } from '@/types/index';
 
 export const ContextMenu: React.FC = () => {
     const { contextMenuState, closeContextMenu } = useAppContext();
@@ -36,8 +38,10 @@ export const ContextMenu: React.FC = () => {
         return null;
     }
 
-    const handleAction = (action: () => void) => {
-        action();
+    const handleAction = (action?: () => void) => {
+        if (action) {
+            action();
+        }
         closeContextMenu();
     };
 
@@ -62,4 +66,24 @@ export const ContextMenu: React.FC = () => {
             ref={menuRef}
             className="fixed z-50 glass-pane rounded-lg shadow-2xl shadow-indigo-500/30 w-56 animate-fade-in-up"
             style={menuStyle}
-            onClick={
+            onClick={e => e.stopPropagation()}
+        >
+            <div className="p-2 space-y-1">
+                {menuItems.map((item, index) => (
+                    item.isSeparator 
+                    ? <div key={`sep-${index}`} className="h-px bg-white/10 my-1" />
+                    : (
+                        <button 
+                            key={item.label || index} 
+                            onClick={() => handleAction(item.action)} 
+                            className={getButtonClass(item)}
+                        >
+                           {item.icon && <span className="w-5 h-5">{item.icon}</span>}
+                           <span>{safeRender(item.label)}</span>
+                        </button>
+                    )
+                ))}
+            </div>
+        </div>
+    );
+};

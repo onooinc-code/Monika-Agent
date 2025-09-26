@@ -1,4 +1,6 @@
-import { Message } from '@/types';
+
+// FIX: Corrected import path for types to point to the barrel file.
+import { Message } from '@/types/index';
 
 export const buildContext = (messages: Message[]): string => {
     return messages.map(m => `${m.sender}: ${m.text}`).join('\n');

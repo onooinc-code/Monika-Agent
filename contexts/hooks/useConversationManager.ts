@@ -1,5 +1,7 @@
+
 import { useState, useEffect, useCallback } from 'react';
-import { Conversation, AgentManager, Message } from '@/types';
+// FIX: Corrected import path for types to point to the barrel file.
+import { Conversation, AgentManager, Message } from '@/types/index';
 import * as TitleService from '@/services/analysis/titleService';
 import { isConversationArray } from '@/types/utils';
 

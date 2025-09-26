@@ -1,5 +1,7 @@
+
 import React, { useState } from 'react';
-import { PipelineStep, Message, ContextMenuItem, Agent, AgentManager, HtmlComponent, CustomComponent } from '@/types';
+// FIX: Corrected import path for types to point to the barrel file.
+import { PipelineStep, Message, ContextMenuItem, Agent, AgentManager, HtmlComponent, CustomComponent } from '@/types/index';
 
 export interface ActionModalButton {
     label: string;

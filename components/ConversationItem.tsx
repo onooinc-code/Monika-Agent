@@ -1,5 +1,7 @@
+
 import React from 'react';
-import { Conversation } from '@/types';
+// FIX: Corrected import path for types to point to the barrel file.
+import { Conversation } from '@/types/index';
 import { TrashIcon } from '@/components/Icons';
 import { safeRender } from '@/services/utils/safeRender';
 
