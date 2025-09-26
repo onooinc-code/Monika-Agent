@@ -1,4 +1,3 @@
-
 import { getGenAIClient } from '@/services/gemini/client';
 // FIX: Corrected import path for types to point to the barrel file.
 import { Message, AgentManager } from '@/types/index';
@@ -30,7 +29,7 @@ export const summarizeMessageChunk = async (messages: Message[], manager: AgentM
     }
 };
 
-export const generateOverallSummaryAndTopics = async (messages: Message[], manager: AgentManager, globalApiKey: string): Promise<{ overallSummary: string, topics: string[] }> => {
+export async function generateOverallSummaryAndTopics(messages: Message[], manager: AgentManager, globalApiKey: string): Promise<{ overallSummary: string, topics: string[] }> {
     const context = buildContext(messages);
     const prompt = `Analyze the following conversation and provide an overall summary and a list of the main topics discussed.\n\n${context}`;
     
@@ -79,6 +78,10 @@ export const generateOverallSummaryAndTopics = async (messages: Message[], manag
             topics,
         };
     } catch (error) {
-        handleAndThrowError(error, 'generateOverallSummaryAndTopics', prompt, responseText);
+        // Re-implement the logic of handleAndThrowError here to make the 'throw' explicit
+        const contextString = 'generateOverallSummaryAndTopics';
+        console.error(`Error in ${contextString}:`, error);
+        const originalMessage = error instanceof Error ? error.message : String(error);
+        throw new AIError(originalMessage, contextString, prompt, responseText);
     }
-};
+}

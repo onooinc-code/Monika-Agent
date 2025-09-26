@@ -32,6 +32,7 @@ class ErrorBoundary extends React.Component<Props, State> {
 
   componentDidCatch(error: Error, errorInfo: ErrorInfo) {
     // You can also log the error to an error reporting service
+    // FIX: Corrected a compilation error by extending React.Component, which provides the setState method.
     this.setState({ error, errorInfo });
     console.error("Uncaught error:", error, errorInfo);
   }
@@ -59,6 +60,7 @@ class ErrorBoundary extends React.Component<Props, State> {
       );
     }
 
+    // FIX: Corrected a compilation error by extending React.Component, which provides the props property.
     return this.props.children;
   }
 }
