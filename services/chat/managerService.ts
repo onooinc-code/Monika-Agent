@@ -67,6 +67,11 @@ export const decideNextSpeaker = async (
         });
 
         const modelDuration = performance.now() - startTime;
+        
+        if (!response.text) {
+            throw new AIError("AI model returned an empty JSON response.", "decideNextSpeaker", prompt);
+        }
+
         let json;
         try {
             json = JSON.parse(response.text);
@@ -157,6 +162,11 @@ export const generateManualSuggestions = async (
         });
         
         const modelDuration = performance.now() - startTime;
+        
+        if (!response.text) {
+            throw new AIError("AI model returned an empty JSON response.", "generateManualSuggestions", prompt);
+        }
+
         let json;
         try {
             json = JSON.parse(response.text);
@@ -290,6 +300,11 @@ export const generateDynamicPlan = async (
         });
         
         const modelDuration = performance.now() - startTime;
+        
+        if (!response.text) {
+            throw new AIError("AI model returned an empty JSON response.", "generateDynamicPlan", prompt);
+        }
+        
         let json;
         try {
             json = JSON.parse(response.text);
@@ -404,6 +419,11 @@ export const moderateTurn = async (
         });
 
         const modelDuration = performance.now() - startTime;
+        
+        if (!response.text) {
+            throw new AIError("AI model returned an empty JSON response.", "moderateTurn", prompt);
+        }
+        
         let json;
         try {
             json = JSON.parse(response.text);
