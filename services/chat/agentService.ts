@@ -126,6 +126,8 @@ export const generateResponse = async (
             },
         });
         const response = result;
+        // FIX: The compiler incorrectly infers that 'candidates' might be undefined.
+        // Optional chaining is used to safely access nested properties.
         const functionCall = response.candidates?.[0]?.content?.parts[0]?.functionCall;
 
         pipeline.push({
