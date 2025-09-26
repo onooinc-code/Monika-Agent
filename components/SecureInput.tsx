@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
-import { useAppContext } from '../contexts/StateProvider.tsx';
-import { EyeIcon, EyeOffIcon, LockOpenIcon, LockClosedIcon, CopyIcon, XCircleIcon, CheckIcon } from './Icons.tsx';
+import { useAppContext } from '@/contexts/StateProvider';
+import { EyeIcon, EyeOffIcon, LockOpenIcon, LockClosedIcon, CopyIcon, XCircleIcon, CheckIcon } from '@/components/Icons';
 
 interface SecureInputProps extends React.InputHTMLAttributes<HTMLInputElement> {
     id: string;

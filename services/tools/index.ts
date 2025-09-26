@@ -1,8 +1,8 @@
 
-import { calculator, calculatorSchema } from './calculator.ts';
-import { getCurrentWeather, getCurrentWeatherSchema } from './weather.ts';
-import { executeShellCommand, executeShellCommandSchema } from './shell.ts';
-import { getFullMessageTextSchema } from './contextual.ts';
+import { calculator, calculatorSchema } from './calculator';
+import { getCurrentWeather, getCurrentWeatherSchema } from './weather';
+import { executeShellCommand, executeShellCommandSchema } from './shell';
+import { getFullMessageTextSchema } from './contextual';
 import { FunctionDeclaration } from '@google/genai';
 
 // A map of all available tool schemas for the Gemini API.

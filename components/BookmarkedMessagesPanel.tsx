@@ -1,8 +1,9 @@
 import React from 'react';
-import { useAppContext } from '../contexts/StateProvider.tsx';
-import { Message } from '../types/index.ts';
-import { CloseIcon, BookmarkFilledIcon } from './Icons.tsx';
-import { safeRender } from '../services/utils/safeRender.ts';
+import { useAppContext } from '@/contexts/StateProvider';
+// FIX: Corrected the import path for types to point to the barrel file.
+import { Message } from '@/types/index';
+import { CloseIcon, BookmarkFilledIcon } from '@/components/Icons';
+import { safeRender } from '@/services/utils/safeRender';
 
 interface BookmarkItemProps {
     message: Message;

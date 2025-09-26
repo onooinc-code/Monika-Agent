@@ -1,8 +1,11 @@
 
+
+
 import React, { useState, useEffect } from 'react';
-import { useAppContext } from '../contexts/StateProvider.tsx';
-import { PipelineStep } from '../types/index.ts';
-import { CloseIcon } from './Icons.tsx';
+import { useAppContext } from '@/contexts/StateProvider';
+// FIX: Corrected the import path for types to point to the barrel file.
+import { PipelineStep } from '@/types/index';
+import { CloseIcon } from '@/components/Icons';
 
 const CodeBlock: React.FC<{ data: any }> = ({ data }) => {
     let content;

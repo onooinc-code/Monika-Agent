@@ -1,6 +1,8 @@
+'use client';
+
 import React from 'react';
-import { useAppContext } from '../contexts/StateProvider.tsx';
-import { GlassIconButton } from './GlassIconButton.tsx';
+import { useAppContext } from '@/contexts/StateProvider';
+import { GlassIconButton } from '@/components/GlassIconButton';
 
 export const HeaderLeftActions: React.FC = () => {
     const { setIsTeamGeneratorOpen, setIsApiUsageOpen, setIsDeveloperInfoOpen } = useAppContext();

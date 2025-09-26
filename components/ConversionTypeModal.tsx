@@ -1,7 +1,10 @@
+'use client';
+
 import React from 'react';
-import { useAppContext } from '../contexts/StateProvider.tsx';
-import { FlipSwitch } from './FlipSwitch.tsx';
-import { ConversionType } from '../types/index.ts';
+import { useAppContext } from '@/contexts/StateProvider';
+import { FlipSwitch } from '@/components/FlipSwitch';
+// FIX: Corrected import path to explicitly use the barrel file.
+import { ConversionType } from '@/types/index';
 
 export const ConversionTypeModal: React.FC = () => {
     const { isConversionTypeModalOpen, setIsConversionTypeModalOpen, conversionType, setConversionType } = useAppContext();

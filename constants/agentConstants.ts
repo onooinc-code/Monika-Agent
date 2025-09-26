@@ -1,4 +1,5 @@
-import { Agent, AgentManager } from '../types/index.ts';
+// FIX: Corrected the import path for types to point to the barrel file.
+import { Agent, AgentManager } from '@/types/index';
 
 export const DEFAULT_AGENTS: Agent[] = [
   {

@@ -1,9 +1,12 @@
 
-import { getGenAIClient } from '../gemini/client.ts';
-import { Agent, Message, AgentManager, ManualSuggestion, PipelineStep, PlanStep } from '../../types/index.ts';
-import { buildContext } from '../utils/contextBuilder.ts';
+
+
+import { getGenAIClient } from '@/services/gemini/client';
+// FIX: Corrected the import path for types to point to the barrel file.
+import { Agent, Message, AgentManager, ManualSuggestion, PipelineStep, PlanStep } from '@/types/index';
+import { buildContext } from '@/services/utils/contextBuilder';
 import { Type } from "@google/genai";
-import { handleAndThrowError } from '../utils/errorHandler.ts';
+import { handleAndThrowError } from '@/services/utils/errorHandler';
 
 export interface ModerationResult {
     critique: string | null;

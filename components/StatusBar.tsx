@@ -1,7 +1,7 @@
 import React, { useMemo } from 'react';
-import { useAppContext } from '../contexts/StateProvider.tsx';
-import * as TokenCounter from '../services/utils/tokenCounter.ts';
-import { TokenIcon, StatsIcon, MessageCountIcon } from './Icons.tsx';
+import { useAppContext } from '@/contexts/StateProvider';
+import * as TokenCounter from '@/services/utils/tokenCounter';
+import { TokenIcon, StatsIcon, MessageCountIcon } from '@/components/Icons';
 
 const getTodayDateString = (): string => {
     const today = new Date();

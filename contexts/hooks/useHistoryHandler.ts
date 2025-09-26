@@ -1,9 +1,10 @@
 
+
 import { useState } from 'react';
-import { Conversation, AgentManager, HistoryView, Message } from '../../types/index.ts';
-import * as HistoryService from '../../services/analysis/historyService.ts';
-// FIX: Corrected import path for HISTORY_CONFIG. It was moved to constants/historyConstants.ts.
-import { HISTORY_CONFIG } from '../../constants/historyConstants.ts';
+// FIX: Corrected the import path for types to point to the barrel file.
+import { Conversation, AgentManager, HistoryView, Message } from '@/types/index';
+import * as HistoryService from '@/services/analysis/historyService';
+import { HISTORY_CONFIG } from '@/constants/historyConstants';
 
 export const useHistoryHandler = () => {
     const [historyView, setHistoryView] = useState<HistoryView | null>(null);

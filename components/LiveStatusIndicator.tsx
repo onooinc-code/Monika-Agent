@@ -1,7 +1,7 @@
 import React from 'react';
-import { useAppContext } from '../contexts/StateProvider.tsx';
-import { Spinner } from './Spinner.tsx';
-import { safeRender } from '../services/utils/safeRender.ts';
+import { useAppContext } from '@/contexts/StateProvider';
+import { Spinner } from '@/components/Spinner';
+import { safeRender } from '@/services/utils/safeRender';
 
 export const LiveStatusIndicator: React.FC = () => {
     const { loadingStage, getAgent } = useAppContext();

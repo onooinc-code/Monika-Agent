@@ -1,6 +1,7 @@
 import { useMemo } from 'react';
-import { SoundEvent } from '../../types/index.ts';
-import { SOUNDS } from '../../assets/sounds.ts';
+// FIX: Corrected the import path for types to point to the barrel file.
+import { SoundEvent } from '@/types/index';
+import { SOUNDS } from '@/assets/sounds';
 
 interface SoundManagerProps {
     isSoundEnabled: boolean;

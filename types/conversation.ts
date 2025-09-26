@@ -1,5 +1,5 @@
 
-import { Message } from './message.ts';
+import { Message } from './message';
 
 export interface DiscussionSettings {
     enabled: boolean;

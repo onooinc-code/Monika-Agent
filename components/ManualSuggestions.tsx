@@ -1,6 +1,8 @@
+'use client';
+
 import React from 'react';
-import { useAppContext } from '../contexts/StateProvider.tsx';
-import { safeRender } from '../services/utils/safeRender.ts';
+import { useAppContext } from '@/contexts/StateProvider';
+import { safeRender } from '@/services/utils/safeRender';
 
 export const ManualSuggestions: React.FC = () => {
     const { manualSuggestions, agents, handleManualSelection, isLoading } = useAppContext();

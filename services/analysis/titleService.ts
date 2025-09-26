@@ -1,8 +1,11 @@
 
-import { getGenAIClient } from '../gemini/client.ts';
-import { Message, AgentManager } from '../../types/index.ts';
-import { buildContext } from '../utils/contextBuilder.ts';
-import { handleAndThrowError } from '../utils/errorHandler.ts';
+
+
+import { getGenAIClient } from '@/services/gemini/client';
+// FIX: Corrected the import path for types to point to the barrel file.
+import { Message, AgentManager } from '@/types/index';
+import { buildContext } from '@/services/utils/contextBuilder';
+import { handleAndThrowError } from '@/services/utils/errorHandler';
 
 export const generateConversationTitle = async (messages: Message[], manager: AgentManager, globalApiKey: string): Promise<string> => {
     if (messages.length === 0) return "New Chat";

@@ -1,11 +1,12 @@
 import React, { useState } from 'react';
-import { useAppContext } from '../contexts/StateProvider.tsx';
-import { Agent, TeamComponent } from '../types/index.ts';
-import { Spinner } from './Spinner.tsx';
-import * as TeamGenerationService from '../services/creation/teamGenerationService.ts';
-import { CloseIcon, SparklesIcon } from './Icons.tsx';
-import { safeRender } from '../services/utils/safeRender.ts';
-import { CopyClearWrapper } from './CopyClearWrapper.tsx';
+import { useAppContext } from '@/contexts/StateProvider';
+// FIX: Corrected the import path for types to point to the barrel file.
+import { Agent, TeamComponent } from '@/types/index';
+import { Spinner } from '@/components/Spinner';
+import * as TeamGenerationService from '@/services/creation/teamGenerationService';
+import { CloseIcon, SparklesIcon } from '@/components/Icons';
+import { safeRender } from '@/services/utils/safeRender';
+import { CopyClearWrapper } from '@/components/CopyClearWrapper';
 
 type LoadingStage = 'idle' | 'prompt' | 'components' | 'final';
 

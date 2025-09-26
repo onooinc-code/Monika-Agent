@@ -1,6 +1,6 @@
 
-import { PipelineStep } from './pipeline.ts';
-import { PlanStep } from './plan.ts';
+import { PipelineStep } from './pipeline';
+import { PlanStep } from './plan';
 
 export interface Attachment {
   base64: string;

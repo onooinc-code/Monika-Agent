@@ -1,8 +1,9 @@
-import { getGenAIClient } from '../gemini/client.ts';
-import { Message, AgentManager } from '../../types/index.ts';
+import { getGenAIClient } from '@/services/gemini/client';
+// FIX: Corrected the import path for types to point to the barrel file.
+import { Message, AgentManager } from '@/types/index';
 import { Type } from "@google/genai";
-import { buildContext } from '../utils/contextBuilder.ts';
-import { handleAndThrowError } from '../utils/errorHandler.ts';
+import { buildContext } from '@/services/utils/contextBuilder';
+import { handleAndThrowError } from '@/services/utils/errorHandler';
 
 export const summarizeMessageChunk = async (messages: Message[], manager: AgentManager, globalApiKey: string): Promise<string> => {
     const context = buildContext(messages);

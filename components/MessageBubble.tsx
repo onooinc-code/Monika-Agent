@@ -1,19 +1,20 @@
 
+
 import React, { useEffect, useRef, useState } from 'react';
-// FIX: Added BubbleSettings to import list
-import { Message, Agent, Conversation, BubbleSettings } from '../types/index.ts';
-import { MANAGER_COLOR } from '../constants/agentConstants.ts';
-import { useAppContext } from '../contexts/StateProvider.tsx';
-import { Avatar } from './Avatar.tsx';
+// FIX: Corrected the import path for types to point to the barrel file.
+import { Message, Agent, Conversation, BubbleSettings } from '@/types/index';
+import { MANAGER_COLOR } from '@/constants/agentConstants';
+import { useAppContext } from '@/contexts/StateProvider';
+import { Avatar } from '@/components/Avatar';
 import { 
     CopyIcon, BookmarkIcon, EditIcon, TrashIcon, RegenerateIcon, SummarizeIcon, RewriteIcon, 
     CodeIcon, WorkflowIcon, AlignLeftIcon, AlignRightIcon, ZoomInIcon, ZoomOutIcon, 
     TextLtrIcon, TextRtlIcon, TokenIcon, BookmarkFilledIcon
-} from './Icons.tsx';
+} from '@/components/Icons';
 
-import { PlanDisplay } from './PlanDisplay.tsx';
-import * as TokenCounter from '../services/utils/tokenCounter.ts';
-import { safeRender } from '../services/utils/safeRender.ts';
+import { PlanDisplay } from '@/components/PlanDisplay';
+import * as TokenCounter from '@/services/utils/tokenCounter';
+import { safeRender } from '@/services/utils/safeRender';
 
 declare const marked: any;
 declare const DOMPurify: any;
@@ -34,7 +35,6 @@ const ActionButton: React.FC<{onClick: () => void, title: string, 'aria-label': 
     </button>
 );
 
-// FIX: Added props interface for MessageToolbar
 interface MessageToolbarProps {
     message: Message;
     isUser: boolean;
@@ -48,7 +48,6 @@ interface MessageToolbarProps {
 
 
 const MessageToolbar: React.FC<MessageToolbarProps> = ({ message, isUser, isContinuous, settings, handleAlignment, handleTextDirection, handleFontSize, handleCopy }) => {
-    // FIX: Removed handleAlignment, handleTextDirection, handleFontSize, handleCopy, and settings from useAppContext as they are now props.
     const {
         handleToggleMessageBookmark, handleDeleteMessage, handleSummarizeMessage, handleRegenerateResponse,
         handleRewritePrompt, handleToggleMessageEdit, openPromptInspectorModal, openInspectorModal,
@@ -133,7 +132,6 @@ const MessageToolbar: React.FC<MessageToolbarProps> = ({ message, isUser, isCont
 
 
 export const MessageBubble: React.FC<MessageBubbleProps> = ({ message, agent, featureFlags }) => {
-    // FIX: Added necessary functions and state setters from context.
     const { 
         handleShowHtmlPreview, 
         handleUpdateMessageText, 
@@ -176,7 +174,6 @@ export const MessageBubble: React.FC<MessageBubbleProps> = ({ message, agent, fe
     }, [message.isEditing, message.text]);
 
     const isUser = message.sender === 'user';
-    // FIX: Added local state and handlers for bubble settings.
     const settings = isUser ? userBubbleSettings : agentBubbleSettings;
     const setSettings = isUser ? setUserBubbleSettings : setAgentBubbleSettings;
 
@@ -350,7 +347,6 @@ export const MessageBubble: React.FC<MessageBubbleProps> = ({ message, agent, fe
                         )}
                     </div>
                     <div className={`absolute -top-3 ${isUser ? 'left-12' : 'right-12'} z-10 opacity-0 group-hover:opacity-100 transition-opacity duration-300`}>
-                        {/* FIX: Passed props to MessageToolbar */}
                         <MessageToolbar message={message} isUser={isUser} isContinuous={true} settings={settings} handleAlignment={handleAlignment} handleTextDirection={handleTextDirection} handleFontSize={handleFontSize} handleCopy={handleCopy} />
                     </div>
                 </div>
@@ -415,7 +411,6 @@ export const MessageBubble: React.FC<MessageBubbleProps> = ({ message, agent, fe
                         )}
                     </div>
                     <div className={`flex items-center p-2 bg-primary-header/70 ${isUser ? 'flex-row-reverse' : ''} opacity-0 group-hover:opacity-100 transition-opacity duration-300`} style={{backgroundColor: 'var(--color-primary-header)'}}>
-                       {/* FIX: Passed props to MessageToolbar */}
                        <MessageToolbar message={message} isUser={isUser} isContinuous={false} settings={settings} handleAlignment={handleAlignment} handleTextDirection={handleTextDirection} handleFontSize={handleFontSize} handleCopy={handleCopy} />
                     </div>
                 </div>

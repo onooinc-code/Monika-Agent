@@ -1,9 +1,10 @@
 import React from 'react';
-import { Message } from '../types/index.ts';
-import { Spinner } from './Spinner.tsx';
-import { useAppContext } from '../contexts/StateProvider.tsx';
-import { CloseIcon } from './Icons.tsx';
-import { safeRender } from '../services/utils/safeRender.ts';
+// FIX: Corrected the import path for types to point to the barrel file.
+import { Message } from '@/types/index';
+import { Spinner } from '@/components/Spinner';
+import { useAppContext } from '@/contexts/StateProvider';
+import { CloseIcon } from '@/components/Icons';
+import { safeRender } from '@/services/utils/safeRender';
 
 export const HistoryModal: React.FC = () => {
     const { isHistoryOpen, setIsHistoryOpen, historyView, isLoading, getAgent } = useAppContext();

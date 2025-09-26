@@ -1,10 +1,10 @@
-
+'use client';
 
 import React, { useState, useMemo } from 'react';
-import { ConversationItem } from './ConversationItem.tsx';
-import { useAppContext } from '../contexts/StateProvider.tsx';
-import { PlusIcon, SearchIcon } from './Icons.tsx';
-import { safeRender } from '../services/utils/safeRender.ts';
+import { ConversationItem } from '@/components/ConversationItem';
+import { useAppContext } from '@/contexts/StateProvider';
+import { PlusIcon, SearchIcon } from '@/components/Icons';
+import { safeRender } from '@/services/utils/safeRender';
 
 interface ConversationListProps {
     isOpen: boolean;

@@ -1,7 +1,8 @@
 
+
 import React from 'react';
-import { useAppContext } from '../contexts/StateProvider.tsx';
-import { CloseIcon } from './Icons.tsx';
+import { useAppContext } from '@/contexts/StateProvider';
+import { CloseIcon } from '@/components/Icons';
 
 export const HtmlPreviewModal: React.FC = () => {
     const { isHtmlPreviewOpen, htmlPreviewContent, handleCloseHtmlPreview } = useAppContext();

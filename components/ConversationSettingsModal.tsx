@@ -1,11 +1,12 @@
 import React, { useState, useEffect } from 'react';
-import { useAppContext } from '../contexts/StateProvider.tsx';
-import { ToggleSwitch } from './ToggleSwitch.tsx';
-import { DiscussionSettings, ManagerSettings } from '../types/index.ts';
-import { Spinner } from './Spinner.tsx';
-import * as DiscussionService from '../services/creation/discussionService.ts';
-import { CloseIcon, SparklesIcon, CpuIcon } from './Icons.tsx';
-import { CopyClearWrapper } from './CopyClearWrapper.tsx';
+import { useAppContext } from '@/contexts/StateProvider';
+import { ToggleSwitch } from '@/components/ToggleSwitch';
+// FIX: Corrected the import path for types to point to the barrel file.
+import { DiscussionSettings, ManagerSettings } from '@/types/index';
+import { Spinner } from '@/components/Spinner';
+import * as DiscussionService from '@/services/creation/discussionService';
+import { CloseIcon, SparklesIcon, CpuIcon } from '@/components/Icons';
+import { CopyClearWrapper } from '@/components/CopyClearWrapper';
 
 const DEFAULT_DISCUSSION_SETTINGS: DiscussionSettings = {
     enabled: false,

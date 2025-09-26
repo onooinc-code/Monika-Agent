@@ -1,7 +1,7 @@
 import React from 'react';
-import { useAppContext } from '../contexts/StateProvider.tsx';
-import { TokenIcon, CpuIcon, CloseIcon, MessageCountIcon } from './Icons.tsx';
-import { safeRender } from '../services/utils/safeRender.ts';
+import { useAppContext } from '@/contexts/StateProvider';
+import { TokenIcon, CpuIcon, CloseIcon, MessageCountIcon } from '@/components/Icons';
+import { safeRender } from '@/services/utils/safeRender';
 
 const getTodayDateString = (): string => {
     const today = new Date();

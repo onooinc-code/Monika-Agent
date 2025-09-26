@@ -1,7 +1,10 @@
+'use client';
+
 import React, { useRef, useState, useEffect } from 'react';
-import { useAppContext } from '../contexts/StateProvider.tsx';
-import { safeRender } from '../services/utils/safeRender.ts';
-import { ContextMenuItem } from '../types/index.ts';
+import { useAppContext } from '@/contexts/StateProvider';
+import { safeRender } from '@/services/utils/safeRender';
+// FIX: Corrected import path to explicitly use the barrel file.
+import { ContextMenuItem } from '@/types/index';
 
 export const ContextMenu: React.FC = () => {
     const { contextMenuState, closeContextMenu } = useAppContext();

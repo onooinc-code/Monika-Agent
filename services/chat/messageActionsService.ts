@@ -1,7 +1,10 @@
 
-import { getGenAIClient } from '../gemini/client.ts';
-import { AgentManager } from '../../types/index.ts';
-import { handleAndThrowError } from '../utils/errorHandler.ts';
+
+
+import { getGenAIClient } from '@/services/gemini/client';
+// FIX: Corrected the import path for types to point to the barrel file.
+import { AgentManager } from '@/types/index';
+import { handleAndThrowError } from '@/services/utils/errorHandler';
 
 export const summarizeMessage = async (text: string, manager: AgentManager, globalApiKey: string): Promise<string> => {
     const prompt = `Summarize the following text in one or two concise sentences:\n\n---\n${text}\n---`;

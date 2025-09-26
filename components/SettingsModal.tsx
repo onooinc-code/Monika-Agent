@@ -1,12 +1,12 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { Agent, AgentManager } from '../types/index.ts';
-import { useAppContext } from '../contexts/StateProvider.tsx';
-import { ToggleSwitch } from './ToggleSwitch.tsx';
-import { LongTermMemoryData } from '../types/index.ts';
-import { CloseIcon, CpuIcon } from './Icons.tsx';
-import { safeRender } from '../services/utils/safeRender.ts';
-import { SecureInput } from './SecureInput.tsx';
-import { CopyClearWrapper } from './CopyClearWrapper.tsx';
+// FIX: Corrected the import path for types to point to the barrel file.
+import { Agent, AgentManager, LongTermMemoryData } from '@/types/index';
+import { useAppContext } from '@/contexts/StateProvider';
+import { ToggleSwitch } from '@/components/ToggleSwitch';
+import { CloseIcon, CpuIcon } from '@/components/Icons';
+import { safeRender } from '@/services/utils/safeRender';
+import { SecureInput } from '@/components/SecureInput';
+import { CopyClearWrapper } from '@/components/CopyClearWrapper';
 
 export const SettingsModal: React.FC = () => {
     const { 

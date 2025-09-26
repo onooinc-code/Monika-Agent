@@ -1,7 +1,8 @@
 import React from 'react';
-import { Conversation } from '../types/index.ts';
-import { TrashIcon } from './Icons.tsx';
-import { safeRender } from '../services/utils/safeRender.ts';
+// FIX: Corrected the import path for types to point to the barrel file.
+import { Conversation } from '@/types/index';
+import { TrashIcon } from '@/components/Icons';
+import { safeRender } from '@/services/utils/safeRender';
 
 interface ConversationItemProps {
     conversation: Conversation;

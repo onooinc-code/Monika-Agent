@@ -1,5 +1,7 @@
+'use client';
+
 import React, { useState, useEffect } from 'react';
-import { useAppContext } from '../contexts/StateProvider.tsx';
+import { useAppContext } from '@/contexts/StateProvider';
 
 interface HeaderActionsProps {
     toggleSidebar: () => void;

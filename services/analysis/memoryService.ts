@@ -1,7 +1,8 @@
-import { getGenAIClient } from '../gemini/client.ts';
-import { AgentManager, Message, LongTermMemoryData } from '../../types/index.ts';
-import { buildContext } from '../utils/contextBuilder.ts';
-import { handleAndThrowError } from '../utils/errorHandler.ts';
+import { getGenAIClient } from '@/services/gemini/client';
+// FIX: Corrected the import path for types to point to the barrel file.
+import { AgentManager, Message, LongTermMemoryData } from '@/types/index';
+import { buildContext } from '@/services/utils/contextBuilder';
+import { handleAndThrowError } from '@/services/utils/errorHandler';
 
 export const extractKeyInformation = async (
     messages: Message[],

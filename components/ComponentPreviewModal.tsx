@@ -1,9 +1,12 @@
+'use client';
+
 import React from 'react';
-import { useAppContext } from '../contexts/StateProvider.tsx';
-import { CloseIcon } from './Icons.tsx';
-import { renderCustomReactComponent } from './ComponentsGalleryModal.tsx';
-import { HtmlComponentPreview } from './HtmlComponentPreview.tsx';
-import { HtmlComponent, CustomComponent } from '../types/index.ts';
+import { useAppContext } from '@/contexts/StateProvider';
+import { CloseIcon } from '@/components/Icons';
+import { renderCustomReactComponent } from '@/components/ComponentsGalleryModal';
+import { HtmlComponentPreview } from '@/components/HtmlComponentPreview';
+// FIX: Corrected import path to explicitly use the barrel file.
+import { HtmlComponent, CustomComponent } from '@/types/index';
 
 interface ComponentPreviewModalProps {
     isOpen: boolean;

@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { CopyIcon, XCircleIcon, CheckIcon } from './Icons.tsx';
+import { CopyIcon, XCircleIcon, CheckIcon } from '@/components/Icons';
 
 interface CopyClearWrapperProps {
     value: string;

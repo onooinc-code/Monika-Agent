@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
-import { useAppContext } from '../contexts/StateProvider.tsx';
-import { CloseIcon, CopyIcon, CheckIcon } from './Icons.tsx';
-import { safeRender } from '../services/utils/safeRender.ts';
+import { useAppContext } from '@/contexts/StateProvider';
+import { CloseIcon, CopyIcon, CheckIcon } from '@/components/Icons';
+import { safeRender } from '@/services/utils/safeRender';
 
 export const ApiUsageModal: React.FC = () => {
     const { isApiUsageOpen, setIsApiUsageOpen, globalApiKey, agentManager, agents } = useAppContext();

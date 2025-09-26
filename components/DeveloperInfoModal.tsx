@@ -1,6 +1,10 @@
-import React, { useState, useMemo } from 'react';
-import { useAppContext } from '../contexts/StateProvider.tsx';
-import { CloseIcon, SearchIcon, FilterIcon, FolderIcon, ChevronDownIcon, CopyIcon, CheckIcon } from './Icons.tsx';
+
+'use client';
+
+import React, { useState, useMemo, useEffect } from 'react';
+import { useAppContext } from '@/contexts/StateProvider';
+import { CloseIcon, SearchIcon, FilterIcon, FolderIcon, ChevronDownIcon, CopyIcon, CheckIcon } from '@/components/Icons';
+import { safeRender } from '@/services/utils/safeRender';
 
 const elementData = [
   {
@@ -79,182 +83,118 @@ const elementData = [
       { name: 'Alternative Response Navigator', description: 'Controls to switch between alternative AI responses.', descriptionAr: 'عناصر التحكم للتبديل بين ردود الذكاء الاصطناعي البديلة.', classNames: 'AlternativeResponseNavigator' },
       { name: 'Timestamp', description: 'The time the message was sent.', descriptionAr: 'وقت إرسال الرسالة.', classNames: 'MessageTimestamp' },
       { name: 'Bubble Body', description: 'The main content area of the message.', descriptionAr: 'منطقة المحتوى الرئيسية للرسالة.', classNames: 'MessageBubbleBody' },
-      { name: 'Plan Display Container', description: 'Container for the AI Manager\'s plan.', descriptionAr: 'حاوية خطة مدير الذكاء الاصطناعي.', classNames: 'PlanDisplayContainer' },
-      { name: 'Message Text', description: 'The rendered markdown text of the message.', descriptionAr: 'نص الرسالة المعروض بصيغة ماركداون.', classNames: 'MessageText' },
-      { name: 'Expand Message Button', description: 'Button to show/hide the full text of a long message.', descriptionAr: 'زر لإظهار/إخفاء النص الكامل لرسالة طويلة.', classNames: 'ExpandMessageButton' },
-      { name: 'Attachment Image', description: 'The attached image in a message.', descriptionAr: 'الصورة المرفقة في رسالة.', classNames: 'MessageAttachment' },
+      { name: 'Plan Display Container', description: 'Container for the Plan Display component.', descriptionAr: 'حاوية مكون عرض الخطة.', classNames: 'prose-agent' }
     ]
-  },
-   {
-    group: 'Message Bubble (Editing State)',
-    elements: [
-      { name: 'Editing Container', description: 'The main wrapper for a bubble in edit mode.', descriptionAr: 'الغلاف الرئيسي للفقاعة في وضع التعديل.', classNames: 'MessageBubbleEditing' },
-      { name: 'Edit Input Textarea', description: 'The textarea for editing the message text.', descriptionAr: 'منطقة النص لتعديل الرسالة.', classNames: 'MessageEditInput' },
-      { name: 'Edit Actions Container', description: 'Container for the save and cancel buttons.', descriptionAr: 'حاوية أزرار الحفظ والإلغاء.', classNames: 'MessageEditActions' },
-      { name: 'Cancel Edit Button', description: 'Button to cancel editing.', descriptionAr: 'زر لإلغاء التعديل.', classNames: 'MessageEditCancelButton' },
-      { name: 'Save Edit Button', description: 'Button to save the edited message.', descriptionAr: 'زر لحفظ الرسالة المعدلة.', classNames: 'MessageEditSaveButton' },
-    ]
-  },
-  {
-    group: 'Message Input',
-    elements: [
-        { name: 'Footer Container', description: 'The main footer element containing the input area.', descriptionAr: 'عنصر التذييل الرئيسي الذي يحتوي على منطقة الإدخال.', classNames: 'MessageInputFooter' },
-        { name: 'Input Wrapper', description: 'The styled wrapper with the gradient border.', descriptionAr: 'الغلاف المصمم مع حدود متدرجة.', classNames: 'MessageInputWrapper' },
-        { name: 'Input Inner', description: 'The inner container with the dark background.', descriptionAr: 'الحاوية الداخلية ذات الخلفية الداكنة.', classNames: 'MessageInputInner' },
-        { name: 'Textarea', description: 'The main text input field.', descriptionAr: 'حقل إدخال النص الرئيسي.', classNames: 'MessageInputTextarea' },
-        { name: 'Action Buttons Container', description: 'Container for the attachment, template, and web buttons.', descriptionAr: 'حاوية أزرار الإجراءات (مرفق، قالب، ويب).', classNames: 'MessageInputActionButtonsContainer' },
-        { name: 'Attach File Button', description: 'Button to open the file attachment dialog.', descriptionAr: 'زر لفتح مربع حوار إرفاق الملفات.', classNames: 'AttachFileButton' },
-        { name: 'Add Template Button', description: 'Button for adding a template.', descriptionAr: 'زر لإضافة قالب.', classNames: 'AddTemplateButton' },
-        { name: 'Browse Web Button', description: 'Button for browsing the web.', descriptionAr: 'زر لتصفح الويب.', classNames: 'BrowseWebButton' },
-        { name: 'Send Message Button', description: 'The main button to send the message.', descriptionAr: 'الزر الرئيسي لإرسال الرسالة.', classNames: 'SendMessageButton' },
-        { name: 'Tags Container', description: 'Container for the suggested action tags.', descriptionAr: 'حاوية علامات الإجراءات المقترحة.', classNames: 'MessageInputTagsContainer' },
-        { name: 'Tag', description: 'An individual suggested action tag.', descriptionAr: 'علامة إجراء مقترحة فردية.', classNames: 'MessageInputTag' },
-    ]
-  },
+  }
 ];
 
-const CopyButton: React.FC<{ text: string }> = ({ text }) => {
-    const [copied, setCopied] = useState(false);
-    const handleCopy = () => {
-        navigator.clipboard.writeText(text);
-        setCopied(true);
-        setTimeout(() => setCopied(false), 1500);
-    };
-    return (
-        <button onClick={handleCopy} className="p-1 rounded-full text-gray-400 hover:bg-white/10 hover:text-white transition-colors" title="Copy">
-            {copied ? <CheckIcon className="w-4 h-4 text-green-400" /> : <CopyIcon className="w-4 h-4" />}
-        </button>
-    );
-};
-
 export const DeveloperInfoModal: React.FC = () => {
-  const { isDeveloperInfoOpen, setIsDeveloperInfoOpen } = useAppContext();
-  const [searchQuery, setSearchQuery] = useState('');
-  const [activeFilters, setActiveFilters] = useState<string[]>([]);
+    const { isDeveloperInfoOpen, setIsDeveloperInfoOpen } = useAppContext();
+    const [searchQuery, setSearchQuery] = useState('');
+    const [activeFilter, setActiveFilter] = useState('All');
+    const [expandedGroups, setExpandedGroups] = useState<Record<string, boolean>>({});
+    const [copiedClass, setCopiedClass] = useState<string | null>(null);
 
-  const filteredData = useMemo(() => {
-    let data = elementData;
-    if (activeFilters.length > 0) {
-      data = data.filter(group => activeFilters.includes(group.group));
-    }
-    if (searchQuery.trim()) {
-      const lowercasedQuery = searchQuery.toLowerCase();
-      return data.map(group => {
-        const filteredElements = group.elements.filter(el => 
-          el.name.toLowerCase().includes(lowercasedQuery) ||
-          el.description.toLowerCase().includes(lowercasedQuery) ||
-          el.descriptionAr.toLowerCase().includes(lowercasedQuery) ||
-          el.classNames.toLowerCase().includes(lowercasedQuery)
-        );
-        return { ...group, elements: filteredElements };
-      }).filter(group => group.elements.length > 0);
-    }
-    return data;
-  }, [searchQuery, activeFilters]);
-  
-  const toggleFilter = (group: string) => {
-    setActiveFilters(prev => 
-      prev.includes(group) ? prev.filter(f => f !== group) : [...prev, group]
-    );
-  };
+    const categories = useMemo(() => ['All', ...elementData.map(d => d.group)], []);
 
-  if (!isDeveloperInfoOpen) return null;
+    const filteredData = useMemo(() => {
+        return elementData
+            .map(group => ({
+                ...group,
+                elements: group.elements.filter(el =>
+                    el.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+                    el.classNames.toLowerCase().includes(searchQuery.toLowerCase())
+                ),
+            }))
+            .filter(group => 
+                (activeFilter === 'All' || group.group === activeFilter) && group.elements.length > 0
+            );
+    }, [searchQuery, activeFilter]);
 
-  return (
-    <div className="fixed inset-0 flex justify-center items-center z-50 p-4 modal-overlay open" onClick={() => setIsDeveloperInfoOpen(false)}>
-      <div className="glass-pane rounded-xl shadow-2xl w-full max-w-6xl max-h-[90vh] flex flex-col modal-content shadow-cyan-500/20" onClick={e => e.stopPropagation()}>
-        <header className="flex justify-between items-center p-6 border-b border-white/10 flex-shrink-0">
-          <h2 className="text-2xl font-bold text-white">Developer Information Panel</h2>
-          <button onClick={() => setIsDeveloperInfoOpen(false)} className="p-1 rounded-full hover:bg-white/10">
-            <CloseIcon className="w-6 h-6" />
-          </button>
-        </header>
+    useEffect(() => {
+        if (isDeveloperInfoOpen) {
+            // Expand all groups by default when modal opens or filter changes
+            const allGroups = filteredData.reduce((acc, group) => {
+                acc[group.group] = true;
+                return acc;
+            }, {} as Record<string, boolean>);
+            setExpandedGroups(allGroups);
+        }
+    }, [isDeveloperInfoOpen, filteredData]);
+    
+    const toggleGroup = (groupName: string) => {
+        setExpandedGroups(prev => ({ ...prev, [groupName]: !prev[groupName] }));
+    };
 
-        <div className="p-4 border-b border-white/10 flex-shrink-0 space-y-4 sticky top-0 bg-[var(--color-pane)] z-10">
-            <div className="relative">
-                <span className="absolute inset-y-0 left-0 flex items-center pl-3"><SearchIcon className="w-5 h-5 text-gray-400" /></span>
-                <input
-                    type="search"
-                    placeholder="Search elements..."
-                    value={searchQuery}
-                    onChange={e => setSearchQuery(e.target.value)}
-                    className="w-full bg-black/20 border border-white/10 rounded-lg py-2 pl-10 pr-4 text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-indigo-500"
-                />
-            </div>
-            <div className="flex flex-wrap gap-2 items-center">
-                <FilterIcon className="w-5 h-5 text-gray-400" />
-                <span className="text-sm font-semibold text-gray-300">Filters:</span>
-                {elementData.map(group => (
-                    <button 
-                        key={group.group}
-                        onClick={() => toggleFilter(group.group)}
-                        className={`px-3 py-1 text-xs font-semibold rounded-full border transition-colors ${activeFilters.includes(group.group) ? 'bg-indigo-500 border-indigo-400 text-white' : 'bg-black/20 border-white/10 text-gray-300 hover:bg-white/10'}`}
-                    >
-                        {group.group}
-                    </button>
-                ))}
-                {activeFilters.length > 0 && <button onClick={() => setActiveFilters([])} className="text-xs text-red-400 hover:underline">Clear Filters</button>}
-            </div>
-        </div>
+    const handleCopy = (className: string) => {
+        navigator.clipboard.writeText(className);
+        setCopiedClass(className);
+        setTimeout(() => setCopiedClass(null), 1500);
+    };
 
-        <div className="flex-1 overflow-y-auto p-6 space-y-6">
-          {filteredData.map(group => (
-            <details key={group.group} open className="group/details">
-                <summary className="flex justify-between items-center text-xl font-semibold text-indigo-300 list-none">
-                    <div className="flex items-center gap-3">
-                        <FolderIcon className="w-6 h-6" />
-                        {group.group}
-                        <span className="text-sm font-mono bg-indigo-500/20 text-indigo-200 px-2.5 py-1 rounded-full">{group.elements.length}</span>
-                    </div>
-                    <ChevronDownIcon className="w-6 h-6 transition-transform transform group-open/details:rotate-180" />
-                </summary>
-                <div className="overflow-x-auto pt-4">
-                    <table className="w-full text-sm text-left text-gray-300">
-                        <thead className="text-xs text-cyan-300 uppercase bg-black/30">
-                            <tr>
-                                <th scope="col" className="px-6 py-3 rounded-tl-lg w-1/4">Element Name</th>
-                                <th scope="col" className="px-6 py-3 w-1/2">Description</th>
-                                <th scope="col" className="px-6 py-3 rounded-tr-lg w-1/4">Class Names</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                        {group.elements.map((el, idx) => (
-                            <tr key={el.name} className={`border-b border-gray-700/50 hover:bg-white/5 ${idx === group.elements.length - 1 ? 'border-b-0' : ''}`}>
-                                <td className="px-6 py-4">
-                                    <div className="flex justify-between items-center">
-                                        <span className="font-semibold text-white">{el.name}</span>
-                                        <CopyButton text={el.name} />
+    if (!isDeveloperInfoOpen) return null;
+
+    return (
+        <div className="fixed inset-0 flex justify-center items-center z-50 p-4 modal-overlay open" onClick={() => setIsDeveloperInfoOpen(false)}>
+            <div className="glass-pane rounded-xl shadow-2xl w-full max-w-6xl max-h-[90vh] flex flex-col modal-content shadow-cyan-500/20" onClick={e => e.stopPropagation()}>
+                <header className="flex justify-between items-center p-6 border-b border-white/10 flex-shrink-0">
+                    <h2 className="text-2xl font-bold text-white">Developer Info & UI Kit</h2>
+                    <button onClick={() => setIsDeveloperInfoOpen(false)} className="p-1 rounded-full hover:bg-white/10"><CloseIcon /></button>
+                </header>
+                <div className="flex-1 flex min-h-0">
+                    {/* Sidebar */}
+                    <aside className="w-64 p-4 border-r border-white/10 flex-shrink-0 flex flex-col">
+                        <div className="relative mb-4">
+                            <span className="absolute inset-y-0 left-0 flex items-center pl-3"><SearchIcon className="w-5 h-5 text-gray-400" /></span>
+                            <input type="search" placeholder="Search..." value={searchQuery} onChange={e => setSearchQuery(e.target.value)} className="w-full bg-black/20 border border-white/10 rounded-lg py-2 pl-10 pr-4 text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-indigo-500" />
+                        </div>
+                        <div className="flex items-center gap-2 mb-4 text-sm font-semibold text-gray-400 uppercase tracking-wider">
+                            <FilterIcon className="w-5 h-5"/>
+                            <span>Categories</span>
+                        </div>
+                        <nav className="flex-1 space-y-1 overflow-y-auto -mr-2 pr-2">
+                            {categories.map(cat => (
+                                <button key={cat} onClick={() => setActiveFilter(cat)} className={`w-full text-left p-2 rounded-md font-semibold text-sm transition-colors ${activeFilter === cat ? 'bg-indigo-600 text-white' : 'text-gray-300 hover:bg-white/10'}`}>
+                                    {safeRender(cat)}
+                                </button>
+                            ))}
+                        </nav>
+                    </aside>
+                    {/* Main Content */}
+                    <main className="flex-1 overflow-y-auto p-6 space-y-6">
+                        {filteredData.map(group => (
+                            <div key={group.group}>
+                                <div onClick={() => toggleGroup(group.group)} className="flex items-center gap-3 cursor-pointer mb-2">
+                                    <FolderIcon className="w-6 h-6 text-indigo-400"/>
+                                    <h3 className="text-xl font-semibold text-white">{safeRender(group.group)}</h3>
+                                    <ChevronDownIcon className={`w-5 h-5 text-gray-400 transition-transform ${expandedGroups[group.group] ? 'rotate-180' : ''}`} />
+                                </div>
+                                {expandedGroups[group.group] && (
+                                    <div className="space-y-4 pl-9 animate-fade-in-up">
+                                        {group.elements.map(el => (
+                                            <div key={el.name} className="glass-pane p-4 rounded-lg">
+                                                <h4 className="font-semibold text-lg text-cyan-300">{safeRender(el.name)}</h4>
+                                                <p className="text-gray-300 mt-1">{safeRender(el.description)}</p>
+                                                <p className="text-gray-400 mt-1 text-right" dir="rtl">{safeRender(el.descriptionAr)}</p>
+                                                <div className="mt-3 pt-3 border-t border-white/10 flex flex-wrap items-center gap-2">
+                                                    {el.classNames.split(',').map(c => c.trim()).map(cls => (
+                                                        <div key={cls} className="flex items-center gap-1 bg-black/30 px-2 py-1 rounded-md font-mono text-xs text-green-400">
+                                                            <span>.{safeRender(cls)}</span>
+                                                            <button onClick={() => handleCopy(cls)} className="text-white hover:text-cyan-300">
+                                                                {copiedClass === cls ? <CheckIcon className="w-3 h-3 text-green-400" /> : <CopyIcon className="w-3 h-3" />}
+                                                            </button>
+                                                        </div>
+                                                    ))}
+                                                </div>
+                                            </div>
+                                        ))}
                                     </div>
-                                </td>
-                                <td className="px-6 py-4">
-                                    <div className="flex justify-between items-start">
-                                        <div>
-                                            <p>{el.description}</p>
-                                            <p className="text-gray-400 mt-1" dir="rtl">{el.descriptionAr}</p>
-                                        </div>
-                                        <CopyButton text={`${el.description}\n${el.descriptionAr}`} />
-                                    </div>
-                                </td>
-                                <td className="px-6 py-4">
-                                    <div className="flex justify-between items-center">
-                                        <span className="font-mono text-yellow-300 whitespace-nowrap">{el.classNames}</span>
-                                        <CopyButton text={el.classNames} />
-                                    </div>
-                                </td>
-                            </tr>
+                                )}
+                            </div>
                         ))}
-                        </tbody>
-                    </table>
+                    </main>
                 </div>
-            </details>
-          ))}
-           {filteredData.length === 0 && (
-            <p className="text-center text-gray-500 py-10">
-              No elements found matching your search criteria.
-            </p>
-          )}
+            </div>
         </div>
-      </div>
-    </div>
-  );
+    );
 };

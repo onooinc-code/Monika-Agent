@@ -1,15 +1,16 @@
 import React from "react";
-import { Agent, AgentManager } from "../types/index.ts";
-import { useAppContext } from "../contexts/StateProvider.tsx";
+// FIX: Corrected the import path for types to point to the barrel file.
+import { Agent, AgentManager } from "@/types/index";
+import { useAppContext } from "@/contexts/StateProvider";
 import {
   PowerIcon,
   InformationCircleIcon,
   CpuIcon,
-} from "./Icons.tsx";
-import { safeRender } from "../services/utils/safeRender.ts";
-import { HeaderActions } from "./HeaderActions.tsx";
-import { HeaderLeftActions } from "./HeaderLeftActions.tsx";
-import { TitleBar } from "./TitleBar.tsx";
+} from "@/components/Icons";
+import { safeRender } from "@/services/utils/safeRender";
+import { HeaderActions } from "@/components/HeaderActions";
+import { HeaderLeftActions } from "@/components/HeaderLeftActions";
+import { TitleBar } from "@/components/TitleBar";
 
 
 const getTodayDateString = (): string => {

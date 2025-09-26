@@ -1,9 +1,12 @@
+'use client';
+
 import React, { useState } from 'react';
-import { Conversation, ConversationMode } from '../types/index.ts';
-import { NavTabs } from './NavTabs.tsx';
-import { ConversationTitle } from './ConversationTitle.tsx';
-import { ConversationActions } from './ConversationActions.tsx';
-import { useAppContext } from '../contexts/StateProvider.tsx';
+// FIX: Corrected import path to explicitly use the barrel file.
+import { Conversation, ConversationMode } from '@/types/index';
+import { NavTabs } from '@/components/NavTabs';
+import { ConversationTitle } from '@/components/ConversationTitle';
+import { ConversationActions } from '@/components/ConversationActions';
+import { useAppContext } from '@/contexts/StateProvider';
 
 export const ConversationSubHeader: React.FC<{ conversation: Conversation | null }> = ({ conversation }) => {
     const { conversationMode, setConversationMode } = useAppContext();

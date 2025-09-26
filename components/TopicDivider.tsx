@@ -1,6 +1,5 @@
-
 import React from 'react';
-import { safeRender } from '../services/utils/safeRender.ts';
+import { safeRender } from '@/services/utils/safeRender';
 
 interface TopicDividerProps {
     text: string;

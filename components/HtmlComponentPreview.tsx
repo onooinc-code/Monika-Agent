@@ -1,5 +1,6 @@
 import React from 'react';
-import { HtmlComponent } from '../types/index.ts';
+// FIX: Corrected import path to explicitly use the barrel file.
+import { HtmlComponent } from '@/types/index';
 
 interface HtmlComponentPreviewProps {
     component: HtmlComponent;

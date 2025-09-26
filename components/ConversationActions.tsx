@@ -1,6 +1,8 @@
+'use client';
+
 import React, { useState, useEffect, useRef } from 'react';
-import { useAppContext } from '../contexts/StateProvider.tsx';
-import { EditIcon, SparklesIcon, SettingsIcon, AlignLeftIcon, BookmarkIcon, HistoryIcon, PlusIcon } from './Icons.tsx';
+import { useAppContext } from '@/contexts/StateProvider';
+import { EditIcon, SparklesIcon, SettingsIcon, AlignLeftIcon, BookmarkIcon, HistoryIcon, PlusIcon } from '@/components/Icons';
 
 export const ConversationActions: React.FC = () => {
     const { 

@@ -1,7 +1,9 @@
+'use client';
+
 import React from 'react';
-import { MessageBubble } from './MessageBubble.tsx';
-import { TopicDivider } from './TopicDivider.tsx';
-import { useAppContext } from '../contexts/StateProvider.tsx';
+import { MessageBubble } from '@/components/MessageBubble';
+import { TopicDivider } from '@/components/TopicDivider';
+import { useAppContext } from '@/contexts/StateProvider';
 
 export const MessageList: React.FC = () => {
     const { getAgent, activeConversation } = useAppContext();

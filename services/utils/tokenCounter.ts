@@ -1,5 +1,7 @@
 
-import { Message } from '../../types/index.ts';
+
+// FIX: Corrected the import path for types to point to the barrel file.
+import { Message } from '@/types/index';
 
 const IMAGE_TOKEN_COST = 258; // Based on Gemini API documentation
 const CHARS_PER_TOKEN = 4; // A common approximation

@@ -1,5 +1,5 @@
 import { FunctionDeclaration, Type } from "@google/genai";
-import { virtualFileSystem as vfs, getPath, navigatePath } from './vfs.ts';
+import { virtualFileSystem as vfs, getPath, navigatePath } from './vfs';
 
 let currentDirectory = '/';
 

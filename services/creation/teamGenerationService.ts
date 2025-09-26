@@ -1,8 +1,11 @@
 
-import { getGenAIClient } from '../gemini/client.ts';
-import { Agent, TeamComponent } from '../../types/index.ts';
+
+
+import { getGenAIClient } from '@/services/gemini/client';
+// FIX: Corrected the import path for types to point to the barrel file.
+import { Agent, TeamComponent } from '@/types/index';
 import { Type } from "@google/genai";
-import { handleAndThrowError } from '../utils/errorHandler.ts';
+import { handleAndThrowError } from '@/services/utils/errorHandler';
 
 const checkApiKey = (apiKey: string) => {
     if (!apiKey) {

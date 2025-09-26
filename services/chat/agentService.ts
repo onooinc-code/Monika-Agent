@@ -1,10 +1,11 @@
 
-import { getGenAIClient } from '../gemini/client.ts';
-import { Agent, Message, Attachment, PipelineStep, LongTermMemoryData } from '../../types/index.ts';
-import { handleAndThrowError } from '../utils/errorHandler.ts';
-import { availableTools, toolSchemas } from '../tools/index.ts';
-import { getFullMessageTextSchema } from '../tools/contextual.ts';
-import { buildAwarenessContext } from '../utils/contextBuilder.ts';
+import { getGenAIClient } from '@/services/gemini/client';
+// FIX: Corrected the import path for types to point to the barrel file.
+import { Agent, Message, Attachment, PipelineStep, LongTermMemoryData } from '@/types/index';
+import { handleAndThrowError } from '@/services/utils/errorHandler';
+import { availableTools, toolSchemas } from '@/services/tools';
+import { getFullMessageTextSchema } from '@/services/tools/contextual';
+import { buildAwarenessContext } from '@/services/utils/contextBuilder';
 import { Content } from '@google/genai';
 
 /**

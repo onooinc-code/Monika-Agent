@@ -1,5 +1,5 @@
 import React from 'react';
-import { CpuIcon, UsersIcon } from './Icons.tsx';
+import { CpuIcon, UsersIcon } from '@/components/Icons';
 
 interface AvatarProps {
     name: string;

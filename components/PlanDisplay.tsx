@@ -1,8 +1,11 @@
+'use client';
+
 import React from 'react';
-import { PlanStep } from '../types/index.ts';
-import { useAppContext } from '../contexts/StateProvider.tsx';
-import { PlanIcon } from './Icons.tsx';
-import { safeRender } from '../services/utils/safeRender.ts';
+// FIX: Corrected import path to explicitly use the barrel file.
+import { PlanStep } from '@/types/index';
+import { useAppContext } from '@/contexts/StateProvider';
+import { PlanIcon } from '@/components/Icons';
+import { safeRender } from '@/services/utils/safeRender';
 
 interface PlanDisplayProps {
     plan: PlanStep[];

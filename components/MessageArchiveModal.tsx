@@ -1,9 +1,11 @@
+'use client';
 
 import React, { useMemo, useState } from 'react';
-import { useAppContext } from '../contexts/StateProvider.tsx';
-import { CloseIcon } from './Icons.tsx';
-import { Message } from '../types/index.ts';
-import { safeRender } from '../services/utils/safeRender.ts';
+import { useAppContext } from '@/contexts/StateProvider';
+import { CloseIcon } from '@/components/Icons';
+// FIX: Corrected import path to explicitly use the barrel file.
+import { Message } from '@/types/index';
+import { safeRender } from '@/services/utils/safeRender';
 
 const ArchiveItem: React.FC<{ message: Message, agentName: string, conversationTitle: string, viewMode: 'summary' | 'full' }> = ({ message, agentName, conversationTitle, viewMode }) => {
     const textToShow = viewMode === 'summary' ? (message.summary || message.text) : message.text;

@@ -1,6 +1,7 @@
 // FIX: Removed useLocalStorage import as it is deprecated.
 import { useState } from 'react';
-import { LongTermMemoryData } from '../../types/index.ts';
+// FIX: Corrected the import path for types to point to the barrel file.
+import { LongTermMemoryData } from '@/types/index';
 
 export const useMemoryManager = () => {
     // FIX: Replaced useLocalStorage with useState for in-memory state management.

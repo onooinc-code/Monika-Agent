@@ -1,6 +1,7 @@
 // FIX: Removed useLocalStorage import as it is deprecated.
 import { useState } from 'react';
-import { UsageMetrics } from '../../types/index.ts';
+// FIX: Corrected the import path for types to point to the barrel file.
+import { UsageMetrics } from '@/types/index';
 
 const getTodayDateString = (): string => {
     const today = new Date();
