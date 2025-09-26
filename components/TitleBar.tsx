@@ -1,6 +1,6 @@
 import React from 'react';
-import { PowerSwitch } from './PowerSwitch.tsx';
-import { MonicaButton } from './MonicaButton.tsx';
+import { PowerSwitch } from './PowerSwitch';
+import { MonicaButton } from './MonicaButton';
 
 export const TitleBar: React.FC = () => {
     return (

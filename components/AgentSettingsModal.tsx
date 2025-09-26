@@ -1,11 +1,13 @@
+
 import React, { useState, useEffect } from 'react';
-import { useAppContext } from '../contexts/StateProvider.tsx';
-import { Agent, AgentManager } from '../types/index.ts';
-import { CloseIcon, CpuIcon } from './Icons.tsx';
-import { safeRender } from '../services/utils/safeRender.ts';
-import { SecureInput } from './SecureInput.tsx';
-import { CopyClearWrapper } from './CopyClearWrapper.tsx';
-import { FancySwitch } from './FancySwitch.tsx';
+import { useAppContext } from '@/contexts/StateProvider';
+// FIX: Corrected import path for types to point to the barrel file.
+import { Agent, AgentManager } from '@/types/index';
+import { CloseIcon, CpuIcon } from '@/components/Icons';
+import { safeRender } from '@/services/utils/safeRender';
+import { SecureInput } from '@/components/SecureInput';
+import { CopyClearWrapper } from '@/components/CopyClearWrapper';
+import { FancySwitch } from '@/components/FancySwitch';
 
 // Type guard to check if it's an Agent
 const isAgent = (agent: Agent | AgentManager): agent is Agent => {

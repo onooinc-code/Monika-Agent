@@ -1,7 +1,9 @@
+
 import React, { useState, useEffect } from 'react';
-import { useAppContext } from '../contexts/StateProvider.tsx';
-import { CloseIcon } from './Icons.tsx';
-import { CustomComponent } from '../types/index.ts';
+import { useAppContext } from '@/contexts/StateProvider';
+import { CloseIcon } from '@/components/Icons';
+// FIX: Corrected import path for types to point to the barrel file.
+import { CustomComponent } from '@/types/index';
 
 declare const Babel: any;
 

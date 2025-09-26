@@ -1,22 +1,24 @@
-import React, { useState, useMemo } from 'react';
-import { useAppContext } from '../contexts/StateProvider.tsx';
-import { CloseIcon, SearchIcon, ComponentGalleryIcon, PlusIcon, EditIcon, MaximizeIcon, ConvertToReactIcon } from './Icons.tsx';
-import { safeRender } from '../services/utils/safeRender.ts';
-import { Conversation, CustomComponent, HtmlComponent } from '../types/index.ts';
-import { DEFAULT_AGENTS } from '../constants/agentConstants.ts';
-import { HtmlComponentPreview } from './HtmlComponentPreview.tsx';
+
+import React, { useState, useMemo, useEffect } from 'react';
+import { useAppContext } from '@/contexts/StateProvider';
+import { CloseIcon, SearchIcon, ComponentGalleryIcon, PlusIcon, EditIcon, MaximizeIcon, ConvertToReactIcon } from '@/components/Icons';
+import { safeRender } from '@/services/utils/safeRender';
+// FIX: Corrected import path for types to point to the barrel file.
+import { Conversation, CustomComponent, HtmlComponent } from '@/types/index';
+import { DEFAULT_AGENTS } from '@/constants/agentConstants';
+import { HtmlComponentPreview } from './HtmlComponentPreview';
 
 // Import Components for Gallery
-import { Avatar } from './Avatar.tsx';
-import { ConversationItem } from './ConversationItem.tsx';
-import { FancySwitch } from './FancySwitch.tsx';
-import { GlassIconButton } from './GlassIconButton.tsx';
-import { PlanDisplay } from './PlanDisplay.tsx';
-import { SecureInput } from './SecureInput.tsx';
-import { Spinner } from './Spinner.tsx';
-import { TitleBar } from './TitleBar.tsx';
-import { ToggleSwitch } from './ToggleSwitch.tsx';
-import { TopicDivider } from './TopicDivider.tsx';
+import { Avatar } from './Avatar';
+import { ConversationItem } from './ConversationItem';
+import { FancySwitch } from './FancySwitch';
+import { GlassIconButton } from './GlassIconButton';
+import { PlanDisplay } from './PlanDisplay';
+import { SecureInput } from './SecureInput';
+import { Spinner } from './Spinner';
+import { TitleBar } from './TitleBar';
+import { ToggleSwitch } from './ToggleSwitch';
+import { TopicDivider } from './TopicDivider';
 
 declare const Babel: any;
 

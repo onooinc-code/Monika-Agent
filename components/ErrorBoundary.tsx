@@ -14,14 +14,17 @@ interface State {
 }
 
 class ErrorBoundary extends Component<Props, State> {
-  // FIX: Initialized state as a public class field to resolve component context issues.
-  public state: State = {
-    hasError: false,
-    error: undefined,
-    errorInfo: undefined,
-  };
+  // FIX: Replaced public class field with a constructor for state initialization to ensure correct component context.
+  constructor(props: Props) {
+    super(props);
+    this.state = {
+      hasError: false,
+      error: undefined,
+      errorInfo: undefined,
+    };
+  }
 
-  public static getDerivedStateFromError(error: Error): State {
+  static getDerivedStateFromError(error: Error): State {
     // Update state so the next render will show the fallback UI.
     return {
       hasError: true,
@@ -30,13 +33,13 @@ class ErrorBoundary extends Component<Props, State> {
     };
   }
 
-  public componentDidCatch(error: Error, errorInfo: ErrorInfo) {
+  componentDidCatch(error: Error, errorInfo: ErrorInfo) {
     // You can also log the error to an error reporting service
     this.setState({ error, errorInfo });
     console.error("Uncaught error:", error, errorInfo);
   }
 
-  public render() {
+  render() {
     if (this.state.hasError) {
       // You can render any custom fallback UI
       return (
