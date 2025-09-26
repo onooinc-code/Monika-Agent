@@ -4,7 +4,7 @@ import { getGenAIClient } from '@/services/gemini/client';
 import { Message, AgentManager } from '@/types/index';
 import { Type } from "@google/genai";
 import { buildContext } from '@/services/utils/contextBuilder';
-import { handleAndThrowError } from '@/services/utils/errorHandler';
+import { AIError, handleAndThrowError } from '@/services/utils/errorHandler';
 
 export const summarizeMessageChunk = async (messages: Message[], manager: AgentManager, globalApiKey: string): Promise<string> => {
     const context = buildContext(messages);
@@ -40,9 +40,8 @@ export const generateOverallSummaryAndTopics = async (messages: Message[], manag
     }
     const ai = getGenAIClient(apiKey);
 
-    let response;
     try {
-        response = await ai.models.generateContent({
+        const response = await ai.models.generateContent({
             model: manager.model,
             contents: prompt,
             config: {
@@ -60,28 +59,31 @@ export const generateOverallSummaryAndTopics = async (messages: Message[], manag
                 }
             }
         });
+
+        let json;
+        try {
+            json = JSON.parse(response.text);
+        } catch (e) {
+            handleAndThrowError(e, 'generateOverallSummaryAndTopics (JSON Parsing)', prompt, response.text);
+        }
+
+        if (typeof json !== 'object' || json === null) {
+            handleAndThrowError(new Error('AI response is not a valid JSON object.'), 'generateOverallSummaryAndTopics (Validation)', prompt, response.text);
+        }
+
+        const overallSummary = typeof json.overallSummary === 'string' ? json.overallSummary : "No summary available.";
+        const topics = Array.isArray(json.topics) && json.topics.every(t => typeof t === 'string') 
+            ? json.topics 
+            : [];
+        
+        return {
+            overallSummary,
+            topics,
+        };
     } catch (error) {
-        handleAndThrowError(error, 'generateOverallSummaryAndTopics', prompt);
+        if (error instanceof AIError) {
+            throw error;
+        }
+        handleAndThrowError(error, 'generateOverallSummaryAndTopics (API Call)', prompt);
     }
-    
-    let json;
-    try {
-        json = JSON.parse(response.text);
-    } catch (e) {
-        handleAndThrowError(e, 'generateOverallSummaryAndTopics', prompt, response.text);
-    }
-
-    if (typeof json !== 'object' || json === null) {
-        handleAndThrowError(new Error('AI response is not a valid JSON object.'), 'generateOverallSummaryAndTopics', prompt, response.text);
-    }
-
-    const overallSummary = typeof json.overallSummary === 'string' ? json.overallSummary : "No summary available.";
-    const topics = Array.isArray(json.topics) && json.topics.every(t => typeof t === 'string') 
-        ? json.topics 
-        : [];
-    
-    return {
-        overallSummary,
-        topics,
-    };
 };

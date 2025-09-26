@@ -1,7 +1,6 @@
-
 'use client';
 
-import React, { Component, ErrorInfo, ReactNode } from 'react';
+import React, { ErrorInfo, ReactNode } from 'react';
 
 interface Props {
   children?: ReactNode;
@@ -13,12 +12,10 @@ interface State {
   errorInfo?: ErrorInfo;
 }
 
-// FIX: Changed to extend React.Component directly to resolve type errors where
-// `setState` and `props` were not being found on the component instance. This
-// ensures the TypeScript compiler correctly identifies this class as a React Component.
-// FIX: Corrected the class definition to extend React.Component, making it a valid class component.
-class ErrorBoundary extends Component<Props, State> {
-  // FIX: Changed state initialization to a class property to resolve component state errors.
+// FIX: Changed to extend React.Component directly. This resolves type errors where
+// `setState` and `props` are not found on the component instance by ensuring
+// the class is correctly recognized as a React Component.
+class ErrorBoundary extends React.Component<Props, State> {
   state: State = {
     hasError: false,
     error: undefined,
