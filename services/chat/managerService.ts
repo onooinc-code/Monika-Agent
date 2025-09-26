@@ -1,12 +1,10 @@
-
-
-
 import { getGenAIClient } from '@/services/gemini/client';
 // FIX: Corrected import path for types to point to the barrel file.
 import { Agent, Message, AgentManager, ManualSuggestion, PipelineStep, PlanStep } from '@/types/index';
 import { buildContext } from '@/services/utils/contextBuilder';
 import { Type } from "@google/genai";
-import { handleAndThrowError } from '@/services/utils/errorHandler';
+// FIX: Changed import to AIError for explicit throw.
+import { AIError } from '@/services/utils/errorHandler';
 
 export interface ModerationResult {
     critique: string | null;
@@ -73,11 +71,14 @@ export const decideNextSpeaker = async (
         try {
             json = JSON.parse(response.text);
         } catch (e) {
-            handleAndThrowError(e, 'decideNextSpeaker', prompt, response.text);
+            const contextString = 'decideNextSpeaker';
+            console.error(`Error in ${contextString}:`, e);
+            const originalMessage = e instanceof Error ? e.message : String(e);
+            throw new AIError(originalMessage, contextString, prompt, response.text);
         }
 
         if (typeof json !== 'object' || json === null) {
-            handleAndThrowError(new Error('AI response is not a valid JSON object.'), 'decideNextSpeaker', prompt, response.text);
+            throw new AIError('AI response is not a valid JSON object.', 'decideNextSpeaker', prompt, response.text);
         }
 
         const nextSpeaker = typeof json.nextSpeaker === 'string' ? json.nextSpeaker : null;
@@ -93,7 +94,10 @@ export const decideNextSpeaker = async (
 
         return { result: { nextSpeaker, newTopic }, pipeline };
     } catch (error) {
-        handleAndThrowError(error, 'decideNextSpeaker', prompt);
+        const contextString = 'decideNextSpeaker';
+        console.error(`Error in ${contextString}:`, error);
+        const originalMessage = error instanceof Error ? error.message : String(error);
+        throw new AIError(originalMessage, contextString, prompt);
     }
 };
 
@@ -157,11 +161,14 @@ export const generateManualSuggestions = async (
         try {
             json = JSON.parse(response.text);
         } catch (e) {
-            handleAndThrowError(e, 'generateManualSuggestions', prompt, response.text);
+            const contextString = 'generateManualSuggestions';
+            console.error(`Error in ${contextString}:`, e);
+            const originalMessage = e instanceof Error ? e.message : String(e);
+            throw new AIError(originalMessage, contextString, prompt, response.text);
         }
 
         if (typeof json !== 'object' || json === null) {
-            handleAndThrowError(new Error('AI response is not a valid JSON object.'), 'generateManualSuggestions', prompt, response.text);
+            throw new AIError('AI response is not a valid JSON object.', 'generateManualSuggestions', prompt, response.text);
         }
 
         const suggestions: ManualSuggestion[] = (Array.isArray(json.suggestions)) 
@@ -179,7 +186,10 @@ export const generateManualSuggestions = async (
 
         return { result: suggestions, pipeline };
     } catch (error) {
-        handleAndThrowError(error, 'generateManualSuggestions', prompt);
+        const contextString = 'generateManualSuggestions';
+        console.error(`Error in ${contextString}:`, error);
+        const originalMessage = error instanceof Error ? error.message : String(error);
+        throw new AIError(originalMessage, contextString, prompt);
     }
 };
 
@@ -192,7 +202,6 @@ export const generateDynamicPlan = async (
 ): Promise<{ result: DynamicPlanResult, pipeline: PipelineStep[] }> => {
     const pipeline: PipelineStep[] = [];
     const startTime = performance.now();
-    const defaultResult = { plan: [], planRationale: '' };
 
     const context = buildContext(messages);
     const agentProfiles = agents.map(a => `- ${a.id}: ${a.name} (${a.job}) - ${a.role}`).join('\n');
@@ -285,11 +294,14 @@ export const generateDynamicPlan = async (
         try {
             json = JSON.parse(response.text);
         } catch (e) {
-            handleAndThrowError(e, 'generateDynamicPlan', prompt, response.text);
+            const contextString = 'generateDynamicPlan';
+            console.error(`Error in ${contextString}:`, e);
+            const originalMessage = e instanceof Error ? e.message : String(e);
+            throw new AIError(originalMessage, contextString, prompt, response.text);
         }
 
         if (typeof json !== 'object' || json === null) {
-            handleAndThrowError(new Error('AI response is not a valid JSON object.'), 'generateDynamicPlan', prompt, response.text);
+            throw new AIError('AI response is not a valid JSON object.', 'generateDynamicPlan', prompt, response.text);
         }
 
         const validatedPlan = (Array.isArray(json.plan)) 
@@ -310,7 +322,10 @@ export const generateDynamicPlan = async (
 
         return { result: planResult, pipeline };
     } catch (error) {
-        handleAndThrowError(error, 'generateDynamicPlan', prompt);
+        const contextString = 'generateDynamicPlan';
+        console.error(`Error in ${contextString}:`, error);
+        const originalMessage = error instanceof Error ? error.message : String(error);
+        throw new AIError(originalMessage, contextString, prompt);
     }
 };
 
@@ -393,12 +408,15 @@ export const moderateTurn = async (
         try {
             json = JSON.parse(response.text);
         } catch (e) {
-            handleAndThrowError(e, 'moderateTurn', prompt, response.text);
+            const contextString = 'moderateTurn';
+            console.error(`Error in ${contextString}:`, e);
+            const originalMessage = e instanceof Error ? e.message : String(e);
+            throw new AIError(originalMessage, contextString, prompt, response.text);
         }
 
         if (typeof json !== 'object' || json === null || !json.decision || !json.rationale) {
             console.error("Failed to parse or validate moderation JSON:", "Raw Text:", response.text);
-            handleAndThrowError(new Error("Missing required fields in moderation response."), 'moderateTurn', prompt, response.text);
+            throw new AIError("Missing required fields in moderation response.", 'moderateTurn', prompt, response.text);
         }
         
         pipeline.push({
@@ -411,6 +429,9 @@ export const moderateTurn = async (
         return { result: json as ModerationResult, pipeline };
 
     } catch (error) {
-        handleAndThrowError(error, 'moderateTurn', prompt);
+        const contextString = 'moderateTurn';
+        console.error(`Error in ${contextString}:`, error);
+        const originalMessage = error instanceof Error ? error.message : String(error);
+        throw new AIError(originalMessage, contextString, prompt);
     }
 };

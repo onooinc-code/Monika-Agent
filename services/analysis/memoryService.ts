@@ -1,9 +1,9 @@
-
 import { getGenAIClient } from '@/services/gemini/client';
 // FIX: Corrected import path for types to point to the barrel file.
 import { AgentManager, Message, LongTermMemoryData } from '@/types/index';
 import { buildContext } from '@/services/utils/contextBuilder';
-import { handleAndThrowError } from '@/services/utils/errorHandler';
+// FIX: Changed from handleAndThrowError to AIError for explicit throw.
+import { AIError } from '@/services/utils/errorHandler';
 
 export const extractKeyInformation = async (
     messages: Message[],
@@ -47,7 +47,12 @@ export const extractKeyInformation = async (
             }
         });
 
-        const text = response.text.trim();
+        const text = response.text?.trim();
+        if (!text) {
+             // Return existing memory if response is empty to avoid crashing on parse
+            console.warn("AI returned an empty response for memory update.");
+            return existingMemory;
+        }
         // The model can sometimes wrap the JSON in ```json ... ``` despite instructions
         const jsonText = text.replace(/^```json\s*/, '').replace(/```$/, '');
         try {
@@ -65,6 +70,10 @@ export const extractKeyInformation = async (
         }
 
     } catch (error) {
-        handleAndThrowError(error, 'extractKeyInformation', prompt);
+        // FIX: Replaced handleAndThrowError with an explicit throw to satisfy TypeScript's control flow analysis.
+        const contextString = 'extractKeyInformation';
+        console.error(`Error in ${contextString}:`, error);
+        const originalMessage = error instanceof Error ? error.message : String(error);
+        throw new AIError(originalMessage, contextString, prompt);
     }
 };

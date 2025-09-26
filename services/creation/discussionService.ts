@@ -1,13 +1,9 @@
-
-
-
-
-
 import { getGenAIClient } from '@/services/gemini/client';
 // FIX: Corrected import path for types to point to the barrel file.
 import { Agent, Message } from '@/types/index';
 import { Type } from "@google/genai";
-import { handleAndThrowError } from '@/services/utils/errorHandler';
+// FIX: Changed import to AIError for explicit throw.
+import { AIError } from '@/services/utils/errorHandler';
 
 export const generateDiscussionRulesAndOrder = async (
     agents: Agent[],
@@ -67,6 +63,10 @@ export const generateDiscussionRulesAndOrder = async (
         }
         return json;
     } catch (error) {
-        handleAndThrowError(error, 'generateDiscussionRulesAndOrder', prompt);
+        // FIX: Replaced handleAndThrowError with an explicit throw to satisfy TypeScript's control flow analysis.
+        const contextString = 'generateDiscussionRulesAndOrder';
+        console.error(`Error in ${contextString}:`, error);
+        const originalMessage = error instanceof Error ? error.message : String(error);
+        throw new AIError(originalMessage, contextString, prompt);
     }
 };

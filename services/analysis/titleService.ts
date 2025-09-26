@@ -1,12 +1,9 @@
-
-
-
-
 import { getGenAIClient } from '@/services/gemini/client';
 // FIX: Corrected import path for types to point to the barrel file.
 import { Message, AgentManager } from '@/types/index';
 import { buildContext } from '@/services/utils/contextBuilder';
-import { handleAndThrowError } from '@/services/utils/errorHandler';
+// FIX: Changed import to AIError for explicit throw.
+import { AIError } from '@/services/utils/errorHandler';
 
 export const generateConversationTitle = async (messages: Message[], manager: AgentManager, globalApiKey: string): Promise<string> => {
     if (messages.length === 0) return "New Chat";
@@ -35,6 +32,10 @@ export const generateConversationTitle = async (messages: Message[], manager: Ag
         }
         return title || "Untitled Chat";
     } catch (error) {
-        handleAndThrowError(error, 'generateConversationTitle', prompt);
+        // FIX: Replaced handleAndThrowError with an explicit throw to satisfy TypeScript's control flow analysis.
+        const contextString = 'generateConversationTitle';
+        console.error(`Error in ${contextString}:`, error);
+        const originalMessage = error instanceof Error ? error.message : String(error);
+        throw new AIError(originalMessage, contextString, prompt);
     }
 };

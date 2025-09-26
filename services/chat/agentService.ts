@@ -1,11 +1,8 @@
-
-
-
-
 import { getGenAIClient } from '@/services/gemini/client';
 // FIX: Corrected import path for types to point to the barrel file.
 import { Agent, Message, Attachment, PipelineStep, LongTermMemoryData } from '@/types/index';
-import { handleAndThrowError } from '@/services/utils/errorHandler';
+// FIX: Changed from handleAndThrowError to AIError for explicit throw.
+import { AIError } from '@/services/utils/errorHandler';
 import { availableTools, toolSchemas } from '@/services/tools';
 import { getFullMessageTextSchema } from '@/services/tools/contextual';
 import { buildAwarenessContext } from '@/services/utils/contextBuilder';
@@ -226,6 +223,10 @@ export const generateResponse = async (
 
         return { finalResult: fullText, summary, pipeline };
     } catch (error) {
-        handleAndThrowError(error, `generateResponse for ${agent.name}`, null, fullText);
+        // FIX: Replaced handleAndThrowError with an explicit throw to satisfy TypeScript's control flow analysis.
+        const contextString = `generateResponse for ${agent.name}`;
+        console.error(`Error in ${contextString}:`, error);
+        const originalMessage = error instanceof Error ? error.message : String(error);
+        throw new AIError(originalMessage, contextString, null, fullText);
     }
 };

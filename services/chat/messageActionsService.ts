@@ -1,11 +1,8 @@
-
-
-
-
 import { getGenAIClient } from '@/services/gemini/client';
 // FIX: Corrected import path for types to point to the barrel file.
 import { AgentManager } from '@/types/index';
-import { handleAndThrowError } from '@/services/utils/errorHandler';
+// FIX: Changed import to AIError for explicit throw.
+import { AIError } from '@/services/utils/errorHandler';
 
 export const summarizeMessage = async (text: string, manager: AgentManager, globalApiKey: string): Promise<string> => {
     const prompt = `Summarize the following text in one or two concise sentences:\n\n---\n${text}\n---`;
@@ -24,7 +21,11 @@ export const summarizeMessage = async (text: string, manager: AgentManager, glob
         });
         return (response.text || '').trim();
     } catch (error) {
-        handleAndThrowError(error, 'summarizeMessage', prompt);
+        // FIX: Replaced handleAndThrowError with an explicit throw to satisfy TypeScript's control flow analysis.
+        const contextString = 'summarizeMessage';
+        console.error(`Error in ${contextString}:`, error);
+        const originalMessage = error instanceof Error ? error.message : String(error);
+        throw new AIError(originalMessage, contextString, prompt);
     }
 };
 
@@ -50,6 +51,10 @@ export const rewritePrompt = async (prompt: string, manager: AgentManager, globa
         }
         return rewritten;
     } catch (error) {
-        handleAndThrowError(error, 'rewritePrompt', fullPrompt);
+        // FIX: Replaced handleAndThrowError with an explicit throw to satisfy TypeScript's control flow analysis.
+        const contextString = 'rewritePrompt';
+        console.error(`Error in ${contextString}:`, error);
+        const originalMessage = error instanceof Error ? error.message : String(error);
+        throw new AIError(originalMessage, contextString, fullPrompt);
     }
 }

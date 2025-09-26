@@ -1,11 +1,9 @@
-
-
-
 import { getGenAIClient } from '@/services/gemini/client';
 // FIX: Corrected import path for types to point to the barrel file.
 import { Agent, TeamComponent } from '@/types/index';
 import { Type } from "@google/genai";
-import { handleAndThrowError } from '@/services/utils/errorHandler';
+// FIX: Changed import to AIError for explicit throw.
+import { AIError } from '@/services/utils/errorHandler';
 
 const checkApiKey = (apiKey: string) => {
     if (!apiKey) {
@@ -33,7 +31,11 @@ export const generateTeamPrompt = async (topic: string, goal: string, globalApiK
         });
         return (response.text || '').trim();
     } catch (error) {
-        handleAndThrowError(error, 'generateTeamPrompt', prompt);
+        // FIX: Replaced handleAndThrowError with an explicit throw to satisfy TypeScript's control flow analysis.
+        const contextString = 'generateTeamPrompt';
+        console.error(`Error in ${contextString}:`, error);
+        const originalMessage = error instanceof Error ? error.message : String(error);
+        throw new AIError(originalMessage, contextString, prompt);
     }
 };
 
@@ -74,7 +76,11 @@ export const generateTeamComponents = async (prompt: string, globalApiKey: strin
         }
         return json.team;
     } catch (error) {
-        handleAndThrowError(error, 'generateTeamComponents', prompt);
+        // FIX: Replaced handleAndThrowError with an explicit throw to satisfy TypeScript's control flow analysis.
+        const contextString = 'generateTeamComponents';
+        console.error(`Error in ${contextString}:`, error);
+        const originalMessage = error instanceof Error ? error.message : String(error);
+        throw new AIError(originalMessage, contextString, prompt);
     }
 };
 
@@ -121,6 +127,10 @@ export const generateFinalAgents = async (components: TeamComponent[], globalApi
         }
         return json.final_agents;
     } catch (error) {
-        handleAndThrowError(error, 'generateFinalAgents', prompt);
+        // FIX: Replaced handleAndThrowError with an explicit throw to satisfy TypeScript's control flow analysis.
+        const contextString = 'generateFinalAgents';
+        console.error(`Error in ${contextString}:`, error);
+        const originalMessage = error instanceof Error ? error.message : String(error);
+        throw new AIError(originalMessage, contextString, prompt);
     }
 }
