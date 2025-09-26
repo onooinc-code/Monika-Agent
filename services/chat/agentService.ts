@@ -92,7 +92,7 @@ export const generateResponse = async (
         return { full_text: msg ? msg.text : "Error: Message not found." };
     };
     
-    const dynamicAvailableTools = { ...availableTools, get_full_message_text };
+    const dynamicAvailableTools: Record<string, (args: any) => Promise<any>> = { ...availableTools, get_full_message_text };
 
     const agentToolSchemas = agent.tools?.map(name => toolSchemas[name]).filter(Boolean) || [];
     agentToolSchemas.push(getFullMessageTextSchema);
