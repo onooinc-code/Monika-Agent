@@ -1,0 +1,5 @@
+
+export const HISTORY_CONFIG = {
+  FULL_MESSAGE_COUNT: 5,
+  SUMMARIZED_CHUNK_SIZE: 10,
+};

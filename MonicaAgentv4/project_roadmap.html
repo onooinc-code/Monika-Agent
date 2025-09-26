@@ -1,0 +1,277 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MonicaAgentv4 - Project Rebuild Roadmap</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto+Mono:wght@400;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --font-sans: 'Inter', sans-serif;
+            --font-mono: 'Roboto Mono', monospace;
+            --color-bg: #0a0a0f;
+            --color-pane: rgba(23, 26, 43, 0.7);
+            --color-border: rgba(129, 140, 248, 0.2);
+            --color-neon-indigo: rgba(129, 140, 248, 1);
+            --color-neon-cyan: rgba(34, 211, 238, 1);
+        }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+        body {
+            font-family: var(--font-sans);
+            background-color: var(--color-bg);
+            color: #e5e7eb;
+            font-size: 16px;
+            line-height: 1.7;
+        }
+        .glass-pane {
+            background-color: var(--color-pane);
+            backdrop-filter: blur(16px) saturate(180%);
+            -webkit-backdrop-filter: blur(16px) saturate(180%);
+            border: 1px solid var(--color-border);
+        }
+        .task-item:hover {
+            background-color: rgba(129, 140, 248, 0.1);
+        }
+        .task-item input:checked + label .task-text {
+            text-decoration: line-through;
+            color: #6b7280;
+        }
+        .prompt-btn {
+            background-color: rgba(34, 211, 238, 0.1);
+            border: 1px solid rgba(34, 211, 238, 0.3);
+            color: var(--color-neon-cyan);
+            transition: all 0.2s ease;
+        }
+        .prompt-btn:hover {
+            background-color: rgba(34, 211, 238, 0.2);
+            box-shadow: 0 0 10px rgba(34, 211, 238, 0.3);
+        }
+        .feedback-popup {
+            position: fixed;
+            bottom: 2rem;
+            left: 50%;
+            transform: translateX(-50%);
+            padding: 0.75rem 1.5rem;
+            border-radius: 0.5rem;
+            background-color: #22c55e;
+            color: white;
+            font-weight: 600;
+            z-index: 100;
+            opacity: 0;
+            transition: all 0.3s ease;
+        }
+        .feedback-popup.show {
+            opacity: 1;
+            bottom: 3rem;
+        }
+    </style>
+</head>
+<body class="p-4 sm:p-6 lg:p-8">
+
+    <main class="max-w-screen-xl mx-auto space-y-8" style="animation: fadeIn 0.8s ease-out;">
+        <header class="glass-pane rounded-xl p-8 text-center">
+            <h1 class="text-4xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-indigo-400 via-cyan-400 to-indigo-400">MonicaAgentv4: Project Rebuild Roadmap</h1>
+            <p class="mt-2 text-lg text-gray-300">An interactive dashboard to track the ground-up rebuild of the Monica application on Next.js 14.</p>
+        </header>
+
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+            <div class="lg:col-span-2 space-y-6">
+                <!-- Phases and Tasks -->
+                <section id="roadmap-phases" class="glass-pane rounded-xl p-8">
+                    <div class="flex justify-between items-center mb-6">
+                         <h2 class="text-2xl font-bold text-white">Project Phases</h2>
+                         <div class="flex items-center gap-4">
+                            <span class="text-sm text-gray-400">Progress:</span>
+                            <div class="w-48 bg-black/30 rounded-full h-2.5">
+                                <div id="progress-bar" class="bg-gradient-to-r from-indigo-500 to-cyan-500 h-2.5 rounded-full" style="width: 0%; transition: width 0.5s ease;"></div>
+                            </div>
+                         </div>
+                    </div>
+                   
+                    <div id="phases-container" class="space-y-6">
+                        <!-- Phases will be injected by JS -->
+                    </div>
+                </section>
+            </div>
+            <div class="lg:col-span-1 space-y-6">
+                <!-- Prompt Generator -->
+                <section class="glass-pane rounded-xl p-6 sticky top-8">
+                     <h2 class="text-xl font-bold text-white mb-4 flex items-center gap-2"><i data-lucide="terminal"></i> Prompt Generator</h2>
+                     <p class="text-sm text-gray-400 mb-4">Select a task below to generate a pre-formatted development prompt for me. The prompt will be copied to your clipboard.</p>
+                     <div class="space-y-2">
+                        <button class="prompt-btn w-full p-3 rounded-lg text-left font-semibold" data-prompt-type="plan">Generate Implementation Plan</button>
+                        <button class="prompt-btn w-full p-3 rounded-lg text-left font-semibold" data-prompt-type="code">Generate Full Code</button>
+                        <button class="prompt-btn w-full p-3 rounded-lg text-left font-semibold" data-prompt-type="test">Generate QA Test Plan</button>
+                        <button class="prompt-btn w-full p-3 rounded-lg text-left font-semibold" data-prompt-type="refactor">Refactor Selection</button>
+                     </div>
+                </section>
+            </div>
+        </div>
+    </main>
+
+    <div id="feedback-container"></div>
+
+    <script>
+        lucide.createIcons();
+
+        const roadmapData = [
+            {
+                phase: "Phase 1: Foundation & Setup",
+                tasks: [
+                    { id: '1-1', text: "Initialize Next.js 14 project with TypeScript & Tailwind CSS.", done: false },
+                    { id: '1-2', text: "Create core directory structure (app, components, contexts, etc.).", done: false },
+                    { id: '1-3', text: "Configure `tailwind.config.ts` and migrate all custom styles to `app/globals.css`.", done: false },
+                    { id: '1-4', text: "Create root `app/layout.tsx` and `app/page.tsx` as the main application shell.", done: false }
+                ]
+            },
+            {
+                phase: "Phase 2: Core Assets Migration",
+                tasks: [
+                    { id: '2-1', text: "Migrate all TypeScript type definitions from the `/types` directory.", done: false },
+                    { id: '2-2', text: "Migrate all constants from `/constants` (agent profiles, history config).", done: false },
+                    { id: '2-3', text: "Migrate all SVG icons from `/components/icons` and create barrel export file.", done: false }
+                ]
+            },
+            {
+                phase: "Phase 3: Service Layer Reconstruction",
+                tasks: [
+                    { id: '3-1', text: "Re-implement the Gemini API client (`services/gemini/client.ts`).", done: false },
+                    { id: '3-2', text: "Migrate and adapt all chat services (`agentService`, `managerService`, etc.).", done: false },
+                    { id: '3-3', text: "Migrate and adapt all analysis services (`historyService`, `titleService`, etc.).", done: false },
+                    { id: '3-4', text: "Migrate and adapt all creation services (`teamGenerationService`, etc.).", done: false },
+                    { id: '3-5', text: "Migrate all utility services and tool definitions (`errorHandler`, `tools`, etc.).", done: false }
+                ]
+            },
+            {
+                phase: "Phase 4: State Management Core",
+                tasks: [
+                    { id: '4-1', text: "Rebuild `StateProvider.tsx` as the central orchestrator.", done: false },
+                    { id: '4-2', text: "Migrate `useLocalStorage` hook for data persistence.", done: false },
+                    { id: '4-3', text: "Re-implement `useConversationManager` with stabilized `useCallback` functions.", done: false },
+                    { id: '4-4', text: "Re-implement `useChatHandler` with stabilized dependencies.", done: false },
+                    { id: '4-5', text: "Migrate all other state management hooks (`useModalManager`, `useUsageTracker`, etc.).", done: false }
+                ]
+            },
+            {
+                phase: "Phase 5: Component Refactoring & Migration",
+                tasks: [
+                    { id: '5-1', text: "Refactor `MessageBubble` into smaller sub-components (`MessageHeader`, `MessageContent`, `MessageEditor`).", done: false },
+                    { id: '5-2', text: "Refactor `SettingsModal` into smaller sub-components (`PreferencesSettings`, `AgentSettingsForm`, etc.).", done: false },
+                    { id: '5-3', text: "Migrate all remaining components, meticulously adding `'use client'` where needed.", done: false },
+                    { id: '5-4', text: "Ensure all components are adapted for the Next.js App Router.", done: false }
+                ]
+            },
+            {
+                phase: "Phase 6: Application Assembly & Finalization",
+                tasks: [
+                    { id: '6-1', text: "Assemble all components and providers in `app/page.tsx`.", done: false },
+                    { id: '6-2', text: "Conduct a full End-to-End test of all application features.", done: false },
+                    { id: '6-3', text: "Update the main `README.md` to reflect the new Next.js structure and commands.", done: false },
+                    { id: '6-4', text: "Final code cleanup and removal of any obsolete files.", done: false }
+                ]
+            }
+        ];
+
+        document.addEventListener('DOMContentLoaded', () => {
+            const phasesContainer = document.getElementById('phases-container');
+            const progressBar = document.getElementById('progress-bar');
+            const feedbackContainer = document.getElementById('feedback-container');
+
+            const saveState = () => {
+                const tasksState = roadmapData.flatMap(p => p.tasks).reduce((acc, task) => {
+                    acc[task.id] = task.done;
+                    return acc;
+                }, {});
+                localStorage.setItem('monicaRoadmapState', JSON.stringify(tasksState));
+            };
+
+            const loadState = () => {
+                const savedState = JSON.parse(localStorage.getItem('monicaRoadmapState') || '{}');
+                roadmapData.forEach(phase => {
+                    phase.tasks.forEach(task => {
+                        if (savedState[task.id] !== undefined) {
+                            task.done = savedState[task.id];
+                        }
+                    });
+                });
+            };
+
+            const updateProgress = () => {
+                const allTasks = roadmapData.flatMap(p => p.tasks);
+                const doneTasks = allTasks.filter(t => t.done).length;
+                const totalTasks = allTasks.length;
+                const percentage = totalTasks > 0 ? (doneTasks / totalTasks) * 100 : 0;
+                progressBar.style.width = `${percentage}%`;
+            };
+
+            const render = () => {
+                phasesContainer.innerHTML = '';
+                roadmapData.forEach(phaseData => {
+                    const phaseEl = document.createElement('div');
+                    phaseEl.innerHTML = `
+                        <h3 class="text-xl font-semibold text-cyan-400 mb-3">${phaseData.phase}</h3>
+                        <div class="space-y-2">
+                            ${phaseData.tasks.map(task => `
+                                <div class="task-item flex items-center p-2 rounded-lg transition-colors">
+                                    <input type="checkbox" id="task-${task.id}" data-task-id="${task.id}" class="h-5 w-5 rounded border-gray-500 bg-transparent text-indigo-500 focus:ring-indigo-600 shrink-0" ${task.done ? 'checked' : ''}>
+                                    <label for="task-${task.id}" class="ml-3 flex-grow">
+                                        <span class="task-text text-gray-300 cursor-pointer">${task.text}</span>
+                                    </label>
+                                </div>
+                            `).join('')}
+                        </div>
+                    `;
+                    phasesContainer.appendChild(phaseEl);
+                });
+                updateProgress();
+            };
+            
+            phasesContainer.addEventListener('change', (e) => {
+                if (e.target.matches('input[type="checkbox"]')) {
+                    const taskId = e.target.dataset.taskId;
+                    const task = roadmapData.flatMap(p => p.tasks).find(t => t.id === taskId);
+                    if (task) {
+                        task.done = e.target.checked;
+                        saveState();
+                        render();
+                    }
+                }
+            });
+            
+            const showFeedback = (message) => {
+                const popup = document.createElement('div');
+                popup.textContent = message;
+                popup.className = 'feedback-popup';
+                feedbackContainer.appendChild(popup);
+                setTimeout(() => popup.classList.add('show'), 10);
+                setTimeout(() => {
+                    popup.classList.remove('show');
+                    setTimeout(() => popup.remove(), 300);
+                }, 2000);
+            };
+
+            document.querySelectorAll('.prompt-btn').forEach(btn => {
+                btn.addEventListener('click', () => {
+                    const type = btn.dataset.promptType;
+                    let promptText = \`You are a world-class senior frontend engineer working on the MonicaAgentv4 project. The current task is to "\${type}" for the application.\`;
+                    if (type === 'refactor') {
+                         promptText = \`You are a world-class senior frontend engineer. Please refactor the following code snippet to improve its clarity, performance, and adherence to the Single Responsibility Principle. I will provide the code in the next message.\`
+                    }
+                    navigator.clipboard.writeText(promptText).then(() => {
+                        showFeedback('Prompt copied to clipboard!');
+                    });
+                });
+            });
+
+            // Initial Load
+            loadState();
+            render();
+        });
+    </script>
+</body>
+</html>
