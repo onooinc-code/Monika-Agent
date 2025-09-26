@@ -14,6 +14,7 @@ export const SecureInput: React.FC<SecureInputProps> = ({ id, value, onChange, .
     const [hasCopied, setHasCopied] = useState(false);
 
     const isVisible = isPermanentlyVisible(id) || isTemporarilyVisible;
+    const inputType = isVisible ? 'text' : 'password';
 
     const handleCopy = () => {
         if (value) {
@@ -23,39 +24,61 @@ export const SecureInput: React.FC<SecureInputProps> = ({ id, value, onChange, .
         }
     };
 
-    const handleClear = () => {
+    const handleClear = (e: React.MouseEvent<HTMLButtonElement>) => {
         if (onChange) {
-            // Simulate the event object for the parent's handler
-            const event = {
-                target: { value: '' },
+            // Simulate a change event with an empty value for the parent state update
+            const syntheticEvent = {
+                target: { value: '' } as HTMLInputElement,
             } as React.ChangeEvent<HTMLInputElement>;
-            onChange(event);
+            onChange(syntheticEvent);
         }
     };
-
+    
     return (
         <div className="relative group">
             <input
                 id={id}
-                type={isVisible ? 'text' : 'password'}
-                value={value}
+                type={inputType}
+                value={value || ''}
                 onChange={onChange}
-                className="w-full bg-black/20 border border-white/10 rounded-md p-2 pr-32 text-white focus:ring-green-500 focus:border-green-500 font-mono text-sm"
+                className="w-full bg-black/20 border border-white/10 rounded-md p-2 text-white focus:ring-indigo-500 focus:border-indigo-500 pr-28"
                 {...props}
             />
-            <div className="absolute inset-y-0 right-0 flex items-center pr-3 opacity-50 group-focus-within:opacity-100 group-hover:opacity-100 transition-opacity">
-                <button type="button" onClick={() => setIsTemporarilyVisible(!isTemporarilyVisible)} className="p-1 rounded-full text-gray-400 hover:text-white" title={isTemporarilyVisible ? "Hide temporarily" : "Show temporarily"}>
-                    {isTemporarilyVisible ? <EyeOffIcon /> : <EyeIcon />}
-                </button>
-                <button type="button" onClick={() => togglePermanentVisibility(id)} className="p-1 rounded-full text-gray-400 hover:text-white" title={isPermanentlyVisible(id) ? "Don't remember visibility" : "Remember visibility"}>
-                    {isPermanentlyVisible(id) ? <LockOpenIcon /> : <LockClosedIcon />}
-                </button>
-                <button type="button" onClick={handleCopy} className="p-1 rounded-full text-gray-400 hover:text-white" title="Copy">
-                    {hasCopied ? <CheckIcon className="text-green-400" /> : <CopyIcon />}
-                </button>
-                <button type="button" onClick={handleClear} className="p-1 rounded-full text-gray-400 hover:text-red-400" title="Clear">
-                    <XCircleIcon />
-                </button>
+            <div className="absolute top-0 right-0 h-full flex items-center pr-2">
+                <div className="flex items-center gap-1 opacity-0 group-focus-within:opacity-100 group-hover:opacity-100 transition-opacity">
+                    <button type="button" onClick={handleCopy} className="p-1 rounded-full bg-black/20 text-gray-400 hover:text-white hover:bg-black/40" title="Copy">
+                        {hasCopied ? <CheckIcon className="w-4 h-4 text-green-400" /> : <CopyIcon className="w-4 h-4" />}
+                    </button>
+                    <button
+                        type="button"
+                        onClick={handleClear}
+                        className="p-1 rounded-full bg-black/20 text-gray-400 hover:text-red-400 hover:bg-black/40"
+                        title="Clear"
+                    >
+                        <XCircleIcon className="w-4 h-4" />
+                    </button>
+                    <div className="w-px h-5 bg-white/20 mx-1"></div>
+                    <button
+                        type="button"
+                        onMouseDown={() => setIsTemporarilyVisible(true)}
+                        onMouseUp={() => setIsTemporarilyVisible(false)}
+                        onMouseLeave={() => setIsTemporarilyVisible(false)}
+                        onTouchStart={() => setIsTemporarilyVisible(true)}
+                        onTouchEnd={() => setIsTemporarilyVisible(false)}
+                        className="p-1 rounded-full bg-black/20 text-gray-400 hover:text-white hover:bg-black/40"
+                        title={isTemporarilyVisible ? 'Hide' : 'Show (hold)'}
+                    >
+                        {isVisible ? <EyeOffIcon className="w-4 h-4" /> : <EyeIcon className="w-4 h-4" />}
+                    </button>
+                    <button
+                        type="button"
+                        onClick={() => togglePermanentVisibility(id)}
+                        className="p-1 rounded-full bg-black/20 text-gray-400 hover:text-white hover:bg-black/40"
+                        title={isPermanentlyVisible(id) ? 'Forget visibility preference' : 'Remember visibility preference'}
+                    >
+                        {isPermanentlyVisible(id) ? <LockOpenIcon className="w-4 h-4 text-cyan-400" /> : <LockClosedIcon className="w-4 h-4" />}
+                    </button>
+                </div>
             </div>
         </div>
     );
