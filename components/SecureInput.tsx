@@ -1,3 +1,5 @@
+'use client';
+
 import React, { useState } from 'react';
 import { useAppContext } from '@/contexts/StateProvider';
 import { EyeIcon, EyeOffIcon, LockOpenIcon, LockClosedIcon, CopyIcon, XCircleIcon, CheckIcon } from '@/components/Icons';

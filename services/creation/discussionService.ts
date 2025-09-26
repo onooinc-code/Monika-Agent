@@ -57,6 +57,9 @@ export const generateDiscussionRulesAndOrder = async (
             }
         });
 
+        if (!response.text) {
+            throw new AIError("AI model returned an empty JSON response.", 'generateDiscussionRulesAndOrder', prompt);
+        }
         const json = JSON.parse(response.text);
         if (!json.rules) {
             throw new Error("AI response was missing required fields.");

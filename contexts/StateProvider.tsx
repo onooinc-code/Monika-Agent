@@ -1,4 +1,3 @@
-
 'use client';
 
 import React, { createContext, useContext, useRef, useCallback, useState, useMemo } from 'react';
@@ -218,7 +217,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     const [conversationMode, setConversationMode] = useLocalStorage<ConversationMode>('conversationMode', 'Dynamic');
     const [sendOnEnter, setSendOnEnter] = useLocalStorage<boolean>('sendOnEnter', true);
     const [isSoundEnabled, setIsSoundEnabled] = useLocalStorage<boolean>('isSoundEnabled', true);
-    const [globalApiKey, setGlobalApiKey] = useLocalStorage<string>('globalApiKey', process.env.API_KEY || '');
+    const [globalApiKey, setGlobalApiKey] = useLocalStorage<string>('globalApiKey', process.env.NEXT_PUBLIC_API_KEY || '');
     const [agentBubbleSettings, setAgentBubbleSettings] = useLocalStorage<BubbleSettings>('agentBubbleSettings', { alignment: 'left', scale: 1, textDirection: 'ltr', fontSize: 1 });
     const [userBubbleSettings, setUserBubbleSettings] = useLocalStorage<BubbleSettings>('userBubbleSettings', { alignment: 'right', scale: 1, textDirection: 'ltr', fontSize: 1 });
     const [customComponents, setCustomComponents] = useLocalStorage<CustomComponent[]>('customComponents', []);

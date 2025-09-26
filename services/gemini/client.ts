@@ -11,12 +11,12 @@ const clients = new Map<string, GoogleGenAI>();
  */
 export const getGenAIClient = (apiKey: string): GoogleGenAI => {
     // In a Next.js environment, the key can be passed from state (user-set)
-    // or from process.env.API_KEY (developer-set).
-    const effectiveApiKey = apiKey || process.env.API_KEY;
+    // or from process.env.NEXT_PUBLIC_API_KEY (developer-set).
+    const effectiveApiKey = apiKey || process.env.NEXT_PUBLIC_API_KEY;
     
     if (!effectiveApiKey || !effectiveApiKey.trim()) {
         // This error will be caught by services and shown to the user.
-        throw new Error("Gemini API key is not configured. Please set it in the application settings or as an API_KEY environment variable.");
+        throw new Error("Gemini API key is not configured. Please set it in the application settings or as a NEXT_PUBLIC_API_KEY environment variable.");
     }
     
     if (clients.has(effectiveApiKey)) {

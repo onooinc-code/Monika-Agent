@@ -601,7 +601,7 @@ body {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
   gap: 1rem;
-  align-content: start;
+  align-content: flex-start;
   grid-auto-rows: min-content; /* Allow rows to grow with content */
 }
 .gallery-component-card {
@@ -628,7 +628,7 @@ body {
   padding: 2rem;
   display: flex;
   justify-content: center;
-  align-items: start; /* Align to top to prevent cutoff */
+  align-items: flex-start; /* Align to top to prevent cutoff */
   min-height: 200px;
   flex-grow: 1; /* Allow preview to take available space */
 }

@@ -1,3 +1,5 @@
+'use client';
+
 import React from 'react';
 import { useAppContext } from '@/contexts/StateProvider';
 import { Spinner } from '@/components/Spinner';

@@ -70,6 +70,9 @@ export const generateTeamComponents = async (prompt: string, globalApiKey: strin
             }
         });
 
+        if (!response.text) {
+            throw new AIError("AI model returned an empty JSON response.", 'generateTeamComponents', prompt);
+        }
         const json = JSON.parse(response.text);
         if (!json.team || json.team.length !== 3) {
             throw new Error("AI did not return a team of 3 agents.");
@@ -121,6 +124,9 @@ export const generateFinalAgents = async (components: TeamComponent[], globalApi
             }
         });
         
+        if (!response.text) {
+            throw new AIError("AI model returned an empty JSON response.", 'generateFinalAgents', prompt);
+        }
         const json = JSON.parse(response.text);
         if (!json.final_agents || json.final_agents.length !== 3) {
             throw new Error("AI did not return details for 3 agents.");

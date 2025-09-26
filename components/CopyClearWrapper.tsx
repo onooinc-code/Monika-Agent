@@ -1,3 +1,5 @@
+'use client';
+
 import React, { useState } from 'react';
 import { CopyIcon, XCircleIcon, CheckIcon } from '@/components/Icons';
 
