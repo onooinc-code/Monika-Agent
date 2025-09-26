@@ -1,3 +1,5 @@
+'use client';
+
 import React, { useState } from 'react';
 import { useAppContext } from '@/contexts/StateProvider';
 import { CloseIcon, CopyIcon, CheckIcon } from '@/components/Icons';

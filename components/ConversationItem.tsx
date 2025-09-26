@@ -1,3 +1,4 @@
+'use client';
 
 import React from 'react';
 // FIX: Corrected import path for types to point to the barrel file.

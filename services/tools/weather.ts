@@ -17,7 +17,8 @@ export const getCurrentWeatherSchema: FunctionDeclaration = {
 
 export const getCurrentWeather = async ({ location }: { location: string }): Promise<{ weather: object }> => {
     // This is a mock function. In a real application, you would call a weather API.
-    const mockWeatherData = {
+    // FIX: Add a string index signature to the object type to resolve the TypeScript error.
+    const mockWeatherData: Record<string, { temperature: string; condition: string; }> = {
         "San Francisco, CA": { temperature: "15°C", condition: "Cloudy" },
         "Tokyo": { temperature: "28°C", condition: "Sunny" },
         "London": { temperature: "12°C", condition: "Rainy" },

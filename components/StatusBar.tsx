@@ -1,3 +1,5 @@
+'use client';
+
 import React, { useMemo } from 'react';
 import { useAppContext } from '@/contexts/StateProvider';
 import * as TokenCounter from '@/services/utils/tokenCounter';
