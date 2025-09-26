@@ -1,11 +1,11 @@
 import { useState, useRef } from 'react';
-import { Conversation, Agent, AgentManager, Attachment, ManualSuggestion, Message, ConversationMode, LongTermMemoryData, PlanStep, SoundEvent } from '../../types/index.ts';
-import * as AgentService from '../../services/chat/agentService.ts';
-import * as ManagerService from '../../services/chat/managerService.ts';
-import * as MessageActionsService from '../../services/chat/messageActionsService.ts';
-import * as TokenCounter from '../../services/utils/tokenCounter.ts';
-import { ActionModalButton } from './useModalManager.ts';
-import { AIError, getApiErrorMessage } from '../../services/utils/errorHandler.ts';
+import { Conversation, Agent, AgentManager, Attachment, ManualSuggestion, Message, ConversationMode, LongTermMemoryData, PlanStep, SoundEvent } from '@/types/index';
+import * as AgentService from '@/services/chat/agentService';
+import * as ManagerService from '@/services/chat/managerService';
+import * as MessageActionsService from '@/services/chat/messageActionsService';
+import * as TokenCounter from '@/services/utils/tokenCounter';
+import { ActionModalButton } from '@/contexts/hooks/useModalManager';
+import { AIError, getApiErrorMessage } from '@/services/utils/errorHandler';
 
 export type LoadingStage = 
     | { stage: 'idle' }

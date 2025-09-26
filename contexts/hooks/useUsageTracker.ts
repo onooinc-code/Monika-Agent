@@ -1,4 +1,5 @@
-import { useLocalStorage } from '../../hooks/useLocalStorage.ts';
+// FIX: Removed useLocalStorage import as it is deprecated.
+import { useState } from 'react';
 import { UsageMetrics } from '../../types/index.ts';
 
 const getTodayDateString = (): string => {
@@ -10,7 +11,8 @@ const getTodayDateString = (): string => {
 };
 
 export const useUsageTracker = () => {
-    const [usageMetrics, setUsageMetrics] = useLocalStorage<UsageMetrics>('usage-metrics', {
+    // FIX: Replaced useLocalStorage with useState for in-memory state management.
+    const [usageMetrics, setUsageMetrics] = useState<UsageMetrics>({
         totalTokens: 0,
         totalRequests: 0,
         dailyUsage: [],

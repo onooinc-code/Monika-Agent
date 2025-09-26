@@ -1,31 +1,12 @@
-
 import { useState, useEffect, useCallback } from 'react';
-import { useLocalStorage } from '../../hooks/useLocalStorage.ts';
-import { Conversation, AgentManager, Message, Agent } from '../../types/index.ts';
-import * as TitleService from '../../services/analysis/titleService.ts';
-import { isConversationArray } from '../../types/utils.ts';
+import { Conversation, AgentManager, Message } from '@/types/index';
+import * as TitleService from '@/services/analysis/titleService';
+import { isConversationArray } from '@/types/utils';
 
 export const useConversationManager = () => {
-    const [conversations, setConversations] = useLocalStorage<Conversation[]>('conversations', []);
-    const [activeConversationId, setActiveConversationId] = useLocalStorage<string | null>('active-conversation-id', null);
+    const [conversations, setConversations] = useState<Conversation[]>([]);
+    const [activeConversationId, setActiveConversationId] = useState<string | null>(null);
     
-    // Effect to sanitize conversations data loaded from localStorage, running only once on mount.
-    // This prevents crashes from malformed data like [null] or objects without an 'id'.
-    useEffect(() => {
-        if (Array.isArray(conversations)) {
-            const needsCleaning = conversations.some(c => !c || !c.id);
-            if (needsCleaning) {
-                console.warn("Corrupted conversation data found in localStorage. Cleaning up.");
-                setConversations(conversations.filter(c => c && c.id));
-            }
-        } else if (conversations) {
-            // If it's not an array but is truthy, it's invalid. Reset.
-            console.error("Invalid conversation data format in localStorage. Resetting.");
-            setConversations([]);
-        }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, []); // Empty dependency array ensures this runs only once after the initial render.
-
     const activeConversation = conversations.find(c => c.id === activeConversationId) || null;
 
     useEffect(() => {
@@ -41,7 +22,7 @@ export const useConversationManager = () => {
                 setActiveConversationId(null);
             }
         }
-    }, [conversations, activeConversationId, setActiveConversationId]);
+    }, [conversations, activeConversationId]);
 
 
     const handleNewConversation = useCallback(() => {
@@ -64,7 +45,7 @@ export const useConversationManager = () => {
         };
         setConversations(prev => [newConversation, ...prev]);
         setActiveConversationId(newConversation.id);
-    }, [setConversations, setActiveConversationId]);
+    }, []);
 
     const handleDeleteConversation = useCallback((conversationId: string) => {
         setConversations(prev => {
@@ -74,15 +55,15 @@ export const useConversationManager = () => {
             }
             return newConversations;
         });
-    }, [activeConversationId, setConversations, setActiveConversationId]);
+    }, [activeConversationId]);
 
     const handleSelectConversation = useCallback((conversationId: string) => {
         setActiveConversationId(conversationId);
-    }, [setActiveConversationId]);
+    }, []);
     
     const handleUpdateConversation = useCallback((conversationId: string, updates: Partial<Conversation>) => {
         setConversations(prev => prev.map(c => c.id === conversationId ? { ...c, ...updates } : c));
-    }, [setConversations]);
+    }, []);
 
     const handleUpdateConversationTitle = useCallback((conversationId: string, title: string) => {
         handleUpdateConversation(conversationId, { title });
@@ -153,7 +134,7 @@ export const useConversationManager = () => {
              alert("An error occurred while reading the file.");
         }
         reader.readAsText(file);
-    }, [setConversations]);
+    }, []);
 
     const handleToggleMessageBookmark = useCallback((messageId: string) => {
         setConversations(prevConversations => {
@@ -167,7 +148,7 @@ export const useConversationManager = () => {
                 return { ...conv, messages: updatedMessages };
             });
         });
-    }, [activeConversationId, setConversations]);
+    }, [activeConversationId]);
     
     const handleDeleteMessage = useCallback((messageId: string) => {
         if (!window.confirm('Are you sure you want to delete this message? This action cannot be undone.')) {
@@ -182,7 +163,7 @@ export const useConversationManager = () => {
                 return { ...conv, messages: updatedMessages };
             });
         });
-    }, [activeConversationId, setConversations]);
+    }, [activeConversationId]);
     
     const handleToggleMessageEdit = useCallback((messageId: string) => {
         setConversations(prevConversations => {
@@ -197,7 +178,7 @@ export const useConversationManager = () => {
                 return { ...conv, messages: updatedMessages };
             });
         });
-    }, [activeConversationId, setConversations]);
+    }, [activeConversationId]);
     
     const handleUpdateMessageText = useCallback((messageId: string, newText: string) => {
         setConversations(prevConversations => {
@@ -211,7 +192,7 @@ export const useConversationManager = () => {
                 return { ...conv, messages: updatedMessages };
             });
         });
-    }, [activeConversationId, setConversations]);
+    }, [activeConversationId]);
 
     const handleChangeAlternativeResponse = useCallback((messageId: string, direction: 'next' | 'prev') => {
         setConversations(prevConversations => {
@@ -235,7 +216,7 @@ export const useConversationManager = () => {
                 return { ...conv, messages: updatedMessages };
             });
         });
-    }, [activeConversationId, setConversations]);
+    }, [activeConversationId]);
     
     const handleAppendToMessageText = useCallback((conversationId: string, messageId: string, textChunk: string) => {
         setConversations(prevConversations => prevConversations.map(conv => {
@@ -245,7 +226,7 @@ export const useConversationManager = () => {
             );
             return { ...conv, messages: updatedMessages };
         }));
-    }, [setConversations]);
+    }, []);
 
     const handleFinalizeMessage = useCallback((conversationId: string, messageId: string, finalMessageData: Partial<Message>) => {
         setConversations(prevConversations => prevConversations.map(conv => {
@@ -255,7 +236,7 @@ export const useConversationManager = () => {
             );
             return { ...conv, messages: updatedMessages };
         }));
-    }, [setConversations]);
+    }, []);
 
     return {
         conversations,

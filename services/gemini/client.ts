@@ -1,4 +1,3 @@
-
 import { GoogleGenAI } from "@google/genai";
 
 const clients = new Map<string, GoogleGenAI>();
@@ -11,16 +10,20 @@ const clients = new Map<string, GoogleGenAI>();
  * @returns A GoogleGenAI instance.
  */
 export const getGenAIClient = (apiKey: string): GoogleGenAI => {
-    if (clients.has(apiKey)) {
-        return clients.get(apiKey)!;
+    // In a Next.js environment, the key can be passed from state (user-set)
+    // or from process.env.API_KEY (developer-set).
+    const effectiveApiKey = apiKey || process.env.API_KEY;
+    
+    if (!effectiveApiKey || !effectiveApiKey.trim()) {
+        // This error will be caught by services and shown to the user.
+        throw new Error("Gemini API key is not configured. Please set it in the application settings or as an API_KEY environment variable.");
     }
     
-    if (!apiKey.trim()) {
-        // This is a developer error, should not happen if UI validation is correct
-        throw new Error("Attempted to initialize Gemini client with an empty API key.");
+    if (clients.has(effectiveApiKey)) {
+        return clients.get(effectiveApiKey)!;
     }
 
-    const newClient = new GoogleGenAI({ apiKey });
-    clients.set(apiKey, newClient);
+    const newClient = new GoogleGenAI({ apiKey: effectiveApiKey });
+    clients.set(effectiveApiKey, newClient);
     return newClient;
 };

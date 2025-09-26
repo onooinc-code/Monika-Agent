@@ -1,7 +1,9 @@
+'use client';
+
 import React from 'react';
-import { useAppContext } from '../contexts/StateProvider.tsx';
-import { CloseIcon } from './Icons.tsx';
-import { safeRender } from '../services/utils/safeRender.ts';
+import { useAppContext } from '@/contexts/StateProvider';
+import { CloseIcon } from '@/components/Icons';
+import { safeRender } from '@/services/utils/safeRender';
 
 export const ActionResponseModal: React.FC = () => {
     const { actionModalState, closeActionModal } = useAppContext();
@@ -28,7 +30,7 @@ export const ActionResponseModal: React.FC = () => {
                                 onClick={action.onClick}
                                 className={action.isSecondary
                                     ? "bg-black/20 text-gray-200 font-bold py-2 px-4 rounded-lg hover:bg-white/10 transition-colors"
-                                    : "bg-indigo-600 text-white font-bold py-2 px-4 rounded-lg hover:bg-indigo-500 transition-all transform hover:scale-105 neon-glow-indigo"
+                                    : "bg-indigo-600 text-white font-bold py-2 px-6 rounded-lg hover:bg-indigo-500 transition-all transform hover:scale-105 neon-glow-indigo"
                                 }
                              >
                                 {action.label}

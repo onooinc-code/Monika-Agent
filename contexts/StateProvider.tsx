@@ -1,17 +1,18 @@
+'use client';
+
 import React, { createContext, useContext, useRef, useCallback, useState } from 'react';
-import { Agent, AgentManager, ConversationMode, Attachment, ManualSuggestion, HistoryView, Conversation, PipelineStep, UsageMetrics, Message, LongTermMemoryData, BubbleSettings, ContextMenuItem, SoundEvent, CustomComponent, HtmlComponent, ConversionType } from '../types/index.ts';
-import { useLocalStorage } from '../hooks/useLocalStorage.ts';
-import { useConversationManager } from './hooks/useConversationManager.ts';
-import { useChatHandler, LoadingStage } from './hooks/useChatHandler.ts';
-import { useHistoryHandler } from './hooks/useHistoryHandler.ts';
-import { useModalManager } from './hooks/useModalManager.ts';
-import { useUsageTracker } from './hooks/useUsageTracker.ts';
-import { useMemoryManager } from './hooks/useMemoryManager.ts';
-import { useUIPrefsManager } from './hooks/useUIPrefsManager.ts';
-import { useSoundManager } from './hooks/useSoundManager.ts';
-import * as MemoryService from '../services/analysis/memoryService.ts';
-import { ActionModalState, ContextMenuState } from './hooks/useModalManager.ts';
-import * as AgentConstants from '../constants/agentConstants.ts';
+import { Agent, AgentManager, ConversationMode, Attachment, ManualSuggestion, HistoryView, Conversation, PipelineStep, UsageMetrics, Message, LongTermMemoryData, BubbleSettings, ContextMenuItem, SoundEvent, CustomComponent, HtmlComponent, ConversionType } from '@/types/index';
+import { useConversationManager } from '@/contexts/hooks/useConversationManager';
+import { useChatHandler, LoadingStage } from '@/contexts/hooks/useChatHandler';
+import { useHistoryHandler } from '@/contexts/hooks/useHistoryHandler';
+import { useModalManager } from '@/contexts/hooks/useModalManager';
+import { useUsageTracker } from '@/contexts/hooks/useUsageTracker';
+import { useMemoryManager } from '@/contexts/hooks/useMemoryManager';
+import { useUIPrefsManager } from '@/contexts/hooks/useUIPrefsManager';
+import { useSoundManager } from '@/contexts/hooks/useSoundManager';
+import * as MemoryService from '@/services/analysis/memoryService';
+import { ActionModalState, ContextMenuState } from '@/contexts/hooks/useModalManager';
+import * as AgentConstants from '@/constants/agentConstants';
 
 interface AppState {
     agents: Agent[];
@@ -207,18 +208,18 @@ interface AppState {
 const AppContext = createContext<AppState | undefined>(undefined);
 
 export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-    // 1. Core state and settings from localStorage
-    const [agents, setAgents] = useLocalStorage<Agent[]>('agents', AgentConstants.DEFAULT_AGENTS);
-    const [agentManager, setAgentManager] = useLocalStorage<AgentManager>('agent-manager', AgentConstants.DEFAULT_AGENT_MANAGER);
-    const [conversationMode, setConversationMode] = useLocalStorage<ConversationMode>('conversation-mode', 'Dynamic');
-    const [sendOnEnter, setSendOnEnter] = useLocalStorage<boolean>('send-on-enter', true);
-    const [isSoundEnabled, setIsSoundEnabled] = useLocalStorage<boolean>('is-sound-enabled', true);
-    const [globalApiKey, setGlobalApiKey] = useLocalStorage<string>('global-api-key', '');
-    const [agentBubbleSettings, setAgentBubbleSettings] = useLocalStorage<BubbleSettings>('agent-bubble-settings', { alignment: 'left', scale: 1, textDirection: 'ltr', fontSize: 1 });
-    const [userBubbleSettings, setUserBubbleSettings] = useLocalStorage<BubbleSettings>('user-bubble-settings', { alignment: 'right', scale: 1, textDirection: 'ltr', fontSize: 1 });
-    const [customComponents, setCustomComponents] = useLocalStorage<CustomComponent[]>('custom-components', []);
-    const [customHtmlComponents, setCustomHtmlComponents] = useLocalStorage<HtmlComponent[]>('custom-html-components', []);
-    const [conversionType, setConversionType] = useLocalStorage<ConversionType>('conversion-type', 'Multi');
+    // 1. Core state and settings managed in memory with useState
+    const [agents, setAgents] = useState<Agent[]>(AgentConstants.DEFAULT_AGENTS);
+    const [agentManager, setAgentManager] = useState<AgentManager>(AgentConstants.DEFAULT_AGENT_MANAGER);
+    const [conversationMode, setConversationMode] = useState<ConversationMode>('Dynamic');
+    const [sendOnEnter, setSendOnEnter] = useState<boolean>(true);
+    const [isSoundEnabled, setIsSoundEnabled] = useState<boolean>(true);
+    const [globalApiKey, setGlobalApiKey] = useState<string>(process.env.API_KEY || '');
+    const [agentBubbleSettings, setAgentBubbleSettings] = useState<BubbleSettings>({ alignment: 'left', scale: 1, textDirection: 'ltr', fontSize: 1 });
+    const [userBubbleSettings, setUserBubbleSettings] = useState<BubbleSettings>({ alignment: 'right', scale: 1, textDirection: 'ltr', fontSize: 1 });
+    const [customComponents, setCustomComponents] = useState<CustomComponent[]>([]);
+    const [customHtmlComponents, setCustomHtmlComponents] = useState<HtmlComponent[]>([]);
+    const [conversionType, setConversionType] = useState<ConversionType>('Multi');
     
     // 2. Refs & Local State
     const messagesEndRef = useRef<HTMLDivElement>(null);
@@ -578,8 +579,11 @@ export default ${newReactComponentName};
         selectedAgentForModal: modalManager.selectedAgentForModal,
         openAgentSettingsModal,
         closeAgentSettingsModal,
+
+        // UI Preferences
+        isPermanentlyVisible: uiPrefsManager.isPermanentlyVisible,
+        togglePermanentVisibility: uiPrefsManager.togglePermanentVisibility,
         
-        // Custom Components
         customComponents,
         setCustomComponents,
         customHtmlComponents,
@@ -587,30 +591,22 @@ export default ${newReactComponentName};
         handleUpdateHtmlComponent,
         handleUpdateCustomComponent,
         handleConvertToReactComponent,
-
-        // Edit HTML Component Modal
+        
         isEditHtmlComponentModalOpen: modalManager.isEditHtmlComponentModalOpen,
         editingHtmlComponent: modalManager.editingHtmlComponent,
         openEditHtmlComponentModal,
         closeEditHtmlComponentModal,
         
-        // Edit React Component Modal
         isEditComponentModalOpen: modalManager.isEditComponentModalOpen,
         editingComponent: modalManager.editingComponent,
         openEditComponentModal,
         closeEditComponentModal,
 
-        // Component Preview Modal
         isComponentPreviewOpen: modalManager.isComponentPreviewOpen,
         componentToPreview: modalManager.componentToPreview,
+        previewBackground: modalManager.previewBackground,
         openComponentPreviewModal,
         closeComponentPreviewModal,
-        previewBackground: modalManager.previewBackground,
-
-
-        // UI Preferences
-        isPermanentlyVisible: uiPrefsManager.isPermanentlyVisible,
-        togglePermanentVisibility: uiPrefsManager.togglePermanentVisibility,
     };
 
     return (
@@ -622,7 +618,7 @@ export default ${newReactComponentName};
 
 export const useAppContext = (): AppState => {
     const context = useContext(AppContext);
-    if (context === undefined) {
+    if (!context) {
         throw new Error('useAppContext must be used within an AppProvider');
     }
     return context;

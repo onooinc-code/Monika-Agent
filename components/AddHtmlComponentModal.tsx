@@ -1,7 +1,9 @@
+'use client';
+
 import React, { useState } from 'react';
-import { useAppContext } from '../contexts/StateProvider.tsx';
-import { CloseIcon } from './Icons.tsx';
-import { HtmlComponent } from '../types/index.ts';
+import { useAppContext } from '@/contexts/StateProvider';
+import { CloseIcon } from '@/components/Icons';
+import { HtmlComponent } from '@/types/index';
 
 const EXAMPLE_HTML = `<div class="card-container">
   <div class="card-content">
