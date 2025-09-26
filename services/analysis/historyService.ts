@@ -62,7 +62,7 @@ export async function generateOverallSummaryAndTopics(messages: Message[], manag
         });
 
         responseText = response.text;
-        if (!responseText) {
+        if (!responseText || responseText.trim() === '') {
             throw new Error('The AI model returned an empty response for the summary and topics generation.');
         }
         
@@ -75,7 +75,7 @@ export async function generateOverallSummaryAndTopics(messages: Message[], manag
         const overallSummary = typeof json.overallSummary === 'string' ? json.overallSummary : "No summary available.";
         // FIX: Replaced the 'any' type with a proper type guard and filter to ensure type safety.
         const topics = Array.isArray(json.topics) 
-            ? json.topics.filter((t): t is string => typeof t === 'string') 
+            ? json.topics.filter((t: any): t is string => typeof t === 'string') 
             : [];
         
         return {

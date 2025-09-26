@@ -6,7 +6,7 @@ import { AIError } from '@/services/utils/errorHandler';
 import { availableTools, toolSchemas } from '@/services/tools';
 import { getFullMessageTextSchema } from '@/services/tools/contextual';
 import { buildAwarenessContext } from '@/services/utils/contextBuilder';
-import { Content } from '@google/genai';
+import { Content, FunctionCall } from '@google/genai';
 
 /**
  * Converts the application's message format to the Gemini API's `Content` format.
@@ -58,6 +58,7 @@ export const generateResponse = async (
 ): Promise<{ finalResult: string; summary: string; pipeline: PipelineStep[] }> => {
     const pipeline: PipelineStep[] = [];
     let fullText = '';
+    let accumulatedFunctionCalls: FunctionCall[] = [];
 
     const { currentTopicMessages, recentTopicNames } = buildAwarenessContext(messages);
 
@@ -116,8 +117,8 @@ export const generateResponse = async (
     
     try {
         const startTime = performance.now();
-        // Step 1: Make the initial API call with the full history to see if a tool is needed.
-        const result = await ai.models.generateContent({
+        // Step 1: Make the initial streaming API call.
+        const firstStream = await ai.models.generateContentStream({
             model: agent.model,
             contents: history,
             config: { 
@@ -125,55 +126,58 @@ export const generateResponse = async (
                 tools,
             },
         });
-        const response = result;
-        // FIX: Add optional chaining to `parts` array access to prevent crashes on empty arrays.
-        const functionCall = response.candidates?.[0]?.content?.parts?.[0]?.functionCall;
-
         pipeline.push({
-            stage: 'Initial Model Invocation',
+            stage: 'Initial Streaming Invocation',
             input: history,
-            output: response,
+            output: 'Stream started...',
             durationMs: Math.round(performance.now() - startTime),
         });
 
-        // Step 2: Check for a function call. Add extra checks to satisfy TypeScript's type inference.
-        if (functionCall && functionCall.name && response.candidates?.[0]?.content) {
-            const toolOutputForStream = `\n\n> **Using tool: \`${functionCall.name}\` with arguments: \`${JSON.stringify(functionCall.args)}\`**\n\n`;
+        // Step 2: Process the first stream for text and function calls.
+        for await (const chunk of firstStream) {
+            const chunkText = chunk.text;
+            if (chunkText) {
+                onStream(chunkText);
+                fullText += chunkText;
+            }
+            if (chunk.functionCalls && chunk.functionCalls.length > 0) {
+                 accumulatedFunctionCalls.push(...chunk.functionCalls);
+            }
+        }
+        
+        // Step 3: If tool calls were found, execute them.
+        if (accumulatedFunctionCalls.length > 0) {
+            const toolOutputForStream = `\n\n> **Thinking...** (Using ${accumulatedFunctionCalls.map(fc => `\`${fc.name}\``).join(', ')})\n\n`;
             onStream(toolOutputForStream);
             fullText += toolOutputForStream;
             
-            pipeline.push({ stage: 'Tool Call Detected', input: null, output: functionCall });
+            pipeline.push({ stage: 'Tool Call(s) Detected', input: null, output: accumulatedFunctionCalls });
 
-            const toolFunction = dynamicAvailableTools[functionCall.name];
-            if (!toolFunction) {
-                throw new Error(`Unknown tool "${functionCall.name}" requested by the model.`);
-            }
-
-            // Step 3: Execute the tool function.
-            const toolStartTime = performance.now();
-            const toolResult = await toolFunction(functionCall.args);
-            pipeline.push({
-                stage: `Tool Execution: ${functionCall.name}`,
-                input: functionCall.args,
-                output: toolResult,
-                durationMs: Math.round(performance.now() - toolStartTime),
+            const toolExecutionPromises = accumulatedFunctionCalls.map(async (functionCall) => {
+                const toolFunction = dynamicAvailableTools[functionCall.name];
+                if (!toolFunction) {
+                     return { name: functionCall.name, response: { error: `Unknown tool "${functionCall.name}" requested by the model.` } };
+                }
+                const toolStartTime = performance.now();
+                const toolResult = await toolFunction(functionCall.args);
+                pipeline.push({
+                    stage: `Tool Execution: ${functionCall.name}`,
+                    input: functionCall.args,
+                    output: toolResult,
+                    durationMs: Math.round(performance.now() - toolStartTime),
+                });
+                return { name: functionCall.name, response: toolResult };
             });
             
-            // Step 4: Send the tool's result back to the model to get a final text response.
+            const toolResults = await Promise.all(toolExecutionPromises);
+
+            // Step 4: Send tool results back to the model and stream the final response.
             const finalResultStream = await ai.models.generateContentStream({
                 model: agent.model,
                 contents: [
                     ...history,
-                    response.candidates[0].content, // Important: include the model's first turn
-                    {
-                        role: 'tool',
-                        parts: [{
-                            functionResponse: { 
-                                name: functionCall.name, 
-                                response: toolResult
-                            }
-                        }],
-                    }
+                    { role: 'model', parts: accumulatedFunctionCalls.map(fc => ({ functionCall: fc })) },
+                    { role: 'tool', parts: toolResults.map(tr => ({ functionResponse: tr })) }
                 ],
                 config: { systemInstruction: finalSystemInstruction },
             });
@@ -187,18 +191,13 @@ export const generateResponse = async (
                 }
             }
              pipeline.push({
-                stage: 'Final Streaming Invocation',
-                input: 'Tool Result',
+                stage: 'Final Streaming Invocation (Post-Tool)',
+                input: 'Tool Results',
                 output: { text: fullText },
                 durationMs: Math.round(performance.now() - streamingStartTime),
             });
-        } else {
-            // No tool call, just a direct text response.
-            const text = response.text || '';
-            onStream(text);
-            fullText = text;
         }
-
+        
         // Step 5: After getting the full text, ask the same agent to summarize it.
         let summary = fullText; // Fallback
         if (fullText.length > 250) { 

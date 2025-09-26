@@ -57,7 +57,7 @@ export const generateDiscussionRulesAndOrder = async (
             }
         });
 
-        if (!response.text) {
+        if (!response.text || response.text.trim() === '') {
             throw new AIError("AI model returned an empty JSON response.", 'generateDiscussionRulesAndOrder', prompt);
         }
         const json = JSON.parse(response.text);
