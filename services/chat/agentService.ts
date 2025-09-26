@@ -137,7 +137,7 @@ export const generateResponse = async (
         });
 
         // Step 2: Check for a function call. Add extra checks to satisfy TypeScript's type inference.
-        if (functionCall && response.candidates?.[0]?.content) {
+        if (functionCall && functionCall.name && response.candidates?.[0]?.content) {
             const toolOutputForStream = `\n\n> **Using tool: \`${functionCall.name}\` with arguments: \`${JSON.stringify(functionCall.args)}\`**\n\n`;
             onStream(toolOutputForStream);
             fullText += toolOutputForStream;
