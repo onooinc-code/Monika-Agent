@@ -126,7 +126,7 @@ export const generateResponse = async (
             },
         });
         const response = result;
-        const functionCall = response.candidates[0]?.content?.parts[0]?.functionCall;
+        const functionCall = response.candidates?.[0]?.content?.parts[0]?.functionCall;
 
         pipeline.push({
             stage: 'Initial Model Invocation',

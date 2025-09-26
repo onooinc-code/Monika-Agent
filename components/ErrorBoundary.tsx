@@ -16,6 +16,8 @@ interface State {
 // This inheritance provides access to component lifecycle methods like componentDidCatch, as well as state management (this.setState) and props (this.props).
 // FIX: The ErrorBoundary class must extend React.Component to function correctly as a React Error Boundary.
 // This inheritance provides access to component lifecycle methods like componentDidCatch, as well as state management (this.setState) and props (this.props).
+// FIX: Extended React.Component to make this a valid class component, granting access to state and props.
+// FIX: Extended React.Component to make this a valid class component, granting access to state and props.
 class ErrorBoundary extends React.Component<Props, State> {
   state: State = {
     hasError: false,
