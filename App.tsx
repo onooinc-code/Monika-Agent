@@ -1,3 +1,4 @@
+
 'use client';
 
 import React, { useEffect, useState } from 'react';
@@ -23,7 +24,7 @@ import { BookmarkedMessagesPanel } from '@/components/BookmarkedMessagesPanel';
 import { MessageArchiveModal } from '@/components/MessageArchiveModal';
 import { ContextMenu } from '@/components/ContextMenu';
 import { ConversationSubHeader } from '@/components/ConversationSubHeader';
-// FIX: Corrected the import path for types to point to the barrel file.
+// FIX: Corrected import path for types to point to the barrel file.
 import { ContextMenuItem } from '@/types/index';
 import { PlusIcon, SettingsIcon, AlignLeftIcon } from '@/components/Icons';
 import { AgentSettingsModal } from '@/components/AgentSettingsModal';

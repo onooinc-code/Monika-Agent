@@ -1,7 +1,8 @@
+
 'use client';
 
 import React, { useEffect, useRef, useState } from 'react';
-// FIX: Corrected the import path for types to point to the barrel file.
+// FIX: Corrected import path for types to point to the barrel file.
 import { Message, Agent, Conversation, BubbleSettings } from '@/types/index';
 import { MANAGER_COLOR } from '@/constants/agentConstants';
 import { useAppContext } from '@/contexts/StateProvider';
@@ -373,48 +374,4 @@ export const MessageBubble: React.FC<MessageBubbleProps> = ({ message, agent, fe
                         </div>
                          <div className="flex items-center text-xs text-gray-500">
                             {hasAlternatives && (
-                                <div className="flex items-center gap-2 mr-2 text-white">
-                                    <button onClick={() => handleChangeAlternativeResponse(message.id, 'prev')} disabled={currentResponseIndex <= -1} className="disabled:opacity-50">&lt;</button>
-                                    <span>{currentResponseIndex + 2} / {totalResponses}</span>
-                                    <button onClick={() => handleChangeAlternativeResponse(message.id, 'next')} disabled={currentResponseIndex >= totalResponses - 2} className="disabled:opacity-50">&gt;</button>
-                                </div>
-                            )}
-                            <span>{formattedTime}</span>
-                        </div>
-                    </div>
-                    <div
-                        className={`p-4 ${isUser ? 'content-bg-user prose-user' : 'content-bg-agent prose-agent'}`}
-                        dir={settings.textDirection}
-                        style={{ fontSize: `${settings.fontSize}rem` }}
-                    >
-                        {message.plan ? (
-                            <PlanDisplay plan={message.plan} />
-                        ) : (
-                            <>
-                                <div
-                                    ref={contentRef}
-                                    className="prose max-w-none prose-p:my-2 prose-headings:my-3"
-                                    dangerouslySetInnerHTML={{ __html: getMessageContent() }}
-                                />
-                                {message.isStreaming && <span className="streaming-cursor"></span>}
-                            </>
-                        )}
-                        {isLongMessageEnabled && (
-                             <button onClick={() => setIsExpanded(!isExpanded)} className="text-indigo-600 hover:text-indigo-800 text-sm font-semibold mt-2 focus:outline-none bg-black bg-opacity-5 px-2 py-1 rounded">
-                                {isExpanded ? 'Show Less' : 'Show More'}
-                            </button>
-                        )}
-                         {message.attachment && (
-                            <div className="mt-2">
-                                <img src={`data:${message.attachment.mimeType};base64,${message.attachment.base64}`} alt="Attachment" className="max-w-xs rounded-lg border-2 border-gray-200" />
-                            </div>
-                        )}
-                    </div>
-                    <div className={`flex items-center p-2 bg-primary-header/70 ${isUser ? 'flex-row-reverse' : ''} opacity-0 group-hover:opacity-100 transition-opacity duration-300`} style={{backgroundColor: 'var(--color-primary-header)'}}>
-                       <MessageToolbar message={message} isUser={isUser} isContinuous={false} settings={settings} handleAlignment={handleAlignment} handleTextDirection={handleTextDirection} handleFontSize={handleFontSize} handleCopy={handleCopy} />
-                    </div>
-                </div>
-            </div>
-        </div>
-    );
-};
+                                <div className="flex items-center gap-2 mr-2

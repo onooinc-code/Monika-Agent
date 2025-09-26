@@ -1,8 +1,7 @@
 'use client';
 
 import React from 'react';
-// FIX: Corrected import path to explicitly use the barrel file.
-import { PlanStep } from '@/types/index';
+import { PlanStep } from '@/types';
 import { useAppContext } from '@/contexts/StateProvider';
 import { PlanIcon } from '@/components/Icons';
 import { safeRender } from '@/services/utils/safeRender';

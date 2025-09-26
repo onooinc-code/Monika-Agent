@@ -1,7 +1,6 @@
 import React from 'react';
 import { useAppContext } from '@/contexts/StateProvider';
-// FIX: Corrected the import path for types to point to the barrel file.
-import { Message } from '@/types/index';
+import { Message } from '@/types';
 import { CloseIcon, BookmarkFilledIcon } from '@/components/Icons';
 import { safeRender } from '@/services/utils/safeRender';
 

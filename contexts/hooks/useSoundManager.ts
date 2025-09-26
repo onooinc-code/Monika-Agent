@@ -1,6 +1,5 @@
 import { useMemo } from 'react';
-// FIX: Corrected the import path for types to point to the barrel file.
-import { SoundEvent } from '@/types/index';
+import { SoundEvent } from '@/types';
 import { SOUNDS } from '@/assets/sounds';
 
 interface SoundManagerProps {

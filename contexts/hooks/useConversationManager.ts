@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback } from 'react';
-import { Conversation, AgentManager, Message } from '@/types/index';
+import { Conversation, AgentManager, Message } from '@/types';
 import * as TitleService from '@/services/analysis/titleService';
 import { isConversationArray } from '@/types/utils';
 

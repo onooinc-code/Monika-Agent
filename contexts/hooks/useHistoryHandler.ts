@@ -1,8 +1,5 @@
-
-
 import { useState } from 'react';
-// FIX: Corrected the import path for types to point to the barrel file.
-import { Conversation, AgentManager, HistoryView, Message } from '@/types/index';
+import { Conversation, AgentManager, HistoryView, Message } from '@/types';
 import * as HistoryService from '@/services/analysis/historyService';
 import { HISTORY_CONFIG } from '@/constants/historyConstants';
 

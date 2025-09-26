@@ -1,7 +1,6 @@
 import React, { useState } from 'react';
 import { useAppContext } from '@/contexts/StateProvider';
-// FIX: Corrected the import path for types to point to the barrel file.
-import { Agent, TeamComponent } from '@/types/index';
+import { Agent, TeamComponent } from '@/types';
 import { Spinner } from '@/components/Spinner';
 import * as TeamGenerationService from '@/services/creation/teamGenerationService';
 import { CloseIcon, SparklesIcon } from '@/components/Icons';

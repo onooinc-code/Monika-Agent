@@ -3,8 +3,7 @@
 import React, { useRef, useState, useEffect } from 'react';
 import { useAppContext } from '@/contexts/StateProvider';
 import { safeRender } from '@/services/utils/safeRender';
-// FIX: Corrected import path to explicitly use the barrel file.
-import { ContextMenuItem } from '@/types/index';
+import { ContextMenuItem } from '@/types';
 
 export const ContextMenu: React.FC = () => {
     const { contextMenuState, closeContextMenu } = useAppContext();
@@ -63,25 +62,4 @@ export const ContextMenu: React.FC = () => {
             ref={menuRef}
             className="fixed z-50 glass-pane rounded-lg shadow-2xl shadow-indigo-500/30 w-56 animate-fade-in-up"
             style={menuStyle}
-            onClick={e => e.stopPropagation()} // Prevent clicks inside the menu from closing it
-        >
-            <div className="p-2 space-y-1">
-                {menuItems.map((item, index) => {
-                    if (item.isSeparator) {
-                        return <hr key={`sep-${index}`} className="my-1 border-white/10" />;
-                    }
-                    return (
-                        <button
-                            key={item.label || index}
-                            onClick={() => item.action && handleAction(item.action)}
-                            className={getButtonClass(item)}
-                        >
-                            {item.icon && <span className="flex-shrink-0 w-5 h-5">{item.icon}</span>}
-                            <span>{safeRender(item.label)}</span>
-                        </button>
-                    );
-                })}
-            </div>
-        </div>
-    );
-};
+            onClick={

@@ -1,7 +1,6 @@
 
 import { getGenAIClient } from '@/services/gemini/client';
-// FIX: Corrected the import path for types to point to the barrel file.
-import { Agent, Message, Attachment, PipelineStep, LongTermMemoryData } from '@/types/index';
+import { Agent, Message, Attachment, PipelineStep, LongTermMemoryData } from '@/types';
 import { handleAndThrowError } from '@/services/utils/errorHandler';
 import { availableTools, toolSchemas } from '@/services/tools';
 import { getFullMessageTextSchema } from '@/services/tools/contextual';

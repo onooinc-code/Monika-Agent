@@ -1,10 +1,6 @@
-
-
-
 import React, { useState, useEffect } from 'react';
 import { useAppContext } from '@/contexts/StateProvider';
-// FIX: Corrected the import path for types to point to the barrel file.
-import { PipelineStep } from '@/types/index';
+import { PipelineStep } from '@/types';
 import { CloseIcon } from '@/components/Icons';
 
 const CodeBlock: React.FC<{ data: any }> = ({ data }) => {
