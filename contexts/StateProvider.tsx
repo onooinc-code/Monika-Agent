@@ -1,6 +1,6 @@
 'use client';
 
-import React, { createContext, useContext, useRef, useCallback, useState } from 'react';
+import React, { createContext, useContext, useRef, useCallback, useState, useMemo } from 'react';
 // FIX: Corrected import path for types to point to the barrel file.
 import { Agent, AgentManager, ConversationMode, Attachment, ManualSuggestion, HistoryView, Conversation, PipelineStep, UsageMetrics, Message, LongTermMemoryData, BubbleSettings, ContextMenuItem, SoundEvent, CustomComponent, HtmlComponent, ConversionType } from '@/types/index';
 import { useConversationManager } from '@/contexts/hooks/useConversationManager';
@@ -105,6 +105,7 @@ interface AppState {
     // Usage Metrics
     usageMetrics: UsageMetrics;
     logUsage: (tokens: number, agentId?: string, requestCount?: number) => void;
+    getAgentTodayStats: (agentId: string) => { tokens: number; messages: number };
 
     // Agent Stats Modal
     isAgentStatsOpen: boolean;
@@ -237,7 +238,20 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     const memoryManager = useMemoryManager();
     const uiPrefsManager = useUIPrefsManager();
     
-    const enabledAgents = agents.filter(a => a.isEnabled ?? true);
+    const enabledAgents = useMemo(() => agents.filter(a => a.isEnabled ?? true), [agents]);
+
+    const getAgentTodayStats = useCallback((agentId: string) => {
+        const getTodayDateString = (): string => {
+            const today = new Date();
+            const year = today.getFullYear();
+            const month = String(today.getMonth() + 1).padStart(2, '0');
+            const day = String(today.getDate()).padStart(2, '0');
+            return `${year}-${month}-${day}`;
+        };
+        const todayStr = getTodayDateString();
+        const stats = usageTracker.usageMetrics.agentUsage[agentId] || { dailyUsage: [] };
+        return stats.dailyUsage.find(d => d.date === todayStr) || { tokens: 0, messages: 0 };
+    }, [usageTracker.usageMetrics.agentUsage]);
 
     const chatHandler = useChatHandler({
         agents: enabledAgents, // Pass only enabled agents for decision-making
@@ -553,6 +567,7 @@ export default ${newReactComponentName};
         // From useUsageTracker
         usageMetrics: usageTracker.usageMetrics,
         logUsage: usageTracker.logUsage,
+        getAgentTodayStats,
         isAgentStatsOpen: modalManager.isAgentStatsOpen,
         setIsAgentStatsOpen,
         isTeamGeneratorOpen: modalManager.isTeamGeneratorOpen,

@@ -1,4 +1,3 @@
-
 'use client';
 
 import React from "react";
@@ -16,31 +15,15 @@ import { HeaderLeftActions } from "@/components/HeaderLeftActions";
 import { TitleBar } from "@/components/TitleBar";
 
 
-const getTodayDateString = (): string => {
-  const today = new Date();
-  const year = today.getFullYear();
-  const month = String(today.getMonth() + 1).padStart(2, "0");
-  const day = String(today.getDate()).padStart(2, "0");
-  return `${year}-${month}-${day}`;
-};
-
 const AgentCard: React.FC<{ agent: Agent }> = ({ agent }) => {
   const {
-    usageMetrics,
     lastTurnAgentIds,
     handleToggleAgentEnabled,
     openAgentSettingsModal,
+    getAgentTodayStats,
   } = useAppContext();
-  const todayStr = getTodayDateString();
 
-  const stats = usageMetrics.agentUsage[agent.id] || {
-    totalMessages: 0,
-    dailyUsage: [],
-  };
-  const todayStats = stats.dailyUsage.find((d) => d.date === todayStr) || {
-    tokens: 0,
-    messages: 0,
-  };
+  const todayStats = getAgentTodayStats(agent.id);
   const wasUsed = lastTurnAgentIds.has(agent.id);
   const isEnabled = agent.isEnabled ?? true;
 

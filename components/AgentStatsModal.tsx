@@ -3,20 +3,10 @@ import { useAppContext } from '@/contexts/StateProvider';
 import { TokenIcon, CpuIcon, CloseIcon, MessageCountIcon } from '@/components/Icons';
 import { safeRender } from '@/services/utils/safeRender';
 
-const getTodayDateString = (): string => {
-    const today = new Date();
-    const year = today.getFullYear();
-    const month = String(today.getMonth() + 1).padStart(2, '0');
-    const day = String(today.getDate()).padStart(2, '0');
-    return `${year}-${month}-${day}`;
-};
-
 export const AgentStatsModal: React.FC = () => {
-    const { isAgentStatsOpen, setIsAgentStatsOpen, agents, usageMetrics } = useAppContext();
+    const { isAgentStatsOpen, setIsAgentStatsOpen, agents, usageMetrics, getAgentTodayStats } = useAppContext();
 
     if (!isAgentStatsOpen) return null;
-
-    const todayStr = getTodayDateString();
 
     const formatTokens = (tokens: number) => {
         if (tokens > 1000) {
@@ -26,7 +16,7 @@ export const AgentStatsModal: React.FC = () => {
     };
 
     const managerStats = usageMetrics.agentUsage['manager'] || { totalMessages: 0, dailyUsage: [] };
-    const managerTodayStats = managerStats.dailyUsage.find(d => d.date === todayStr) || { tokens: 0, messages: 0 };
+    const managerTodayStats = getAgentTodayStats('manager');
 
 
     return (
@@ -69,7 +59,7 @@ export const AgentStatsModal: React.FC = () => {
                         {/* Agent Cards */}
                         {agents.map(agent => {
                             const stats = usageMetrics.agentUsage[agent.id] || { totalMessages: 0, dailyUsage: [] };
-                            const todayStats = stats.dailyUsage.find(d => d.date === todayStr) || { tokens: 0, messages: 0 };
+                            const todayStats = getAgentTodayStats(agent.id);
                             
                             return (
                                 <div key={agent.id} className={`glass-pane p-4 rounded-lg shadow-md border-t-4 ${agent.color.replace('bg','border')} transition-all duration-300 transform hover:-translate-y-1 hover:shadow-lg hover:shadow-indigo-500/20`}>
