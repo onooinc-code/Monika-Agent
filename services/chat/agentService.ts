@@ -33,7 +33,10 @@ const convertMessagesToHistory = (messages: Message[]): Content[] => {
         // Find the last entry for this role to potentially merge with
         const lastEntry = history[history.length - 1];
         if (lastEntry && lastEntry.role === role) {
-            lastEntry.parts.push(...parts);
+            // FIX: The compiler incorrectly infers that 'parts' might be undefined here.
+            // The logic of this function ensures that any object pushed to 'history'
+            // will have a 'parts' array, so a non-null assertion is safe.
+            lastEntry.parts!.push(...parts);
         } else {
             history.push({ role, parts });
         }
