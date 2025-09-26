@@ -1,4 +1,7 @@
 
+
+
+
 import { getGenAIClient } from '@/services/gemini/client';
 // FIX: Corrected import path for types to point to the barrel file.
 import { Message, AgentManager } from '@/types/index';
@@ -22,7 +25,7 @@ export const summarizeMessageChunk = async (messages: Message[], manager: AgentM
                 systemInstruction: "You are a summarization assistant.",
             }
         });
-        return response.text;
+        return response.text || "Summary could not be generated for this section.";
     } catch (error) {
         console.error("Error summarizing chunk:", error);
         // For chunks, we prefer to return a soft error message rather than failing the whole history view.

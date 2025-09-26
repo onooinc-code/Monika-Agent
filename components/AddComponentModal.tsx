@@ -1,8 +1,10 @@
+
 'use client';
 
 import React, { useState } from 'react';
 import { useAppContext } from '@/contexts/StateProvider';
 import { CloseIcon } from '@/components/Icons';
+// FIX: Corrected import path for types to point to the barrel file.
 import { CustomComponent } from '@/types/index';
 
 declare const Babel: any;
@@ -169,10 +171,11 @@ export const AddComponentModal: React.FC<AddComponentModalProps> = ({ isOpen, on
              setError('Component Name must be a valid JavaScript identifier (e.g., MyComponent).');
              return;
         }
-
+        
         try {
-            // Validate by transpiling with Babel.
+            // Attempt to transpile the code to validate JSX syntax
             Babel.transform(code, { presets: ['react'] }).code;
+
             onAddComponent({ name: name.trim(), category: category.trim(), code });
             playSound('success');
             onClose();
@@ -200,7 +203,7 @@ export const AddComponentModal: React.FC<AddComponentModalProps> = ({ isOpen, on
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                         <div>
                             <label className="block text-sm font-medium text-gray-300 mb-1">Component Name</label>
-                            <input type="text" value={name} onChange={e => setName(e.target.value)} className="w-full bg-black/20 border border-white/10 rounded-md p-2 text-white" placeholder="e.g., MusicPlayerCard" />
+                            <input type="text" value={name} onChange={e => setName(e.target.value)} className="w-full bg-black/20 border border-white/10 rounded-md p-2 text-white" placeholder="e.g., MyComponent" />
                         </div>
                         <div>
                             <label className="block text-sm font-medium text-gray-300 mb-1">Category</label>
@@ -209,7 +212,6 @@ export const AddComponentModal: React.FC<AddComponentModalProps> = ({ isOpen, on
                     </div>
                     <div>
                         <label className="block text-sm font-medium text-gray-300 mb-1">React JSX Code</label>
-                        <p className="text-xs text-white mb-2">The code must be a single functional component and have a `export default` statement.</p>
                         <textarea 
                             value={code} 
                             onChange={e => setCode(e.target.value)} 

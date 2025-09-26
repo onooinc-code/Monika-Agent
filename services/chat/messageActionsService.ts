@@ -1,4 +1,7 @@
 
+
+
+
 import { getGenAIClient } from '@/services/gemini/client';
 // FIX: Corrected import path for types to point to the barrel file.
 import { AgentManager } from '@/types/index';
@@ -19,7 +22,7 @@ export const summarizeMessage = async (text: string, manager: AgentManager, glob
                 systemInstruction: "You are a summarization assistant.",
             }
         });
-        return response.text.trim();
+        return (response.text || '').trim();
     } catch (error) {
         handleAndThrowError(error, 'summarizeMessage', prompt);
     }
@@ -40,7 +43,7 @@ export const rewritePrompt = async (prompt: string, manager: AgentManager, globa
                 systemInstruction: "You are an expert prompt engineer. You rewrite user prompts to be optimal for large language models.",
             }
         });
-        let rewritten = response.text.trim();
+        let rewritten = (response.text || '').trim();
         // Remove potential quotes around the response
         if (rewritten.startsWith('"') && rewritten.endsWith('"')) {
             rewritten = rewritten.substring(1, rewritten.length - 1);

@@ -10,7 +10,7 @@ The application's "Future World" aesthetic is built on glassmorphism, dark mode,
 
 ---
 
-## ✨ Key Features
+## ✨ Key Features (Client-Side v3.5.0 - Feature Complete)
 
 Monica is packed with features that make it a powerful and flexible platform for AI interaction.
 

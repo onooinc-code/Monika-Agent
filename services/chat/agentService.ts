@@ -1,5 +1,7 @@
 
 
+
+
 import { getGenAIClient } from '@/services/gemini/client';
 // FIX: Corrected import path for types to point to the barrel file.
 import { Agent, Message, Attachment, PipelineStep, LongTermMemoryData } from '@/types/index';
@@ -191,7 +193,7 @@ export const generateResponse = async (
             });
         } else {
             // No tool call, just a direct text response.
-            const text = response.text;
+            const text = response.text || '';
             onStream(text);
             fullText = text;
         }
@@ -209,7 +211,7 @@ export const generateResponse = async (
                         systemInstruction: "You are an expert at creating very brief summaries of your own writing for memory purposes. Respond with only the summary text.",
                     }
                 });
-                summary = summaryResult.text.trim();
+                summary = (summaryResult.text || '').trim();
                  pipeline.push({
                     stage: 'Self-Summarization',
                     input: `Text length: ${fullText.length}`,

@@ -1,3 +1,4 @@
+
 'use client';
 
 import React from 'react';
@@ -5,7 +6,7 @@ import { useAppContext } from '@/contexts/StateProvider';
 import { CloseIcon } from '@/components/Icons';
 import { renderCustomReactComponent } from '@/components/ComponentsGalleryModal';
 import { HtmlComponentPreview } from '@/components/HtmlComponentPreview';
-// FIX: Corrected import path to explicitly use the barrel file.
+// FIX: Corrected import path for types to point to the barrel file.
 import { HtmlComponent, CustomComponent } from '@/types/index';
 
 interface ComponentPreviewModalProps {

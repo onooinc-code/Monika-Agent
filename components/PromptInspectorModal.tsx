@@ -1,4 +1,6 @@
 
+
+
 import React from 'react';
 import { useAppContext } from '@/contexts/StateProvider';
 // FIX: Corrected import path for types to point to the barrel file.

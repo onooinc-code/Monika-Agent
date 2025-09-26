@@ -1,9 +1,10 @@
+
 'use client';
 
 import React, { useMemo, useState } from 'react';
 import { useAppContext } from '@/contexts/StateProvider';
 import { CloseIcon } from '@/components/Icons';
-// FIX: Corrected import path to explicitly use the barrel file.
+// FIX: Corrected import path for types to point to the barrel file.
 import { Message } from '@/types/index';
 import { safeRender } from '@/services/utils/safeRender';
 

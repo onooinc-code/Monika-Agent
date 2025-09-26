@@ -1,30 +1,27 @@
-
-import { useState, useEffect, useCallback } from 'react';
+import { useEffect, useCallback } from 'react';
 // FIX: Corrected import path for types to point to the barrel file.
 import { Conversation, AgentManager, Message } from '@/types/index';
 import * as TitleService from '@/services/analysis/titleService';
 import { isConversationArray } from '@/types/utils';
+import { useLocalStorage } from './useLocalStorage';
 
 export const useConversationManager = () => {
-    const [conversations, setConversations] = useState<Conversation[]>([]);
-    const [activeConversationId, setActiveConversationId] = useState<string | null>(null);
+    const [conversations, setConversations] = useLocalStorage<Conversation[]>('conversations', []);
+    const [activeConversationId, setActiveConversationId] = useLocalStorage<string | null>('activeConversationId', null);
     
     const activeConversation = conversations.find(c => c.id === activeConversationId) || null;
 
     useEffect(() => {
         const activeConvExists = activeConversationId ? conversations.some(c => c.id === activeConversationId) : false;
 
-        // If the active conversation doesn't exist (or isn't set), find a new one.
         if (!activeConvExists) {
             if (conversations.length > 0) {
-                // Set the first valid conversation as active.
                 setActiveConversationId(conversations[0].id);
             } else if (activeConversationId !== null) {
-                // If no conversations exist, clear the active ID.
                 setActiveConversationId(null);
             }
         }
-    }, [conversations, activeConversationId]);
+    }, [conversations, activeConversationId, setActiveConversationId]);
 
 
     const handleNewConversation = useCallback(() => {
@@ -47,7 +44,7 @@ export const useConversationManager = () => {
         };
         setConversations(prev => [newConversation, ...prev]);
         setActiveConversationId(newConversation.id);
-    }, []);
+    }, [setConversations, setActiveConversationId]);
 
     const handleDeleteConversation = useCallback((conversationId: string) => {
         setConversations(prev => {
@@ -57,15 +54,15 @@ export const useConversationManager = () => {
             }
             return newConversations;
         });
-    }, [activeConversationId]);
+    }, [activeConversationId, setConversations, setActiveConversationId]);
 
     const handleSelectConversation = useCallback((conversationId: string) => {
         setActiveConversationId(conversationId);
-    }, []);
+    }, [setActiveConversationId]);
     
     const handleUpdateConversation = useCallback((conversationId: string, updates: Partial<Conversation>) => {
         setConversations(prev => prev.map(c => c.id === conversationId ? { ...c, ...updates } : c));
-    }, []);
+    }, [setConversations]);
 
     const handleUpdateConversationTitle = useCallback((conversationId: string, title: string) => {
         handleUpdateConversation(conversationId, { title });
@@ -129,116 +126,98 @@ export const useConversationManager = () => {
 
             } catch (error) {
                 console.error("Failed to import conversations:", error);
-                alert(`Import failed: ${(error as Error).message}`);
+                const message = (error instanceof Error) ? error.message : "An unknown error occurred during import.";
+                alert(`Import Failed: ${message}`);
             }
         };
-        reader.onerror = () => {
-             alert("An error occurred while reading the file.");
-        }
         reader.readAsText(file);
-    }, []);
+    }, [setConversations]);
 
     const handleToggleMessageBookmark = useCallback((messageId: string) => {
-        setConversations(prevConversations => {
-            const activeId = activeConversationId;
-            if (!activeId) return prevConversations;
-            return prevConversations.map(conv => {
-                if (conv.id !== activeId) return conv;
-                const updatedMessages = conv.messages.map(msg =>
-                    msg.id === messageId ? { ...msg, isBookmarked: !msg.isBookmarked } : msg
-                );
-                return { ...conv, messages: updatedMessages };
-            });
-        });
-    }, [activeConversationId]);
-    
+        if (!activeConversation) return;
+        const updatedMessages = activeConversation.messages.map(m => 
+            m.id === messageId ? { ...m, isBookmarked: !m.isBookmarked } : m
+        );
+        handleUpdateConversation(activeConversation.id, { messages: updatedMessages });
+    }, [activeConversation, handleUpdateConversation]);
+
     const handleDeleteMessage = useCallback((messageId: string) => {
-        if (!window.confirm('Are you sure you want to delete this message? This action cannot be undone.')) {
-            return;
-        }
-        setConversations(prevConversations => {
-            const activeId = activeConversationId;
-            if (!activeId) return prevConversations;
-            return prevConversations.map(conv => {
-                if (conv.id !== activeId) return conv;
-                const updatedMessages = conv.messages.filter(msg => msg.id !== messageId);
-                return { ...conv, messages: updatedMessages };
-            });
-        });
-    }, [activeConversationId]);
-    
+        if (!activeConversation) return;
+        if (!window.confirm('Are you sure you want to delete this message? This cannot be undone.')) return;
+        const updatedMessages = activeConversation.messages.filter(m => m.id !== messageId);
+        handleUpdateConversation(activeConversation.id, { messages: updatedMessages });
+    }, [activeConversation, handleUpdateConversation]);
+
     const handleToggleMessageEdit = useCallback((messageId: string) => {
-        setConversations(prevConversations => {
-            const activeId = activeConversationId;
-            if (!activeId) return prevConversations;
-            return prevConversations.map(conv => {
-                if (conv.id !== activeId) return conv;
-                const updatedMessages = conv.messages.map(msg => ({
-                    ...msg,
-                    isEditing: msg.id === messageId ? !msg.isEditing : false,
-                }));
-                return { ...conv, messages: updatedMessages };
-            });
-        });
-    }, [activeConversationId]);
-    
+         if (!activeConversation) return;
+        const updatedMessages = activeConversation.messages.map(m => 
+            m.id === messageId ? { ...m, isEditing: !m.isEditing } : { ...m, isEditing: false }
+        );
+        handleUpdateConversation(activeConversation.id, { messages: updatedMessages });
+    }, [activeConversation, handleUpdateConversation]);
+
     const handleUpdateMessageText = useCallback((messageId: string, newText: string) => {
-        setConversations(prevConversations => {
-            const activeId = activeConversationId;
-            if (!activeId) return prevConversations;
-            return prevConversations.map(conv => {
-                if (conv.id !== activeId) return conv;
-                const updatedMessages = conv.messages.map(msg =>
-                    msg.id === messageId ? { ...msg, text: newText, isEditing: false } : msg
-                );
-                return { ...conv, messages: updatedMessages };
-            });
-        });
-    }, [activeConversationId]);
+         if (!activeConversation) return;
+        const updatedMessages = activeConversation.messages.map(m => 
+            m.id === messageId ? { ...m, text: newText, isEditing: false } : m
+        );
+        handleUpdateConversation(activeConversation.id, { messages: updatedMessages });
+    }, [activeConversation, handleUpdateConversation]);
 
-    const handleChangeAlternativeResponse = useCallback((messageId: string, direction: 'next' | 'prev') => {
-        setConversations(prevConversations => {
-            const activeId = activeConversationId;
-            if (!activeId) return prevConversations;
-            return prevConversations.map(conv => {
-                if (conv.id !== activeId) return conv;
-                const updatedMessages = conv.messages.map(msg => {
-                    if (msg.id !== messageId) return msg;
-
-                    const totalAlternatives = msg.alternatives?.length ?? 0;
-                    let currentIndex = msg.activeAlternativeIndex ?? -1;
-
-                    if (direction === 'next') {
-                        currentIndex = Math.min(currentIndex + 1, totalAlternatives - 1);
-                    } else {
-                        currentIndex = Math.max(currentIndex - 1, -1);
-                    }
-                    return { ...msg, activeAlternativeIndex: currentIndex };
-                });
-                return { ...conv, messages: updatedMessages };
-            });
-        });
-    }, [activeConversationId]);
-    
     const handleAppendToMessageText = useCallback((conversationId: string, messageId: string, textChunk: string) => {
-        setConversations(prevConversations => prevConversations.map(conv => {
-            if (conv.id !== conversationId) return conv;
-            const updatedMessages = conv.messages.map(msg => 
-                msg.id === messageId ? { ...msg, text: (msg.text || '') + textChunk } : msg
-            );
-            return { ...conv, messages: updatedMessages };
+        setConversations(prev => prev.map(c => {
+            if (c.id === conversationId) {
+                const messages = c.messages.map(m => {
+                    if (m.id === messageId) {
+                        return { ...m, text: m.text + textChunk, isStreaming: true };
+                    }
+                    return m;
+                });
+                return { ...c, messages };
+            }
+            return c;
         }));
-    }, []);
+    }, [setConversations]);
 
     const handleFinalizeMessage = useCallback((conversationId: string, messageId: string, finalMessageData: Partial<Message>) => {
-        setConversations(prevConversations => prevConversations.map(conv => {
-            if (conv.id !== conversationId) return conv;
-            const updatedMessages = conv.messages.map(msg =>
-                msg.id === messageId ? { ...msg, ...finalMessageData } : msg
-            );
-            return { ...conv, messages: updatedMessages };
+        setConversations(prev => prev.map(c => {
+            if (c.id === conversationId) {
+                const messages = c.messages.map(m => {
+                    if (m.id === messageId) {
+                        return { ...m, ...finalMessageData, isStreaming: false };
+                    }
+                    return m;
+                });
+                return { ...c, messages };
+            }
+            return c;
         }));
-    }, []);
+    }, [setConversations]);
+
+    const handleChangeAlternativeResponse = useCallback((messageId: string, direction: 'next' | 'prev') => {
+        if (!activeConversation) return;
+        
+        const updatedMessages = activeConversation.messages.map(m => {
+            if (m.id === messageId && m.alternatives && m.alternatives.length > 0) {
+                let currentIndex = m.activeAlternativeIndex ?? -1;
+                let nextIndex;
+                
+                if (direction === 'next') {
+                    nextIndex = currentIndex + 1;
+                    if (nextIndex >= m.alternatives.length) nextIndex = m.alternatives.length - 1; // Cap at the end
+                } else { // 'prev'
+                    nextIndex = currentIndex - 1;
+                    if (nextIndex < -1) nextIndex = -1; // Cap at original
+                }
+                
+                return { ...m, activeAlternativeIndex: nextIndex };
+            }
+            return m;
+        });
+
+        handleUpdateConversation(activeConversation.id, { messages: updatedMessages });
+
+    }, [activeConversation, handleUpdateConversation]);
 
     return {
         conversations,

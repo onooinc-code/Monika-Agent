@@ -1,7 +1,8 @@
+
 'use client';
 
 import React, { useState } from 'react';
-// FIX: Corrected import path to explicitly use the barrel file.
+// FIX: Corrected import path for types to point to the barrel file.
 import { Conversation, ConversationMode } from '@/types/index';
 import { NavTabs } from '@/components/NavTabs';
 import { ConversationTitle } from '@/components/ConversationTitle';

@@ -1,4 +1,7 @@
 
+
+
+
 import { getGenAIClient } from '@/services/gemini/client';
 // FIX: Corrected import path for types to point to the barrel file.
 import { Message, AgentManager } from '@/types/index';
@@ -26,7 +29,7 @@ export const generateConversationTitle = async (messages: Message[], manager: Ag
             }
         });
         
-        let title = response.text.trim();
+        let title = (response.text || '').trim();
         if (title.startsWith('"') && title.endsWith('"')) {
             title = title.substring(1, title.length - 1);
         }

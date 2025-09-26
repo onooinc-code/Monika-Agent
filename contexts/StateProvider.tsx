@@ -1,4 +1,3 @@
-
 'use client';
 
 import React, { createContext, useContext, useRef, useCallback, useState } from 'react';
@@ -15,6 +14,7 @@ import { useSoundManager } from '@/contexts/hooks/useSoundManager';
 import * as MemoryService from '@/services/analysis/memoryService';
 import { ActionModalState, ContextMenuState } from '@/contexts/hooks/useModalManager';
 import * as AgentConstants from '@/constants/agentConstants';
+import { useLocalStorage } from './hooks/useLocalStorage';
 
 interface AppState {
     agents: Agent[];
@@ -210,18 +210,18 @@ interface AppState {
 const AppContext = createContext<AppState | undefined>(undefined);
 
 export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-    // 1. Core state and settings managed in memory with useState
-    const [agents, setAgents] = useState<Agent[]>(AgentConstants.DEFAULT_AGENTS);
-    const [agentManager, setAgentManager] = useState<AgentManager>(AgentConstants.DEFAULT_AGENT_MANAGER);
-    const [conversationMode, setConversationMode] = useState<ConversationMode>('Dynamic');
-    const [sendOnEnter, setSendOnEnter] = useState<boolean>(true);
-    const [isSoundEnabled, setIsSoundEnabled] = useState<boolean>(true);
-    const [globalApiKey, setGlobalApiKey] = useState<string>(process.env.API_KEY || '');
-    const [agentBubbleSettings, setAgentBubbleSettings] = useState<BubbleSettings>({ alignment: 'left', scale: 1, textDirection: 'ltr', fontSize: 1 });
-    const [userBubbleSettings, setUserBubbleSettings] = useState<BubbleSettings>({ alignment: 'right', scale: 1, textDirection: 'ltr', fontSize: 1 });
-    const [customComponents, setCustomComponents] = useState<CustomComponent[]>([]);
-    const [customHtmlComponents, setCustomHtmlComponents] = useState<HtmlComponent[]>([]);
-    const [conversionType, setConversionType] = useState<ConversionType>('Multi');
+    // 1. Core state and settings managed in memory with useLocalStorage for persistence
+    const [agents, setAgents] = useLocalStorage<Agent[]>('agents', AgentConstants.DEFAULT_AGENTS);
+    const [agentManager, setAgentManager] = useLocalStorage<AgentManager>('agentManager', AgentConstants.DEFAULT_AGENT_MANAGER);
+    const [conversationMode, setConversationMode] = useLocalStorage<ConversationMode>('conversationMode', 'Dynamic');
+    const [sendOnEnter, setSendOnEnter] = useLocalStorage<boolean>('sendOnEnter', true);
+    const [isSoundEnabled, setIsSoundEnabled] = useLocalStorage<boolean>('isSoundEnabled', true);
+    const [globalApiKey, setGlobalApiKey] = useLocalStorage<string>('globalApiKey', process.env.API_KEY || '');
+    const [agentBubbleSettings, setAgentBubbleSettings] = useLocalStorage<BubbleSettings>('agentBubbleSettings', { alignment: 'left', scale: 1, textDirection: 'ltr', fontSize: 1 });
+    const [userBubbleSettings, setUserBubbleSettings] = useLocalStorage<BubbleSettings>('userBubbleSettings', { alignment: 'right', scale: 1, textDirection: 'ltr', fontSize: 1 });
+    const [customComponents, setCustomComponents] = useLocalStorage<CustomComponent[]>('customComponents', []);
+    const [customHtmlComponents, setCustomHtmlComponents] = useLocalStorage<HtmlComponent[]>('customHtmlComponents', []);
+    const [conversionType, setConversionType] = useLocalStorage<ConversionType>('conversionType', 'Multi');
     
     // 2. Refs & Local State
     const messagesEndRef = useRef<HTMLDivElement>(null);

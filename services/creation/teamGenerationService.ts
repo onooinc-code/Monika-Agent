@@ -1,4 +1,6 @@
 
+
+
 import { getGenAIClient } from '@/services/gemini/client';
 // FIX: Corrected import path for types to point to the barrel file.
 import { Agent, TeamComponent } from '@/types/index';
@@ -29,7 +31,7 @@ export const generateTeamPrompt = async (topic: string, goal: string, globalApiK
                 systemInstruction: "You are an expert in designing prompts for AI agent team generation.",
             }
         });
-        return response.text.trim();
+        return (response.text || '').trim();
     } catch (error) {
         handleAndThrowError(error, 'generateTeamPrompt', prompt);
     }

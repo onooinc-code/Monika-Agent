@@ -1,6 +1,5 @@
-
-// FIX: Removed useLocalStorage import as it is deprecated.
-import { useState } from 'react';
+// FIX: Restored useLocalStorage to ensure data persistence.
+import { useLocalStorage } from './useLocalStorage';
 // FIX: Corrected import path for types to point to the barrel file.
 import { UsageMetrics } from '@/types/index';
 
@@ -13,8 +12,8 @@ const getTodayDateString = (): string => {
 };
 
 export const useUsageTracker = () => {
-    // FIX: Replaced useLocalStorage with useState for in-memory state management.
-    const [usageMetrics, setUsageMetrics] = useState<UsageMetrics>({
+    // FIX: Replaced useState with useLocalStorage to fix data loss on refresh.
+    const [usageMetrics, setUsageMetrics] = useLocalStorage<UsageMetrics>('usageMetrics', {
         totalTokens: 0,
         totalRequests: 0,
         dailyUsage: [],
