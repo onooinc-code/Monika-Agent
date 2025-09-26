@@ -1,7 +1,8 @@
 'use client';
 
 import React from 'react';
-import { Message } from '@/types';
+// FIX: Corrected the import path for types to point to the barrel file.
+import { Message } from '@/types/index';
 import { Spinner } from '@/components/Spinner';
 import { useAppContext } from '@/contexts/StateProvider';
 import { CloseIcon } from '@/components/Icons';

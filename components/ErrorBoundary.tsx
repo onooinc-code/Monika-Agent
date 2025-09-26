@@ -13,18 +13,22 @@ interface State {
 }
 
 class ErrorBoundary extends Component<Props, State> {
-  public state: State = {
-    hasError: false,
-    error: undefined,
-    errorInfo: undefined,
-  };
+  // FIX: Replaced public state field with a constructor to ensure `this` context for props and state is correctly initialized.
+  constructor(props: Props) {
+    super(props);
+    this.state = {
+      hasError: false,
+      error: undefined,
+      errorInfo: undefined,
+    };
+  }
 
-  public static getDerivedStateFromError(_: Error): State {
+  public static getDerivedStateFromError(error: Error): State {
     // Update state so the next render will show the fallback UI.
-    return { 
-        hasError: true,
-        error: _,
-        errorInfo: undefined 
+    return {
+      hasError: true,
+      error: error,
+      errorInfo: undefined,
     };
   }
 

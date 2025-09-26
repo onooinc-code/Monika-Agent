@@ -1,7 +1,8 @@
 'use client';
 
 import React, { createContext, useContext, useRef, useCallback, useState } from 'react';
-import { Agent, AgentManager, ConversationMode, Attachment, ManualSuggestion, HistoryView, Conversation, PipelineStep, UsageMetrics, Message, LongTermMemoryData, BubbleSettings, ContextMenuItem, SoundEvent, CustomComponent, HtmlComponent, ConversionType } from '@/types';
+// FIX: Corrected the import path for types to point to the barrel file.
+import { Agent, AgentManager, ConversationMode, Attachment, ManualSuggestion, HistoryView, Conversation, PipelineStep, UsageMetrics, Message, LongTermMemoryData, BubbleSettings, ContextMenuItem, SoundEvent, CustomComponent, HtmlComponent, ConversionType } from '@/types/index';
 import { useConversationManager } from '@/contexts/hooks/useConversationManager';
 import { useChatHandler, LoadingStage } from '@/contexts/hooks/useChatHandler';
 import { useHistoryHandler } from '@/contexts/hooks/useHistoryHandler';
@@ -474,9 +475,131 @@ export default ${newReactComponentName};
         handleGenerateTitle,
         handleExportConversations: conversationManager.handleExportConversations,
         handleImportConversations: conversationManager.handleImportConversations,
+        handleToggleMessageBookmark: conversationManager.handleToggleMessageBookmark,
+        handleDeleteMessage: conversationManager.handleDeleteMessage,
+        handleToggleMessageEdit: conversationManager.handleToggleMessageEdit,
+        handleUpdateMessageText: conversationManager.handleUpdateMessageText,
+        handleChangeAlternativeResponse: conversationManager.handleChangeAlternativeResponse,
+        handleAppendToMessageText: conversationManager.handleAppendToMessageText,
+        handleFinalizeMessage: conversationManager.handleFinalizeMessage,
 
         // From useChatHandler & combined loading state
         isLoading,
         loadingStage: chatHandler.loadingStage,
         manualSuggestions: chatHandler.manualSuggestions,
-        handleSendMessage: chatHandler.handleSendMessage
+        handleSendMessage: chatHandler.handleSendMessage,
+        handleManualSelection: chatHandler.handleManualSelection,
+        handleSummarizeMessage: chatHandler.handleSummarizeMessage,
+        handleRewritePrompt: chatHandler.handleRewritePrompt,
+        handleRegenerateResponse: chatHandler.handleRegenerateResponse,
+        
+        // From useHistoryHandler
+        historyView: historyHandler.historyView,
+        handleShowHistory,
+        
+        // From useModalManager & wrappers
+        isSettingsOpen: modalManager.isSettingsOpen,
+        setIsSettingsOpen,
+        isHistoryOpen: modalManager.isHistoryOpen,
+        setIsHistoryOpen,
+        isConversationSettingsOpen: modalManager.isConversationSettingsOpen,
+        setIsConversationSettingsOpen,
+        isHtmlPreviewOpen: modalManager.isHtmlPreviewOpen,
+        htmlPreviewContent: modalManager.htmlPreviewContent,
+        handleShowHtmlPreview: modalManager.handleShowHtmlPreview,
+        handleCloseHtmlPreview: modalManager.handleCloseHtmlPreview,
+        actionModalState: modalManager.actionModalState,
+        closeActionModal: modalManager.closeActionModal,
+        isInspectorOpen: modalManager.isInspectorOpen,
+        inspectorData: modalManager.inspectorData,
+        openInspectorModal: modalManager.openInspectorModal,
+        closeInspectorModal: modalManager.closeInspectorModal,
+        isPromptInspectorOpen: modalManager.isPromptInspectorOpen,
+        promptInspectorData: modalManager.promptInspectorData,
+        openPromptInspectorModal: modalManager.openPromptInspectorModal,
+        closePromptInspectorModal: modalManager.closePromptInspectorModal,
+        contextMenuState: modalManager.contextMenuState,
+        openContextMenu: modalManager.openContextMenu,
+        closeContextMenu: modalManager.closeContextMenu,
+        isAgentSettingsModalOpen: modalManager.isAgentSettingsModalOpen,
+        selectedAgentForModal: modalManager.selectedAgentForModal,
+        openAgentSettingsModal,
+        closeAgentSettingsModal,
+        isDeveloperInfoOpen: modalManager.isDeveloperInfoOpen,
+        setIsDeveloperInfoOpen,
+        isComponentsGalleryOpen: modalManager.isComponentsGalleryOpen,
+        setIsComponentsGalleryOpen,
+        isAddComponentModalOpen: modalManager.isAddComponentModalOpen,
+        setIsAddComponentModalOpen,
+        isAddHtmlComponentModalOpen: modalManager.isAddHtmlComponentModalOpen,
+        setIsAddHtmlComponentModalOpen,
+        isEditHtmlComponentModalOpen: modalManager.isEditHtmlComponentModalOpen,
+        editingHtmlComponent: modalManager.editingHtmlComponent,
+        openEditHtmlComponentModal,
+        closeEditHtmlComponentModal,
+        isEditComponentModalOpen: modalManager.isEditComponentModalOpen,
+        editingComponent: modalManager.editingComponent,
+        openEditComponentModal,
+        closeEditComponentModal,
+        isComponentPreviewOpen: modalManager.isComponentPreviewOpen,
+        componentToPreview: modalManager.componentToPreview,
+        previewBackground: modalManager.previewBackground,
+        openComponentPreviewModal,
+        closeComponentPreviewModal,
+        isConversionTypeModalOpen: modalManager.isConversionTypeModalOpen,
+        setIsConversionTypeModalOpen,
+
+        // From useUsageTracker
+        usageMetrics: usageTracker.usageMetrics,
+        logUsage: usageTracker.logUsage,
+        isAgentStatsOpen: modalManager.isAgentStatsOpen,
+        setIsAgentStatsOpen,
+        isTeamGeneratorOpen: modalManager.isTeamGeneratorOpen,
+        setIsTeamGeneratorOpen,
+        isApiUsageOpen: modalManager.isApiUsageOpen,
+        setIsApiUsageOpen,
+        isArchiveOpen: modalManager.isArchiveOpen,
+        setIsArchiveOpen,
+        isBookmarksPanelOpen: modalManager.isBookmarksPanelOpen,
+        setIsBookmarksPanelOpen,
+
+        // From useMemoryManager
+        longTermMemory: memoryManager.longTermMemory,
+        setLongTermMemory: memoryManager.setLongTermMemory,
+        clearMemory: memoryManager.clearMemory,
+        handleExtractAndUpdateMemory,
+
+        // UI Prefs & Bubble settings
+        agentBubbleSettings,
+        setAgentBubbleSettings,
+        userBubbleSettings,
+        setUserBubbleSettings,
+        isPermanentlyVisible: uiPrefsManager.isPermanentlyVisible,
+        togglePermanentVisibility: uiPrefsManager.togglePermanentVisibility,
+        
+        // Agent Management
+        handleToggleAgentEnabled,
+        lastTurnAgentIds,
+        handleUpdateSingleAgent,
+        handleUpdateAgentManager,
+
+        // Custom Components
+        customComponents,
+        setCustomComponents,
+        customHtmlComponents,
+        setCustomHtmlComponents,
+        handleUpdateHtmlComponent,
+        handleUpdateCustomComponent,
+        handleConvertToReactComponent,
+    };
+
+    return <AppContext.Provider value={value}>{children}</AppContext.Provider>;
+};
+
+export const useAppContext = () => {
+    const context = useContext(AppContext);
+    if (context === undefined) {
+        throw new Error('useAppContext must be used within an AppProvider');
+    }
+    return context;
+};

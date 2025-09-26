@@ -1,7 +1,8 @@
 'use client';
 
 import React, { useState, useRef } from "react";
-import { Attachment } from "@/types";
+// FIX: Corrected the import path for types to point to the barrel file.
+import { Attachment } from "@/types/index";
 import { useAppContext } from "@/contexts/StateProvider";
 import { ProfileActions } from "@/components/ProfileActions";
 

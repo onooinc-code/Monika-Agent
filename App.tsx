@@ -23,7 +23,8 @@ import { BookmarkedMessagesPanel } from '@/components/BookmarkedMessagesPanel';
 import { MessageArchiveModal } from '@/components/MessageArchiveModal';
 import { ContextMenu } from '@/components/ContextMenu';
 import { ConversationSubHeader } from '@/components/ConversationSubHeader';
-import { ContextMenuItem } from '@/types';
+// FIX: Corrected the import path for types to point to the barrel file.
+import { ContextMenuItem } from '@/types/index';
 import { PlusIcon, SettingsIcon, AlignLeftIcon } from '@/components/Icons';
 import { AgentSettingsModal } from '@/components/AgentSettingsModal';
 import { DeveloperInfoModal } from '@/components/DeveloperInfoModal';
