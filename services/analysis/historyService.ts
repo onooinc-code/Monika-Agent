@@ -62,6 +62,10 @@ export async function generateOverallSummaryAndTopics(messages: Message[], manag
         });
 
         responseText = response.text;
+        if (!responseText) {
+            throw new Error('The AI model returned an empty response for the summary and topics generation.');
+        }
+        
         const json = JSON.parse(responseText);
 
         if (typeof json !== 'object' || json === null) {
