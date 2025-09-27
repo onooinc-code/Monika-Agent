@@ -1,7 +1,6 @@
-
 'use client';
 
-import React, { createContext, useContext, useRef, useCallback, useState, useMemo } from 'react';
+import React, { createContext, useContext, useRef, useCallback, useMemo } from 'react';
 // FIX: Corrected import path for types to point to the barrel file.
 import { Agent, AgentManager, ConversationMode, Attachment, ManualSuggestion, HistoryView, Conversation, PipelineStep, UsageMetrics, Message, LongTermMemoryData, BubbleSettings, ContextMenuItem, SoundEvent, CustomComponent, HtmlComponent, ConversionType, LiveHandlerState } from '@/types/index';
 import { useConversationManager } from '@/contexts/hooks/useConversationManager';
@@ -204,10 +203,13 @@ interface AppState extends LiveHandlerState {
     isConversionTypeModalOpen: boolean;
     setIsConversionTypeModalOpen: (isOpen: boolean) => void;
 
-
     // UI Preferences
     isPermanentlyVisible: (id: string) => boolean;
     togglePermanentVisibility: (id: string) => void;
+
+    // Header visibility
+    isHeaderExpanded: boolean;
+    setIsHeaderExpanded: React.Dispatch<React.SetStateAction<boolean>>;
 }
 
 const AppContext = createContext<AppState | undefined>(undefined);
@@ -225,11 +227,12 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     const [customComponents, setCustomComponents] = useLocalStorage<CustomComponent[]>('customComponents', []);
     const [customHtmlComponents, setCustomHtmlComponents] = useLocalStorage<HtmlComponent[]>('customHtmlComponents', []);
     const [conversionType, setConversionType] = useLocalStorage<ConversionType>('conversionType', 'Multi');
+    const [isHeaderExpanded, setIsHeaderExpanded] = useLocalStorage('isHeaderExpanded', true);
     
     // 2. Refs & Local State
     const messagesEndRef = useRef<HTMLDivElement>(null);
-    const [isExtractingMemory, setIsExtractingMemory] = useState(false);
-    const [lastTurnAgentIds, setLastTurnAgentIds] = useState<Set<string>>(new Set());
+    const [isExtractingMemory, setIsExtractingMemory] = React.useState(false);
+    const [lastTurnAgentIds, setLastTurnAgentIds] = React.useState<Set<string>>(new Set());
 
     // 3. Custom Hooks for logic domains
     const { playSound } = useSoundManager({ isSoundEnabled });
@@ -257,7 +260,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     }, [usageTracker.usageMetrics.agentUsage]);
 
     const chatHandler = useChatHandler({
-        agents: enabledAgents, // Pass only enabled agents for decision-making
+        agents: enabledAgents,
         agentManager,
         globalApiKey,
         activeConversation: conversationManager.activeConversation,
@@ -274,7 +277,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     });
     
     // 4. Combined loading state for UI components
-    const [isGeneratingTitle, setIsGeneratingTitle] = useState(false);
+    const [isGeneratingTitle, setIsGeneratingTitle] = React.useState(false);
     const isLoading = chatHandler.isChatLoading || historyHandler.isGeneratingHistory || isExtractingMemory || isGeneratingTitle;
 
     // 5. Callback functions that bridge hooks or components
@@ -435,7 +438,6 @@ export default ${newReactComponentName};
         modalManager.closeComponentPreviewModal();
     }, [playSound, modalManager.closeComponentPreviewModal]);
 
-
     const openAgentSettingsModal = useCallback((agent: Agent | AgentManager) => {
         playSound('open');
         modalManager.openAgentSettingsModal(agent);
@@ -451,6 +453,24 @@ export default ${newReactComponentName};
             await historyHandler.handleShowHistory(conversationManager.activeConversation, agentManager, globalApiKey);
         }
     }, [conversationManager.activeConversation, agentManager, globalApiKey, historyHandler, setIsHistoryOpen]);
+
+    // Wrapped functions for header control
+    const handleSendMessage = useCallback(async (text: string, attachment?: Attachment) => {
+        if (isHeaderExpanded) {
+            setIsHeaderExpanded(false);
+        }
+        await chatHandler.handleSendMessage(text, attachment);
+    }, [chatHandler, isHeaderExpanded, setIsHeaderExpanded]);
+
+    const handleSelectConversation = useCallback((conversationId: string) => {
+        conversationManager.handleSelectConversation(conversationId);
+        setIsHeaderExpanded(true);
+    }, [conversationManager.handleSelectConversation, setIsHeaderExpanded]);
+
+    const handleNewConversation = useCallback(() => {
+        conversationManager.handleNewConversation();
+        setIsHeaderExpanded(true);
+    }, [conversationManager.handleNewConversation, setIsHeaderExpanded]);
     
     const value: AppState = {
         // Core state
@@ -475,13 +495,13 @@ export default ${newReactComponentName};
         conversionType,
         setConversionType,
         
-        // From useConversationManager
+        // From useConversationManager, with some overridden by wrappers
         conversations: conversationManager.conversations.map(c => ({...c, isGeneratingTitle: c.id === conversationManager.activeConversationId && isGeneratingTitle})),
         activeConversationId: conversationManager.activeConversationId,
         activeConversation: conversationManager.activeConversation ? { ...conversationManager.activeConversation, isGeneratingTitle } : null,
-        handleNewConversation: conversationManager.handleNewConversation,
+        handleNewConversation,
         handleDeleteConversation: conversationManager.handleDeleteConversation,
-        handleSelectConversation: conversationManager.handleSelectConversation,
+        handleSelectConversation,
         handleUpdateConversation: conversationManager.handleUpdateConversation,
         handleUpdateConversationTitle: conversationManager.handleUpdateConversationTitle,
         handleGenerateTitle,
@@ -495,11 +515,11 @@ export default ${newReactComponentName};
         handleAppendToMessageText: conversationManager.handleAppendToMessageText,
         handleFinalizeMessage: conversationManager.handleFinalizeMessage,
 
-        // From useChatHandler & combined loading state
+        // From useChatHandler, with some overridden by wrappers
         isLoading,
         loadingStage: chatHandler.loadingStage,
         manualSuggestions: chatHandler.manualSuggestions,
-        handleSendMessage: chatHandler.handleSendMessage,
+        handleSendMessage,
         handleManualSelection: chatHandler.handleManualSelection,
         handleSummarizeMessage: chatHandler.handleSummarizeMessage,
         handleRewritePrompt: chatHandler.handleRewritePrompt,
@@ -607,6 +627,10 @@ export default ${newReactComponentName};
         handleUpdateHtmlComponent,
         handleUpdateCustomComponent,
         handleConvertToReactComponent,
+
+        // Header visibility
+        isHeaderExpanded,
+        setIsHeaderExpanded,
     };
 
     return <AppContext.Provider value={value}>{children}</AppContext.Provider>;

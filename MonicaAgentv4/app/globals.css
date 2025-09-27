@@ -120,6 +120,34 @@ body {
   transform: translateY(0) scale(1);
 }
 
+@keyframes modal-pop-in {
+  0% {
+    opacity: 0;
+    transform: scale(0.8) rotate(-5deg);
+  }
+  70% {
+    opacity: 1;
+    transform: scale(1.05) rotate(2deg);
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1) rotate(0deg);
+  }
+}
+.conversion-type-modal.open .modal-content {
+  animation: modal-pop-in 0.4s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+}
+
+@keyframes animated-border-glow {
+  0% { box-shadow: 0 0 15px rgba(34, 211, 238, 0.2), 0 0 5px rgba(34, 211, 238, 0.4) inset; }
+  50% { box-shadow: 0 0 30px rgba(34, 211, 238, 0.5), 0 0 10px rgba(34, 211, 238, 0.6) inset; }
+  100% { box-shadow: 0 0 15px rgba(34, 211, 238, 0.2), 0 0 5px rgba(34, 211, 238, 0.4) inset; }
+}
+.conversion-type-modal-pane {
+  animation: animated-border-glow 3s ease-in-out infinite;
+  border-color: var(--color-neon-cyan);
+}
+
 /* Glassmorphism & Neon Effects */
 .glass-pane {
   background-color: var(--color-pane);

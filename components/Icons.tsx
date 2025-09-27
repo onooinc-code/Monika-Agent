@@ -16,6 +16,7 @@ export { BookmarkIcon } from './icons/BookmarkIcon';
 export { ChartBarIcon as StatsIcon } from './icons/ChartBarIcon';
 export { CheckIcon } from './icons/CheckIcon';
 export { ChevronDownIcon } from './icons/ChevronDownIcon';
+export { ChevronUpIcon } from './icons/ChevronUpIcon';
 export { ClipboardListIcon as PlanIcon } from './icons/ClipboardListIcon';
 export { CloseIcon } from './icons/CloseIcon';
 export { CodeBracketIcon as CodeIcon } from './icons/CodeBracketIcon';

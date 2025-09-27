@@ -1,4 +1,3 @@
-
 'use client';
 
 import React from "react";
@@ -149,31 +148,33 @@ export const Header: React.FC<{
   toggleSidebar: () => void;
   sidebarAnimationState: 'idle' | 'slow' | 'fast';
 }> = ({ isSidebarOpen, toggleSidebar, sidebarAnimationState }) => {
-  const { agents, agentManager } = useAppContext();
+  const { agents, agentManager, isHeaderExpanded } = useAppContext();
 
   return (
-    <header className="AppHeader p-2 flex items-stretch gap-4 z-20 h-[30vh] xl:h-[20vh] flex-shrink-0">
-        <div className="HeaderLeftSection flex aspect-square">
-            <HeaderLeftActions />
-        </div>
-        <div className="HeaderCenterSection flex-1 min-w-0 flex flex-col gap-2">
-            <div className="h-[30%]">
-                <TitleBar />
+    <header className={`AppHeader flex-shrink-0 transition-all duration-500 ease-in-out overflow-hidden ${isHeaderExpanded ? 'max-h-[30vh] p-2' : 'max-h-0 p-0'}`}>
+        <div className={`flex items-stretch gap-4 w-full h-[calc(30vh-1rem)] xl:h-[calc(20vh-1rem)] transition-opacity duration-300 ${isHeaderExpanded ? 'opacity-100' : 'opacity-0 pointer-events-none'}`}>
+            <div className="HeaderLeftSection flex aspect-square">
+                <HeaderLeftActions />
             </div>
-            <div className="h-[70%]">
-                <div className="HeaderCardsContainer grid grid-cols-2 md:grid-cols-4 gap-2 min-w-0 h-full">
-                    <ManagerCard manager={agentManager} />
-                    {agents.map((agent) => (
-                      <AgentCard key={agent.id} agent={agent} />
-                    ))}
+            <div className="HeaderCenterSection flex-1 min-w-0 flex flex-col gap-2">
+                <div className="h-[30%]">
+                    <TitleBar />
+                </div>
+                <div className="h-[70%]">
+                    <div className="HeaderCardsContainer grid grid-cols-2 md:grid-cols-4 gap-2 min-w-0 h-full">
+                        <ManagerCard manager={agentManager} />
+                        {agents.map((agent) => (
+                          <AgentCard key={agent.id} agent={agent} />
+                        ))}
+                    </div>
                 </div>
             </div>
-        </div>
-        <div className="HeaderRightSection flex aspect-square">
-            <HeaderActions 
-                toggleSidebar={toggleSidebar} 
-                sidebarAnimationState={sidebarAnimationState} 
-            />
+            <div className="HeaderRightSection flex aspect-square">
+                <HeaderActions 
+                    toggleSidebar={toggleSidebar} 
+                    sidebarAnimationState={sidebarAnimationState} 
+                />
+            </div>
         </div>
     </header>
   );

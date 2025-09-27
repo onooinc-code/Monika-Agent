@@ -1,9 +1,8 @@
-
 'use client';
 
 import React, { useState, useEffect, useRef } from 'react';
 import { useAppContext } from '@/contexts/StateProvider';
-import { EditIcon, SparklesIcon, SettingsIcon, AlignLeftIcon, BookmarkIcon, HistoryIcon, PlusIcon, MicrophoneIcon, MicrophoneOffIcon } from '@/components/Icons';
+import { EditIcon, SparklesIcon, SettingsIcon, AlignLeftIcon, BookmarkIcon, HistoryIcon, PlusIcon, MicrophoneIcon, MicrophoneOffIcon, ChevronUpIcon, ChevronDownIcon } from '@/components/Icons';
 
 export const ConversationActions: React.FC = () => {
     const { 
@@ -19,6 +18,8 @@ export const ConversationActions: React.FC = () => {
         isConnecting,
         startSession,
         closeSession,
+        isHeaderExpanded,
+        setIsHeaderExpanded,
     } = useAppContext();
 
     const [activeIndex, setActiveIndex] = useState<number | null>(null);
@@ -45,6 +46,7 @@ export const ConversationActions: React.FC = () => {
     };
 
     const actions = [
+        { id: 'toggle-header', title: isHeaderExpanded ? 'Collapse Header' : 'Expand Header', icon: isHeaderExpanded ? <ChevronUpIcon className="w-5 h-5"/> : <ChevronDownIcon className="w-5 h-5"/>, action: () => setIsHeaderExpanded(!isHeaderExpanded), disabled: false },
         { id: 'live', title: isLiveModeActive ? 'Stop Live Session' : 'Start Live Session', icon: isLiveModeActive ? <MicrophoneOffIcon className="w-5 h-5"/> : <MicrophoneIcon className="w-5 h-5"/>, action: handleToggleLiveMode, disabled: !isChatActive },
         { id: 'edit', title: 'Edit Title', icon: <EditIcon className="w-5 h-5"/>, action: handleEditTitle, disabled: !isChatActive || isLiveModeActive },
         { id: 'gen-title', title: 'Generate Title with AI', icon: <SparklesIcon className="w-5 h-5"/>, action: () => handleGenerateTitle(activeConversation!.id), disabled: !isChatActive || activeConversation?.isGeneratingTitle || isLiveModeActive },
