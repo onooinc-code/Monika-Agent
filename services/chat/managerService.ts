@@ -1,9 +1,7 @@
 import { getGenAIClient } from '@/services/gemini/client';
-// FIX: Corrected import path for types to point to the barrel file.
 import { Agent, Message, AgentManager, ManualSuggestion, PipelineStep, PlanStep } from '@/types/index';
 import { buildContext } from '@/services/utils/contextBuilder';
 import { Type } from "@google/genai";
-// FIX: Changed import to AIError for explicit throw.
 import { AIError } from '@/services/utils/errorHandler';
 
 export interface ModerationResult {
@@ -32,7 +30,7 @@ export const decideNextSpeaker = async (
 
     const context = buildContext(messages);
     const systemInstruction = systemInstructionOverride || manager.systemInstruction;
-    const prompt = `Conversation History:\n${context}\n\nUser's latest message: "${latestText}"\n\nAnalyze the user's latest message. First, determine if it introduces a new topic distinct from the prior conversation. Second, based on the message and history, decide which agent should respond next.`;
+    const prompt = `Conversation History:\n${context}\n\nUser's latest message: "${latestText}"\n\nAnalyze the user's latest message. First, determine if it introduces a new topic distinct from the prior conversation. If so, provide a concise one-sentence summary of this new topic. Second, based on the message and history, decide which agent should respond next.`;
     
     pipeline.push({
         stage: 'Context Assembly',
@@ -60,7 +58,7 @@ export const decideNextSpeaker = async (
                     type: Type.OBJECT,
                     properties: {
                         nextSpeaker: { type: Type.STRING, description: "The ID of the agent that should speak next." },
-                        new_topic: { type: Type.STRING, description: "The name of the new topic if one is detected, otherwise null." }
+                        new_topic: { type: Type.STRING, description: "A concise, one-sentence summary of the new topic if one is detected, otherwise null." }
                     }
                 }
             }
@@ -217,48 +215,13 @@ export const generateDynamicPlan = async (
     const agentProfiles = agents.map(a => `- ${a.id}: ${a.name} (${a.job}) - ${a.role}`).join('\n');
     const prompt = `
         You are an expert AI Manager. Your job is to create a step-by-step plan to address the user's request using a team of AI agents.
-
-        **Your Thinking Process:**
-        1.  **Analyze the User's Request:** Deconstruct the user's latest message to understand their core goal.
-        2.  **Consult Agent Profiles:** Review the available agents and their specializations to see who can help.
-        3.  **Formulate a Plan:** Create a sequence of logical steps. Even simple requests should have a one-step plan.
-        4.  **Assign Agents:** Assign the best agent for each task in the plan.
-        5.  **Provide Rationale:** Write a brief, high-level rationale explaining your overall strategy for the plan.
-        
-        **Crucial Rule on Self-Reference:**
-        If the user's request seems to be about you or your own functioning (e.g., "you are failing", "create a better plan", "you couldn't make a plan"), do not treat it as a meta-command to stop. Instead, interpret it as a task to be analyzed and planned like any other. For example, if the user says "You aren't making good plans", a valid plan would be to assign an agent to analyze the previous plans and suggest improvements.
-
         **Available Agents:**
         ${agentProfiles}
-
         **Conversation History:**
         ${context}
-
         **User's latest message:** "${latestText}"
-
         **Your Task:**
         You MUST formulate a plan. Create a sequence of tasks for the agents to follow. Your response MUST be a valid JSON object.
-        - **planRationale**: A brief, high-level summary of your strategic thinking behind the plan.
-        - **plan**: An array of steps for the agents to follow.
-        - If the request is simple, create a one-step plan.
-        - **If the request is genuinely unclear, nonsensical, or a simple greeting (like "hello"), your plan should be a single step to have an appropriate agent (like the Empathetic Counselor, agent-3) ask the user for clarification or respond to the greeting.** Do NOT return an empty plan for these cases.
-
-        **Example of a good plan for a complex request:**
-        {
-          "planRationale": "The request requires two stages: first, data analysis to extract facts, and second, creative writing to present those facts in a compelling way. I will assign the Technical Analyst for the first step and the Creative Writer for the second.",
-          "plan": [
-            {
-              "agentId": "agent-2",
-              "task": "Analyze the provided data to identify key trends.",
-              "rationale": "The Technical Analyst is best suited to find patterns in data first."
-            },
-            {
-              "agentId": "agent-1",
-              "task": "Write a compelling summary of the identified trends for a business audience.",
-              "rationale": "The Creative Writer can then turn the raw analysis into an engaging narrative."
-            }
-          ]
-        }
     `;
     
     pipeline.push({
@@ -315,13 +278,8 @@ export const generateDynamicPlan = async (
             throw new AIError(originalMessage, contextString, prompt, response.text);
         }
 
-        if (typeof json !== 'object' || json === null) {
-            throw new AIError('AI response is not a valid JSON object.', 'generateDynamicPlan', prompt, response.text);
-        }
-
         const validatedPlan = (Array.isArray(json.plan)) 
-            ? json.plan.filter((s: any) => s && typeof s.agentId === 'string' && typeof s.task === 'string')
-            : [];
+            ? json.plan.filter((s: any) => s && typeof s.agentId === 'string' && typeof s.task === 'string') : [];
 
         const planResult: DynamicPlanResult = {
             plan: validatedPlan,
@@ -357,38 +315,22 @@ export const moderateTurn = async (
     const context = buildContext(messages);
     const agentProfiles = agents.map(a => `- ${a.id}: ${a.name} (${a.job})`).join('\n');
     const lastMessage = messages[messages.length - 1];
-    const isLastMessageFromAgent = lastMessage && lastMessage.sender !== 'user' && lastMessage.sender !== 'system';
-
+    
     const prompt = `
-        You are an expert AI conversation moderator in a meeting with a user and a team of AI agents. Your job is to manage the conversation flow dynamically.
-
-        **Your Thinking Process:**
-        1.  **Analyze the Last Message:** Who said it? What was the intent?
-        2.  **Critique (If Applicable):** If the last message was from an AI, evaluate it. Did it follow the conversation rules? Did it address the user's request? If not, formulate a brief, constructive critique.
-        3.  **Decide the Next Action:** Based on the conversation, decide what should happen next. Should another agent speak to continue the progress, or is it time to wait for the user's input?
-        4.  **Assign Task:** If an agent should speak, formulate a clear, one-sentence task for them.
-        
+        You are an expert AI conversation moderator.
         **Available Agents:**
         ${agentProfiles}
-
         **Conversation Rules:**
         ${rules}
-
         **Full Conversation History:**
         ${context}
-
         **Your Task:**
         Analyze the state of the conversation and decide the next step. Your response MUST be a valid JSON object.
-        - **"critique"**: If the last message was from an agent, provide a critique IF AND ONLY IF they violated the rules or failed to address the task. Otherwise, this MUST be null.
-        - **"decision"**: Your final decision. Must be either "speak" (if an agent should talk next) or "wait_for_user" (if the conversation is at a good stopping point).
-        - **"nextSpeakerAgentId"**: The ID of the agent who should speak next. MUST be null if the decision is "wait_for_user".
-        - **"taskForNextSpeaker"**: A clear, concise task for the next speaker. MUST be null if the decision is "wait_for_user".
-        - **"rationale"**: A brief explanation for your decision.
     `;
 
     pipeline.push({
         stage: 'Moderation Context Assembly',
-        input: { rule: rules, agentCount: agents.length, messageCount: messages.length, isLastMessageFromAgent },
+        input: { rule: rules, agentCount: agents.length, messageCount: messages.length },
         output: prompt,
     });
     
@@ -432,11 +374,6 @@ export const moderateTurn = async (
             console.error(`Error in ${contextString}:`, e);
             const originalMessage = e instanceof Error ? e.message : String(e);
             throw new AIError(originalMessage, contextString, prompt, response.text);
-        }
-
-        if (typeof json !== 'object' || json === null || !json.decision || !json.rationale) {
-            console.error("Failed to parse or validate moderation JSON:", "Raw Text:", response.text);
-            throw new AIError("Missing required fields in moderation response.", 'moderateTurn', prompt, response.text);
         }
         
         pipeline.push({

@@ -1,8 +1,6 @@
-
 'use client';
 
 import React, { useEffect, useRef, useState } from 'react';
-// FIX: Corrected import path for types to point to the barrel file.
 import { Message, Agent, Conversation, BubbleSettings } from '@/types/index';
 import { MANAGER_COLOR } from '@/constants/agentConstants';
 import { useAppContext } from '@/contexts/StateProvider';
@@ -143,13 +141,6 @@ export const MessageBubble: React.FC<MessageBubbleProps> = ({ message, agent, fe
         conversionType,
         setAgentBubbleSettings,
         setUserBubbleSettings,
-        handleToggleMessageBookmark,
-        handleDeleteMessage,
-        handleSummarizeMessage,
-        handleRegenerateResponse,
-        handleRewritePrompt,
-        openPromptInspectorModal,
-        openInspectorModal,
     } = useAppContext();
     
     const contentRef = useRef<HTMLDivElement>(null);
@@ -340,7 +331,7 @@ export const MessageBubble: React.FC<MessageBubbleProps> = ({ message, agent, fe
                             ref={contentRef}
                             dangerouslySetInnerHTML={{ __html: getMessageContent() }}
                         />
-                         {message.isStreaming && <span className="streaming-cursor"></span>}
+                         {message.isStreaming && <span className={`streaming-cursor ${agentColorIndicator}`}></span>}
                          {message.attachment && (
                             <div className="mt-2">
                                 <img src={`data:${message.attachment.mimeType};base64,${message.attachment.base64}`} alt="Attachment" className="max-w-xs rounded-lg border-2 border-gray-700" />
@@ -389,21 +380,21 @@ export const MessageBubble: React.FC<MessageBubbleProps> = ({ message, agent, fe
                     </div>
 
                     <div 
-                        className={`p-4 content-bg-${isUser ? 'user' : 'agent'}`}
+                        className={`p-4 bg-slate-800/30`}
                         style={{ backgroundColor: isInsight ? 'transparent' : '' }}
                     >
                          {message.plan ? (
                             <PlanDisplay plan={message.plan} />
                         ) : (
                             <div
-                                className={`prose max-w-none ${isUser ? 'prose-user' : 'prose-agent'}`}
+                                className={`prose max-w-none prose-invert`}
                                 dir={settings.textDirection}
                                 style={{ fontSize: `${settings.fontSize}rem` }}
                                 ref={contentRef}
                                 dangerouslySetInnerHTML={{ __html: getMessageContent() }}
                             />
                         )}
-                        {message.isStreaming && <span className="streaming-cursor"></span>}
+                        {message.isStreaming && <span className={`streaming-cursor ${agentColorIndicator}`}></span>}
                         {message.attachment && (
                             <div className="mt-2">
                                 <img src={`data:${message.attachment.mimeType};base64,${message.attachment.base64}`} alt="Attachment" className="max-w-xs rounded-lg border-2 border-gray-700" />

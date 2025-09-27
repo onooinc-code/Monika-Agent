@@ -76,6 +76,7 @@ export default function App() {
     previewBackground,
     isConnected,
     isConnecting,
+    activeGlowColor,
   } = useAppContext();
 
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
@@ -174,6 +175,13 @@ export default function App() {
 
   const isLiveModeActive = isConnected || isConnecting;
 
+  const mainStyle: React.CSSProperties = {
+    transition: 'background 1.5s ease-in-out',
+    background: activeGlowColor
+      ? `radial-gradient(ellipse at 50% 0%, ${activeGlowColor}20 0%, transparent 50%), #0a0a0f`
+      : '#0a0a0f',
+  };
+
   return (
     <div className="flex h-screen bg-[#0a0a0f] text-gray-200" style={{fontFamily: "'Inter', sans-serif"}}>
         <ConversationList isOpen={isSidebarOpen} />
@@ -185,15 +193,16 @@ export default function App() {
             />
             <div className="flex flex-1 min-h-0">
                 <main
-                    className="flex flex-col flex-1 bg-[#0a0a0f] min-h-0"
+                    className="flex flex-col flex-1 bg-[#0a0a0f] min-h-0 overflow-y-auto"
                     onContextMenu={handleGlobalContextMenu}
+                    style={mainStyle}
                 >
-                    <div className="flex-shrink-0">
+                    <div className="flex-shrink-0 sticky top-0 z-20 bg-[#0a0a0f]/80 backdrop-blur-sm">
                       <ConversationSubHeader conversation={activeConversation} />
                     </div>
                     
                     {activeConversation ? (
-                        <div className="flex-1 overflow-y-auto pt-2">
+                        <div className="flex-1">
                             <MessageList />
                             <div ref={messagesEndRef} />
                         </div>
@@ -207,7 +216,7 @@ export default function App() {
                     )}
 
                     {activeConversation && !isLiveModeActive && (
-                        <div className="flex-shrink-0">
+                        <div className="flex-shrink-0 mt-auto">
                           {conversationMode === 'Manual' && <ManualSuggestions />}
                           <LiveStatusIndicator />
                           <MessageInput />

@@ -1,6 +1,7 @@
+
 'use client';
 
-import React, { createContext, useContext, useRef, useCallback, useMemo } from 'react';
+import React, { createContext, useContext, useRef, useCallback, useMemo, useState, useEffect } from 'react';
 // FIX: Corrected import path for types to point to the barrel file.
 import { Agent, AgentManager, ConversationMode, Attachment, ManualSuggestion, HistoryView, Conversation, PipelineStep, UsageMetrics, Message, LongTermMemoryData, BubbleSettings, ContextMenuItem, SoundEvent, CustomComponent, HtmlComponent, ConversionType, LiveHandlerState } from '@/types/index';
 import { useConversationManager } from '@/contexts/hooks/useConversationManager';
@@ -210,6 +211,9 @@ interface AppState extends LiveHandlerState {
     // Header visibility
     isHeaderExpanded: boolean;
     setIsHeaderExpanded: React.Dispatch<React.SetStateAction<boolean>>;
+
+    // UI Enhancements
+    activeGlowColor: string | null;
 }
 
 const AppContext = createContext<AppState | undefined>(undefined);
@@ -231,8 +235,9 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     
     // 2. Refs & Local State
     const messagesEndRef = useRef<HTMLDivElement>(null);
-    const [isExtractingMemory, setIsExtractingMemory] = React.useState(false);
-    const [lastTurnAgentIds, setLastTurnAgentIds] = React.useState<Set<string>>(new Set());
+    const [isExtractingMemory, setIsExtractingMemory] = useState(false);
+    const [lastTurnAgentIds, setLastTurnAgentIds] = useState<Set<string>>(new Set());
+    const [activeGlowColor, setActiveGlowColor] = useState<string | null>(null);
 
     // 3. Custom Hooks for logic domains
     const { playSound } = useSoundManager({ isSoundEnabled });
@@ -246,18 +251,9 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     
     const enabledAgents = useMemo(() => agents.filter(a => a.isEnabled ?? true), [agents]);
 
-    const getAgentTodayStats = useCallback((agentId: string) => {
-        const getTodayDateString = (): string => {
-            const today = new Date();
-            const year = today.getFullYear();
-            const month = String(today.getMonth() + 1).padStart(2, '0');
-            const day = String(today.getDate()).padStart(2, '0');
-            return `${year}-${month}-${day}`;
-        };
-        const todayStr = getTodayDateString();
-        const stats = usageTracker.usageMetrics.agentUsage[agentId] || { dailyUsage: [] };
-        return stats.dailyUsage.find(d => d.date === todayStr) || { tokens: 0, messages: 0 };
-    }, [usageTracker.usageMetrics.agentUsage]);
+    const getAgent = useCallback((id: string) => {
+        return agents.find(a => a.id === id);
+    }, [agents]);
 
     const chatHandler = useChatHandler({
         agents: enabledAgents,
@@ -277,13 +273,58 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     });
     
     // 4. Combined loading state for UI components
-    const [isGeneratingTitle, setIsGeneratingTitle] = React.useState(false);
+    const [isGeneratingTitle, setIsGeneratingTitle] = useState(false);
     const isLoading = chatHandler.isChatLoading || historyHandler.isGeneratingHistory || isExtractingMemory || isGeneratingTitle;
 
     // 5. Callback functions that bridge hooks or components
-    const getAgent = useCallback((id: string) => {
-        return agents.find(a => a.id === id);
-    }, [agents]);
+    const getAgentTodayStats = useCallback((agentId: string) => {
+        const getTodayDateString = (): string => {
+            const today = new Date();
+            const year = today.getFullYear();
+            const month = String(today.getMonth() + 1).padStart(2, '0');
+            const day = String(today.getDate()).padStart(2, '0');
+            return `${year}-${month}-${day}`;
+        };
+        const todayStr = getTodayDateString();
+        const stats = usageTracker.usageMetrics.agentUsage[agentId] || { dailyUsage: [] };
+        return stats.dailyUsage.find(d => d.date === todayStr) || { tokens: 0, messages: 0 };
+    }, [usageTracker.usageMetrics.agentUsage]);
+
+    // Effect for handling the contextual background glow
+    useEffect(() => {
+        const colorMap: Record<string, string> = {
+            'manager': '#eab308', // yellow-500
+        };
+        agents.forEach(agent => {
+            // A simple map from Tailwind class to hex. Could be expanded.
+            const colorHex = {
+                'bg-blue-500': '#3b82f6',
+                'bg-green-500': '#22c55e',
+                'bg-purple-500': '#a855f7',
+            }[agent.color];
+            if (colorHex) {
+                colorMap[agent.id] = colorHex;
+            }
+        });
+
+        const stage = chatHandler.loadingStage;
+        switch (stage.stage) {
+            case 'generating':
+            case 'executing_plan':
+                setActiveGlowColor(stage.agentId ? colorMap[stage.agentId] : null);
+                break;
+            case 'deciding':
+            case 'planning':
+            case 'moderating':
+            case 'suggesting':
+                setActiveGlowColor(colorMap['manager']);
+                break;
+            case 'idle':
+                setActiveGlowColor(null);
+                break;
+        }
+    }, [chatHandler.loadingStage, agents]);
+
 
     const handleGenerateTitle = useCallback(async (conversationId: string) => {
         setIsGeneratingTitle(true);
@@ -631,6 +672,9 @@ export default ${newReactComponentName};
         // Header visibility
         isHeaderExpanded,
         setIsHeaderExpanded,
+
+        // UI Enhancements
+        activeGlowColor,
     };
 
     return <AppContext.Provider value={value}>{children}</AppContext.Provider>;
